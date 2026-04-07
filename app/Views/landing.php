@@ -71,7 +71,7 @@
                 </div>
                 <div class="relative">
                     <div class="absolute -inset-4 bg-emerald-500/10 rounded-3xl blur-2xl"></div>
-                    <img src="https://images.unsplash.com/photo-1586769852044-692d6e3703f0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Screenshot Aplikasi" class="relative rounded-2xl shadow-2xl border border-gray-100 transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                    <img src="/img/undraw_printing.svg" alt="Ilustrasi Cetak Label" class="relative w-full max-w-lg mx-auto drop-shadow-2xl transform hover:scale-105 transition-transform duration-500">
                 </div>
             </div>
         </div>
@@ -121,7 +121,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid lg:grid-cols-2 gap-16 items-center">
                 <div class="order-2 lg:order-1">
-                    <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="Fitur Utama" class="rounded-2xl shadow-2xl">
+                    <img src="/img/undraw_spreadsheet.svg" alt="Manajemen Data Tamu" class="w-full max-w-md mx-auto drop-shadow-xl">
                 </div>
                 <div class="order-1 lg:order-2">
                     <h2 class="text-base font-bold text-emerald-600 uppercase tracking-widest mb-4">Solusi Cerdas</h2>
@@ -230,4 +230,4 @@
 
 </body>
 
-</html>>
+</html>>l>>
