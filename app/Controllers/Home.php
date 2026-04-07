@@ -14,10 +14,13 @@ class Home extends BaseController
     public function dashboard(): string
     {
         $model = new RecipientModel();
+        if (session()->get('role') !== 'admin') {
+            $model->where('user_id', session()->get('user_id'));
+        }
         $data = [
             'title' => 'Beranda',
             'totalRecipients' => $model->countAllResults(),
         ];
-        return view('welcome_message', $data);
+        return view('dashboard', $data);
     }
 }

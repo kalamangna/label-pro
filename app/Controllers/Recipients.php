@@ -17,6 +17,23 @@ class Recipients extends BaseController
         $this->recipientModel = new RecipientModel();
     }
 
+    private function applyScope($model = null)
+    {
+        $model = $model ?? $this->recipientModel;
+        if (session()->get('role') !== 'admin') {
+            return $model->where('user_id', session()->get('user_id'));
+        }
+        return $model;
+    }
+
+    private function checkOwnership($id)
+    {
+        if (session()->get('role') === 'admin') {
+            return $this->recipientModel->find($id);
+        }
+        return $this->recipientModel->where('user_id', session()->get('user_id'))->find($id);
+    }
+
     public function index()
     {
         $search = $this->request->getGet('search') ?? '';
@@ -24,7 +41,11 @@ class Recipients extends BaseController
         $sort   = $this->request->getGet('sort') ?? 'id';
         $dir    = $this->request->getGet('dir') ?? 'desc';
 
-        $model = $this->recipientModel;
+        $model = $this->applyScope();
+
+        // Select necessary fields and join users table to get username
+        $model = $model->select('recipients.*, users.username as added_by')
+                       ->join('users', 'users.id = recipients.user_id', 'left');
 
         if (!empty($search)) {
             $model = $model->groupStart()
@@ -39,7 +60,13 @@ class Recipients extends BaseController
 
         $allowedSort = ['id', 'name', 'address', 'is_selected', 'is_printed', 'created_at'];
         $sort = in_array($sort, $allowedSort) ? $sort : 'id';
-        $dir  = strtolower($dir) === 'asc' ? 'asc' : 'desc';
+        
+        // Custom direction handling for more intuitive sorting
+        if ($sort === 'id') {
+            $dir = 'desc'; // Newest first by default
+        } else {
+            $dir = strtolower($dir) === 'desc' ? 'desc' : 'asc';
+        }
 
         $model = $model->orderBy($sort, $dir);
 
@@ -54,15 +81,6 @@ class Recipients extends BaseController
         ];
 
         return view('recipients/index', $data);
-    }
-
-    public function create()
-    {
-        $data = [
-            'title' => 'Tambah Penerima',
-        ];
-
-        return view('recipients/create', $data);
     }
 
     public function store()
@@ -88,38 +106,32 @@ class Recipients extends BaseController
         }
 
         $name = $this->request->getPost('name');
+        $address = $this->request->getPost('address');
         
-        $existing = $this->recipientModel->where('name', $name)->first();
+        $existing = $this->applyScope()
+                         ->where('name', $name)
+                         ->where('address', $address)
+                         ->first();
         if ($existing) {
-            return redirect()->back()->withInput()->with('error', 'Penerima dengan nama tersebut sudah ada di daftar.');
+            return redirect()->back()->withInput()->with('error', 'Penerima dengan nama dan alamat tersebut sudah ada di daftar Anda.');
         }
 
         $this->recipientModel->save([
             'name'    => $name,
-            'address' => $this->request->getPost('address'),
+            'address' => $address,
+            'user_id' => session()->get('user_id'),
         ]);
 
         return redirect()->to('/recipients')->with('message', 'Penerima berhasil ditambahkan.');
     }
 
-    public function edit($id)
-    {
-        $recipient = $this->recipientModel->find($id);
-
-        if (!$recipient) {
-            return redirect()->to('/recipients')->with('error', 'Penerima tidak ditemukan.');
-        }
-
-        $data = [
-            'title'     => 'Ubah Penerima',
-            'recipient' => $recipient,
-        ];
-
-        return view('recipients/edit', $data);
-    }
-
     public function update($id)
     {
+        $recipient = $this->checkOwnership($id);
+        if (!$recipient) {
+            return redirect()->to('/recipients')->with('error', 'Penerima tidak ditemukan atau Anda tidak memiliki akses.');
+        }
+
         $rules = [
             'name'    => [
                 'label' => 'Nama',
@@ -150,9 +162,12 @@ class Recipients extends BaseController
 
     public function delete($id)
     {
-        $this->recipientModel->delete($id);
-
-        return redirect()->to('/recipients')->with('message', 'Penerima berhasil dihapus.');
+        $recipient = $this->checkOwnership($id);
+        if ($recipient) {
+            $this->recipientModel->delete($id);
+            return redirect()->to('/recipients')->with('message', 'Penerima berhasil dihapus.');
+        }
+        return redirect()->to('/recipients')->with('error', 'Penerima tidak ditemukan atau Anda tidak memiliki akses.');
     }
 
     public function import()
@@ -200,22 +215,26 @@ class Recipients extends BaseController
                     continue;
                 }
 
-                $existing = $this->recipientModel->where('name', $name)->first();
+                $existing = $this->applyScope()
+                                 ->where('name', $name)
+                                 ->where('address', $address)
+                                 ->first();
                 if ($existing) {
                     $errorCount++;
                     continue;
                 }
 
-                $this->recipientModel->save([
+                $this->recipientModel->insert([
                     'name'    => $name,
                     'address' => $address,
+                    'user_id' => session()->get('user_id'),
                 ]);
                 $successCount++;
             }
 
             $message = "Berhasil mengimpor $successCount penerima.";
             if ($errorCount > 0) {
-                $message .= " Melewati $errorCount baris karena nama kosong atau duplikat.";
+                $message .= " Melewati $errorCount baris karena nama kosong atau duplikat di data Anda.";
             }
 
             return redirect()->to('/recipients')->with('message', $message);
@@ -230,7 +249,7 @@ class Recipients extends BaseController
         $type = $this->request->getGet('type') ?? '103';
         
         $data = [
-            'recipients' => $this->recipientModel->where('is_selected', 1)->findAll(),
+            'recipients' => $this->applyScope()->where('is_selected', 1)->findAll(),
             'type'       => $type,
         ];
 
@@ -246,7 +265,7 @@ class Recipients extends BaseController
         $type = $this->request->getGet('type') ?? '103';
         
         $data = [
-            'recipients' => $this->recipientModel->where('is_selected', 1)->findAll(),
+            'recipients' => $this->applyScope()->where('is_selected', 1)->findAll(),
             'type'       => $type,
         ];
 
@@ -268,7 +287,7 @@ class Recipients extends BaseController
 
     public function updateSelected($id)
     {
-        $recipient = $this->recipientModel->find($id);
+        $recipient = $this->checkOwnership($id);
         if ($recipient) {
             $newValue = $recipient['is_selected'] ? 0 : 1;
             $this->recipientModel->update($id, ['is_selected' => $newValue]);
@@ -279,7 +298,7 @@ class Recipients extends BaseController
 
     public function updatePrinted($id)
     {
-        $recipient = $this->recipientModel->find($id);
+        $recipient = $this->checkOwnership($id);
         if ($recipient) {
             $newValue = $recipient['is_printed'] ? 0 : 1;
             $this->recipientModel->update($id, ['is_printed' => $newValue]);
@@ -294,7 +313,51 @@ class Recipients extends BaseController
         $state = $this->request->getJSON(true)['state'] ?? 0;
 
         if (!empty($ids) && is_array($ids)) {
-            $this->recipientModel->whereIn('id', $ids)->set(['is_selected' => $state])->update();
+            if (session()->get('role') !== 'admin') {
+                // Ensure all IDs belong to the user
+                $owned = $this->recipientModel->where('user_id', session()->get('user_id'))->whereIn('id', $ids)->findAll();
+                $ids = array_column($owned, 'id');
+            }
+            if (!empty($ids)) {
+                $this->recipientModel->whereIn('id', $ids)->set(['is_selected' => $state])->update();
+            }
+            return $this->response->setJSON(['success' => true]);
+        }
+        return $this->response->setJSON(['success' => false], 400);
+    }
+
+    public function bulkDelete()
+    {
+        $ids = $this->request->getJSON(true)['ids'] ?? [];
+
+        if (!empty($ids) && is_array($ids)) {
+            if (session()->get('role') !== 'admin') {
+                // Ensure all IDs belong to the user
+                $owned = $this->recipientModel->where('user_id', session()->get('user_id'))->whereIn('id', $ids)->findAll();
+                $ids = array_column($owned, 'id');
+            }
+            if (!empty($ids)) {
+                $this->recipientModel->whereIn('id', $ids)->delete();
+            }
+            return $this->response->setJSON(['success' => true]);
+        }
+        return $this->response->setJSON(['success' => false], 400);
+    }
+
+    public function bulkUpdatePrinted()
+    {
+        $ids = $this->request->getJSON(true)['ids'] ?? [];
+        $state = $this->request->getJSON(true)['state'] ?? 0;
+
+        if (!empty($ids) && is_array($ids)) {
+            if (session()->get('role') !== 'admin') {
+                // Ensure all IDs belong to the user
+                $owned = $this->recipientModel->where('user_id', session()->get('user_id'))->whereIn('id', $ids)->findAll();
+                $ids = array_column($owned, 'id');
+            }
+            if (!empty($ids)) {
+                $this->recipientModel->whereIn('id', $ids)->set(['is_printed' => $state])->update();
+            }
             return $this->response->setJSON(['success' => true]);
         }
         return $this->response->setJSON(['success' => false], 400);

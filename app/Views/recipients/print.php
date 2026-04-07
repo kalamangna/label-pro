@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cetak Label <?= $type ?></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
         /* Base Print Settings */
         @page {
@@ -79,7 +80,7 @@
         .prefix {
             font-size: 10pt;
             margin-bottom: 1mm;
-            text-align: left;
+            text-align: center;
             width: 100%;
         }
         .address {
@@ -89,25 +90,41 @@
 
         /* Toolbar for preview */
         .toolbar {
-            background: #333;
+            background: #064e3b; /* emerald-950 */
             color: white;
-            padding: 10px;
+            padding: 15px;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .btn {
-            background: #4F46E5;
+            background: #059669; /* emerald-600 */
             color: white;
-            padding: 8px 16px;
+            padding: 10px 24px;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 14px;
+            font-weight: bold;
             margin: 0 5px;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn-amber {
+            background: #f59e0b; /* amber-500 */
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
         }
 
         @media print {
@@ -121,12 +138,17 @@
 </head>
 <body onload="if(window.location.search.includes('print=true')) window.print()">
     <div class="toolbar">
-        <span>Pratinjau: Label <?= $type ?></span>
-        <button onclick="window.print()" class="btn">Cetak Sekarang</button>
-        <a href="/recipients/export-pdf?type=<?= $type ?>" class="btn" style="background:#10B981;">Unduh PDF</a>
-        <button onclick="window.history.back()" class="btn" style="background:#666">Kembali</button>
-        <div style="font-size: 11px; margin-top: 5px; opacity: 0.8;">
-            * Penting: Atur "Margin" ke "None" dan "Scale" ke "100%" pada pengaturan cetak browser Anda.
+        <div style="margin-bottom: 12px; font-weight: 800; letter-spacing: -0.025em; font-size: 20px;">
+            Label<span style="color: #10b981;">Pro</span> <span style="font-weight: 400; opacity: 0.6; font-size: 14px; margin-left: 8px;">| Pratinjau <?= $type ?></span>
+        </div>
+        <button onclick="window.print()" class="btn btn-amber">
+            <i class="fa-solid fa-print" style="margin-right: 8px;"></i> Cetak Sekarang
+        </button>
+        <a href="/recipients/export-pdf?type=<?= $type ?>" class="btn">
+            <i class="fa-solid fa-file-pdf" style="margin-right: 8px;"></i> Unduh PDF
+        </a>
+        <div style="font-size: 11px; margin-top: 12px; opacity: 0.7; font-style: italic;">
+            * Penting: Atur "Margin" ke "None" dan "Scale" ke "100%" pada pengaturan browser Anda.
         </div>
     </div>
 
@@ -135,7 +157,7 @@
             <?php foreach ($recipients as $recipient): ?>
             <div class="label">
                 <div class="name"><?= esc($recipient['name']) ?></div>
-                <div class="prefix">&nbsp;</div>
+                <div class="prefix">di-</div>
                 <div class="address"><?= esc($recipient['address']) ?></div>
             </div>
             <?php endforeach; ?>
