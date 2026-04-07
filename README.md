@@ -34,7 +34,6 @@ LabelPro adalah aplikasi berbasis web modern untuk manajemen daftar tamu dan pen
    - Assets: `npm run dev`
 
 ## Penggunaan
-- Login default (Admin): `kalamangna` / `Syazani`.
 - Pastikan pengaturan margin browser disetel ke "None" dan Scale ke "100%" saat mencetak langsung.
 
 ## Lisensi
