@@ -29,7 +29,7 @@
             </div>
             <div>
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Template</p>
-                <p class="text-2xl font-extrabold tracking-tight text-gray-900">103 & 121</p>
+                <p class="text-2xl font-extrabold tracking-tight text-gray-900">121</p>
             </div>
         </div>
         <div class="mt-4 pt-4 border-t border-gray-50">

@@ -15,13 +15,6 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-3">
-        <button id="printLabelBtn" class="flex-1 sm:flex-none text-white bg-amber-500 border border-amber-600 hover:bg-amber-600 focus:ring-4 focus:ring-amber-100 font-bold rounded-xl text-sm px-8 py-3 inline-flex items-center justify-center transition-all shadow-xl shadow-amber-100 active:scale-95" type="button">
-            <i class="fa-solid fa-print me-2 text-lg"></i>
-            Cetak Label
-        </button>
-
-        <div class="h-10 w-px bg-gray-200 hidden sm:block mx-2"></div>
-
         <div class="flex gap-2 w-full sm:w-auto">
             <a href="/recipients/import" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
                 <i class="fa-solid fa-file-import me-2 text-emerald-600"></i>
@@ -33,6 +26,13 @@
                 Tambah
             </button>
         </div>
+
+        <div class="h-10 w-px bg-gray-200 hidden sm:block mx-2"></div>
+
+        <button id="printLabelBtn" class="flex-1 sm:flex-none text-white bg-amber-500 border border-amber-600 hover:bg-amber-600 focus:ring-4 focus:ring-amber-100 font-bold rounded-xl text-sm px-8 py-3 inline-flex items-center justify-center transition-all shadow-xl shadow-amber-100 active:scale-95" type="button">
+            <i class="fa-solid fa-print me-2 text-lg"></i>
+            Cetak Label
+        </button>
     </div>
 </div>
 
@@ -141,7 +141,7 @@
             <?php foreach ($recipients as $recipient): ?>
                 <tr id="row-<?= $recipient['id'] ?>" class="bg-white hover:bg-emerald-50/30 transition-colors <?= ($recipient['is_printed'] ?? 0) ? 'bg-gray-50/30' : '' ?>">
                     <td class="p-4 text-center">
-                        <input type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer toggle-select" data-id="<?= $recipient['id'] ?>" <?= ($recipient['is_selected'] ?? 0) ? 'checked' : '' ?>>
+                        <input type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer toggle-select" data-id="<?= $recipient['id'] ?>">
                     </td>
                     <th scope="row" class="px-6 py-4 font-bold text-gray-900 whitespace-nowrap <?= ($recipient['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : '' ?>">
                         <?= esc($recipient['name']) ?>
@@ -181,7 +181,7 @@
                             <div class="relative p-4 w-full max-w-md max-h-full">
                                 <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100 text-left">
                                     <div class="p-6 text-center">
-                                        <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <div class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                                             <i class="fa-solid fa-circle-exclamation text-xl"></i>
                                         </div>
                                         <h3 class="mb-2 text-lg font-bold text-gray-900">Hapus data ini?</h3>
@@ -244,56 +244,28 @@
                     this.checked = false;
                     return;
                 }
-
-                const id = this.getAttribute('data-id');
-                const originalState = !this.checked;
-
-                fetch(`/recipients/select/${id}`, {
-                    method: 'POST',
-                    headers: headers,
-                }).then(response => response.json()).then(data => {
-                    if (!data.success) {
-                        alert('Gagal memperbarui status pilihan.');
-                        this.checked = originalState;
-                    }
-                    updateSelectAllState();
-                }).catch(() => {
-                    alert('Kesalahan jaringan.');
-                    this.checked = originalState;
-                    updateSelectAllState();
-                });
+                updateSelectAllState();
             });
         });
 
         if (selectAllCheckbox) {
             selectAllCheckbox.addEventListener('change', function() {
                 const isChecked = this.checked;
-                const ids = Array.from(selectCheckboxes).map(cb => cb.getAttribute('data-id'));
-
-                if (isChecked && ids.length > 10) {
-                    alert('Hanya 10 data pertama yang akan dipilih.');
-                }
-
-                const targetIds = isChecked ? ids.slice(0, 10) : ids;
-
-                fetch(`/recipients/bulk-select`, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify({
-                        ids: targetIds,
-                        state: isChecked ? 1 : 0
-                    })
-                }).then(response => response.json()).then(data => {
-                    if (data.success) {
-                        selectCheckboxes.forEach((cb, index) => {
-                            cb.checked = isChecked && index < 10;
-                        });
+                
+                let count = 0;
+                selectCheckboxes.forEach((cb) => {
+                    if (isChecked && count < 10) {
+                        cb.checked = true;
+                        count++;
                     } else {
-                        alert('Gagal memperbarui pilihan massal.');
-                        this.checked = !isChecked;
+                        cb.checked = false;
                     }
-                    updateSelectAllState();
                 });
+
+                if (isChecked && selectCheckboxes.length > 10) {
+                    alert('Hanya 10 data pertama yang dipilih karena batas maksimal cetak.');
+                }
+                updateSelectAllState();
             });
         }
 
@@ -390,14 +362,19 @@
 
         const printModal = new Modal(document.getElementById('print-options-modal'));
         const printLabelBtn = document.getElementById('printLabelBtn');
+        const print121Link = document.getElementById('print-121-link');
         
         if (printLabelBtn) {
             printLabelBtn.addEventListener('click', function() {
-                const checkedCount = document.querySelectorAll('.toggle-select:checked').length;
-                if (checkedCount === 0) {
+                const checkedCheckboxes = document.querySelectorAll('.toggle-select:checked');
+                if (checkedCheckboxes.length === 0) {
                     alert('Harap pilih setidaknya satu penerima untuk dicetak.');
                     return;
                 }
+                
+                const selectedIds = Array.from(checkedCheckboxes).map(cb => cb.getAttribute('data-id')).join(',');
+                if (print121Link) print121Link.href = `/recipients/print?type=121&ids=${selectedIds}`;
+                
                 printModal.show();
             });
         }
@@ -450,7 +427,7 @@
                 </div>
                 <div>
                     <label for="address" class="block mb-2 text-sm font-bold text-gray-900">Alamat / Keterangan</label>
-                    <textarea id="address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 12, Jakarta"></textarea>
+                    <textarea id="address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" data-modal-hide="add-recipient-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
@@ -479,7 +456,7 @@
                 </div>
                 <div>
                     <label for="edit-address" class="block mb-2 text-sm font-bold text-gray-900">Alamat / Keterangan</label>
-                    <textarea id="edit-address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 12, Jakarta"></textarea>
+                    <textarea id="edit-address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" data-modal-hide="edit-recipient-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
@@ -510,12 +487,8 @@
             <!-- Modal body -->
             <div class="p-6 md:p-8">
                 <p class="text-sm text-gray-500 mb-6 font-medium">Pilih ukuran label stiker yang akan Anda gunakan untuk mencetak data terpilih.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <a href="/recipients/print?type=103" target="_blank" class="flex flex-col items-center justify-center p-6 bg-emerald-50 border-2 border-emerald-100 rounded-2xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all group">
-                        <span class="text-3xl font-black mb-2 tracking-tighter">103</span>
-                        <span class="text-xs font-bold opacity-60 uppercase tracking-widest group-hover:opacity-100 transition-opacity">32 x 64 mm</span>
-                    </a>
-                    <a href="/recipients/print?type=121" target="_blank" class="flex flex-col items-center justify-center p-6 bg-emerald-50 border-2 border-emerald-100 rounded-2xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all group">
+                <div class="grid grid-cols-1 max-w-sm mx-auto gap-4">
+                    <a id="print-121-link" href="/recipients/print?type=121" target="_blank" class="flex flex-col items-center justify-center p-6 bg-emerald-50 border-2 border-emerald-100 rounded-2xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all group">
                         <span class="text-3xl font-black mb-2 tracking-tighter">121</span>
                         <span class="text-xs font-bold opacity-60 uppercase tracking-widest group-hover:opacity-100 transition-opacity">38 x 75 mm</span>
                     </a>

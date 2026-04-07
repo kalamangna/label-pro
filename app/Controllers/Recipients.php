@@ -246,10 +246,17 @@ class Recipients extends BaseController
 
     public function printLabels()
     {
-        $type = $this->request->getGet('type') ?? '103';
-        
+        $type = $this->request->getGet('type') ?? '121';
+        $idsStr = $this->request->getGet('ids');
+        $ids = !empty($idsStr) ? explode(',', $idsStr) : [];
+        $recipients = [];
+
+        if (!empty($ids)) {
+            $recipients = $this->applyScope()->whereIn('id', $ids)->findAll();
+        }
+
         $data = [
-            'recipients' => $this->applyScope()->where('is_selected', 1)->findAll(),
+            'recipients' => $recipients,
             'type'       => $type,
         ];
 
@@ -262,10 +269,17 @@ class Recipients extends BaseController
 
     public function exportPdf()
     {
-        $type = $this->request->getGet('type') ?? '103';
+        $type = $this->request->getGet('type') ?? '121';
+        $idsStr = $this->request->getGet('ids');
+        $ids = !empty($idsStr) ? explode(',', $idsStr) : [];
+        $recipients = [];
+
+        if (!empty($ids)) {
+            $recipients = $this->applyScope()->whereIn('id', $ids)->findAll();
+        }
         
         $data = [
-            'recipients' => $this->applyScope()->where('is_selected', 1)->findAll(),
+            'recipients' => $recipients,
             'type'       => $type,
         ];
 
@@ -285,17 +299,6 @@ class Recipients extends BaseController
             ->setBody($dompdf->output());
     }
 
-    public function updateSelected($id)
-    {
-        $recipient = $this->checkOwnership($id);
-        if ($recipient) {
-            $newValue = $recipient['is_selected'] ? 0 : 1;
-            $this->recipientModel->update($id, ['is_selected' => $newValue]);
-            return $this->response->setJSON(['success' => true, 'is_selected' => $newValue]);
-        }
-        return $this->response->setJSON(['success' => false], 404);
-    }
-
     public function updatePrinted($id)
     {
         $recipient = $this->checkOwnership($id);
@@ -305,25 +308,6 @@ class Recipients extends BaseController
             return $this->response->setJSON(['success' => true, 'is_printed' => $newValue]);
         }
         return $this->response->setJSON(['success' => false], 404);
-    }
-
-    public function bulkUpdateSelected()
-    {
-        $ids = $this->request->getJSON(true)['ids'] ?? [];
-        $state = $this->request->getJSON(true)['state'] ?? 0;
-
-        if (!empty($ids) && is_array($ids)) {
-            if (session()->get('role') !== 'admin') {
-                // Ensure all IDs belong to the user
-                $owned = $this->recipientModel->where('user_id', session()->get('user_id'))->whereIn('id', $ids)->findAll();
-                $ids = array_column($owned, 'id');
-            }
-            if (!empty($ids)) {
-                $this->recipientModel->whereIn('id', $ids)->set(['is_selected' => $state])->update();
-            }
-            return $this->response->setJSON(['success' => true]);
-        }
-        return $this->response->setJSON(['success' => false], 400);
     }
 
     public function bulkDelete()

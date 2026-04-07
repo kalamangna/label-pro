@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <style>
         @page {
-            size: A4;
+            size: A4 portrait;
             margin: 0;
         }
         body {
@@ -24,14 +24,9 @@
             position: absolute;
         }
         
-        .sheet-103 {
-            left: 23mm;
-            top: 50mm;
-            width: 130mm;
-        }
         .sheet-121 {
-            left: 28mm;
-            top: 50mm;
+            left: 29mm;
+            top: 49.5mm;
             width: 152mm;
         }
 
@@ -46,16 +41,23 @@
         .name {
             font-size: 11pt;
             font-weight: bold;
-            margin-bottom: 1mm;
+            line-height: 1.2;
+            margin-bottom: 0.5mm;
         }
+
+        .details {
+            display: block;
+            text-align: center;
+        }
+
         .prefix {
             font-size: 10pt;
-            margin-bottom: 1mm;
-            text-align: left;
+            margin-bottom: 0.5mm;
             width: 100%;
         }
+
         .address {
-            font-size: 9pt;
+            font-size: 10pt;
             line-height: 1.1;
         }
         
@@ -65,59 +67,39 @@
 </head>
 <body>
     <div class="page">
-        <?php if ($type === '103'): ?>
-            <table class="sheet-103">
-                <?php 
-                $chunks = array_chunk($recipients, 2);
-                foreach ($chunks as $rowIndex => $row): 
-                ?>
-                    <tr>
-                        <td style="width: 64mm; height: 32mm;">
-                            <div class="name"><?= esc($row[0]['name'] ?? '') ?></div>
-                            <div class="prefix">&nbsp;</div>
-                            <div class="address"><?= esc($row[0]['address'] ?? '') ?></div>
-                        </td>
-                        <td class="spacer-col"></td>
-                        <td style="width: 64mm; height: 32mm;">
-                            <?php if (isset($row[1])): ?>
-                                <div class="name"><?= esc($row[1]['name']) ?></div>
+        <table class="sheet-121">
+            <?php 
+            $chunks = array_chunk($recipients, 2);
+            foreach (array_slice($chunks, 0, 5) as $rowIndex => $row): 
+            ?>
+                <tr>
+                    <td style="width: 75mm; height: 38mm;">
+                        <?php if (isset($row[0])): ?>
+                            <div class="name"><?= esc($row[0]['name']) ?></div>
+                            <div style="height: 3mm;">&nbsp;</div>
+                            <div class="details">
                                 <div class="prefix">di-</div>
-                                <div class="address"><?= esc($row[1]['address']) ?></div>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                    <?php if ($rowIndex < 5): ?>
-                        <tr class="spacer-row"><td colspan="3"></td></tr>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </table>
-        <?php else: // 121 ?>
-            <table class="sheet-121">
-                <?php 
-                $chunks = array_chunk($recipients, 2);
-                foreach ($chunks as $rowIndex => $row): 
-                ?>
-                    <tr>
-                        <td style="width: 75mm; height: 38mm;">
-                            <div class="name"><?= esc($row[0]['name'] ?? '') ?></div>
-                            <div class="prefix">&nbsp;</div>
-                            <div class="address"><?= esc($row[0]['address'] ?? '') ?></div>
-                        </td>
-                        <td class="spacer-col"></td>
-                        <td style="width: 75mm; height: 38mm;">
-                            <?php if (isset($row[1])): ?>
-                                <div class="name"><?= esc($row[1]['name']) ?></div>
+                                <div class="address"><?= empty(trim((string)($row[0]['address'] ?? ''))) ? 'Tempat' : esc($row[0]['address']) ?></div>
+                            </div>
+                        <?php endif; ?>
+                    </td>
+                    <td class="spacer-col"></td>
+                    <td style="width: 75mm; height: 38mm;">
+                        <?php if (isset($row[1])): ?>
+                            <div class="name"><?= esc($row[1]['name']) ?></div>
+                            <div style="height: 3mm;">&nbsp;</div>
+                            <div class="details">
                                 <div class="prefix">di-</div>
-                                <div class="address"><?= esc($row[1]['address']) ?></div>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                    <?php if ($rowIndex < 4): ?>
-                        <tr class="spacer-row"><td colspan="3"></td></tr>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </table>
-        <?php endif; ?>
+                                <div class="address"><?= empty(trim((string)$row[1]['address'])) ? 'Tempat' : esc($row[1]['address']) ?></div>
+                            </div>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php if ($rowIndex < 4): ?>
+                    <tr class="spacer-row"><td colspan="3"></td></tr>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </table>
     </div>
 </body>
 </html>

@@ -22,8 +22,6 @@ $routes->group('recipients', ['filter' => 'auth'], function($routes) {
     $routes->post('import', 'Recipients::processImport');
     $routes->get('print', 'Recipients::printLabels');
     $routes->get('export-pdf', 'Recipients::exportPdf');
-    $routes->post('select/(:num)', 'Recipients::updateSelected/$1');
-    $routes->post('bulk-select', 'Recipients::bulkUpdateSelected');
     $routes->post('bulk-delete', 'Recipients::bulkDelete');
     $routes->post('bulk-printed', 'Recipients::bulkUpdatePrinted');
     $routes->post('printed/(:num)', 'Recipients::updatePrinted/$1');

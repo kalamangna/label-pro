@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +9,10 @@
     <style>
         /* Base Print Settings */
         @page {
-            size: A4;
+            size: A4 portrait;
             margin: 0;
         }
+
         body {
             margin: 0;
             padding: 0;
@@ -28,34 +30,24 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* The actual sticker sheet area (approx 165x205mm) */
+        /* The actual sticker sheet area */
         .sticker-sheet {
-            width: 165mm;
-            height: 205mm;
             position: relative;
             display: grid;
             box-sizing: border-box;
         }
 
-        /* Label 103 (32x64mm, 2 cols x 6 rows) */
-        .sheet-103 {
-            grid-template-columns: 64mm 64mm;
-            grid-template-rows: repeat(6, 32mm);
-            column-gap: 2mm;
-            row-gap: 2mm;
-            padding: 1.5mm 17.5mm;
-        }
-
         /* Label 121 (38x75mm, 2 cols x 5 rows) */
         .sheet-121 {
-            grid-template-columns: 75mm 75mm;
+            width: 152mm;
+            height: 198mm;
+            grid-template-columns: repeat(2, 75mm);
             grid-template-rows: repeat(5, 38mm);
             column-gap: 2mm;
             row-gap: 2mm;
-            padding: 3.5mm 6.5mm;
         }
 
         .label {
@@ -69,28 +61,36 @@
             align-items: center;
             text-align: center;
             overflow: hidden;
+            border: 1px dashed #cbd5e1;
         }
 
         .name {
-            font-size: 11pt;
+            font-size: 12pt;
             font-weight: bold;
             line-height: 1.2;
-            margin-bottom: 1mm;
+            margin-bottom: 0.5mm;
         }
+
+        .details {
+            display: block;
+            text-align: center;
+        }
+
         .prefix {
             font-size: 10pt;
-            margin-bottom: 1mm;
-            text-align: center;
+            margin-bottom: 0.5mm;
             width: 100%;
         }
+
         .address {
-            font-size: 9pt;
+            font-size: 10pt;
             line-height: 1.1;
         }
 
         /* Toolbar for preview */
         .toolbar {
-            background: #064e3b; /* emerald-950 */
+            background: #064e3b;
+            /* emerald-950 */
             color: white;
             padding: 15px;
             text-align: center;
@@ -99,8 +99,10 @@
             z-index: 100;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
+
         .btn {
-            background: #059669; /* emerald-600 */
+            background: #059669;
+            /* emerald-600 */
             color: white;
             padding: 10px 24px;
             border: none;
@@ -114,28 +116,49 @@
             align-items: center;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .btn:hover {
             opacity: 0.9;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
+
         .btn:active {
             transform: translateY(0);
         }
+
         .btn-amber {
-            background: #f59e0b; /* amber-500 */
+            background: #f59e0b;
+            /* amber-500 */
             box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
         }
 
         @media print {
-            body { background: none; }
-            .page { box-shadow: none; margin: 0; border: none; }
-            .toolbar { display: none; }
-            .label { border: none; }
-            .sticker-sheet { border: none; }
+            body {
+                background: none;
+            }
+
+            .page {
+                box-shadow: none;
+                margin: 0;
+                border: none;
+            }
+
+            .toolbar {
+                display: none;
+            }
+
+            .label {
+                border: none;
+            }
+
+            .sticker-sheet {
+                border: none;
+            }
         }
     </style>
 </head>
+
 <body onload="if(window.location.search.includes('print=true')) window.print()">
     <div class="toolbar">
         <div style="margin-bottom: 12px; font-weight: 800; letter-spacing: -0.025em; font-size: 20px;">
@@ -144,7 +167,11 @@
         <button onclick="window.print()" class="btn btn-amber">
             <i class="fa-solid fa-print" style="margin-right: 8px;"></i> Cetak Sekarang
         </button>
-        <a href="/recipients/export-pdf?type=<?= $type ?>" class="btn">
+        <?php
+        $ids = service('request')->getGet('ids');
+        $queryString = http_build_query(['type' => $type, 'ids' => $ids]);
+        ?>
+        <a href="/recipients/export-pdf?<?= $queryString ?>" class="btn">
             <i class="fa-solid fa-file-pdf" style="margin-right: 8px;"></i> Unduh PDF
         </a>
         <div style="font-size: 11px; margin-top: 12px; opacity: 0.7; font-style: italic;">
@@ -157,11 +184,15 @@
             <?php foreach ($recipients as $recipient): ?>
             <div class="label">
                 <div class="name"><?= esc($recipient['name']) ?></div>
-                <div class="prefix">di-</div>
-                <div class="address"><?= esc($recipient['address']) ?></div>
+                <div style="height: 3mm;">&nbsp;</div>
+                <div class="details">
+                    <div class="prefix">di-</div>
+                    <div class="address"><?= empty(trim((string)$recipient['address'])) ? 'Tempat' : esc($recipient['address']) ?></div>
+                </div>
             </div>
             <?php endforeach; ?>
         </div>
     </div>
 </body>
+
 </html>

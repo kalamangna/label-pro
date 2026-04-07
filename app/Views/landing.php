@@ -22,9 +22,9 @@
     <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center">
-                    <span class="text-2xl font-extrabold text-gray-900 tracking-tight">Label<span class="text-emerald-600">Pro</span></span>
-                </div>
+                <a href="/" class="flex items-center group">
+                    <span class="text-2xl font-extrabold text-gray-900 tracking-tight transition-transform group-hover:scale-105">Label<span class="text-emerald-600">Pro</span></span>
+                </a>
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="#fitur" class="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">Fitur</a>
                     <a href="#harga" class="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">Harga</a>
@@ -145,7 +145,7 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h4 class="text-lg font-bold">Siap Pakai Untuk Label 103 & 121</h4>
+                                <h4 class="text-lg font-bold">Siap Pakai Untuk Label 121</h4>
                                 <p class="text-gray-600 text-sm mt-1">Template presisi untuk ukuran stiker label paling populer di Indonesia.</p>
                             </div>
                         </li>
@@ -196,7 +196,7 @@
                             <svg class="w-5 h-5 text-emerald-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
                             </svg>
-                            Akses Semua Template (103, 121)
+                            Akses Template Label 121
                         </li>
                         <li class="flex items-center text-sm">
                             <svg class="w-5 h-5 text-emerald-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -230,4 +230,4 @@
 
 </body>
 
-</html>
+</html>>
