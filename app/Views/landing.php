@@ -47,7 +47,7 @@
                         Cetak Label Undangan <span class="text-emerald-600">Dalam Hitungan Detik!</span>
                     </h1>
                     <p class="text-xl text-gray-600 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                        Stop ngetik manual di Word. Impor dari Excel, pilih ukuran label, dan cetak label yang presisi secara instan.
+                        Stop ngetik manual di Word. Impor dari Excel, pilih posisi cetak, dan hasilkan label yang presisi langsung dari browser Anda.
                     </p>
                     <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
                         <a href="https://wa.me/6282188344982?text=Halo%20LabelPro%2C%20saya%20ingin%20mendapatkan%20akses%20seumur%20hidup." class="bg-amber-500 text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-amber-600 transition-all shadow-xl shadow-amber-200 flex items-center justify-center">
@@ -156,8 +156,19 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h4 class="text-lg font-bold">Export Ke PDF & Cetak Langsung</h4>
-                                <p class="text-gray-600 text-sm mt-1">Export hasil ke PDF berkualitas tinggi atau cetak langsung dari browser Anda.</p>
+                                <h4 class="text-lg font-bold">Cetak Cerdas & Presisi</h4>
+                                <p class="text-gray-600 text-sm mt-1">Pratinjau layout realistis dan cetak langsung dari browser Anda tanpa aplikasi tambahan.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
+                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Fitur Offset (Hemat Kertas)</h4>
+                                <p class="text-gray-600 text-sm mt-1">Mulai cetak dari posisi mana pun pada kertas stiker yang sudah terpakai sebagian. Lebih hemat!</p>
                             </div>
                         </li>
                     </ul>
