@@ -52,9 +52,7 @@
                     <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
                         <a href="https://wa.me/6282188344982?text=Halo%20LabelPro%2C%20saya%20ingin%20mendapatkan%20akses%20seumur%20hidup." class="bg-amber-500 text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-amber-600 transition-all shadow-xl shadow-amber-200 flex items-center justify-center">
                             Akses Penuh
-                            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                            </svg>
+                            <i class="fa-solid fa-arrow-right ml-2"></i>
                         </a>
                         <a href="/demo/start" class="bg-white text-gray-700 border-2 border-gray-200 px-8 py-4 rounded-xl text-lg font-bold hover:border-emerald-600 hover:text-emerald-600 transition-all flex items-center justify-center">
                             Demo Gratis
@@ -87,27 +85,21 @@
             <div class="grid md:grid-cols-3 gap-8 text-center">
                 <div class="p-8 bg-white rounded-2xl shadow-sm">
                     <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
+                        <i class="fa-regular fa-clock text-2xl text-red-600"></i>
                     </div>
                     <h4 class="text-xl font-bold mb-4">Buang Waktu</h4>
                     <p class="text-gray-600">Berjam-jam ngetik satu per satu di Word yang seringkali layout-nya berantakan saat diprint.</p>
                 </div>
                 <div class="p-8 bg-white rounded-2xl shadow-sm">
                     <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                        </svg>
+                        <i class="fa-solid fa-triangle-exclamation text-2xl text-red-600"></i>
                     </div>
                     <h4 class="text-xl font-bold mb-4">Typo & Salah Nama</h4>
                     <p class="text-gray-600">Satu kesalahan kecil berarti Anda harus print ulang satu lembar. Kertas stiker dan tinta terbuang percuma.</p>
                 </div>
                 <div class="p-8 bg-white rounded-2xl shadow-sm">
                     <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
+                        <i class="fa-solid fa-arrows-up-down-left-right text-2xl text-red-600"></i>
                     </div>
                     <h4 class="text-xl font-bold mb-4">Margin Gak Pas</h4>
                     <p class="text-gray-600">Stres ngatur margin di software office konvensional demi mendapatkan posisi tengah yang presisi.</p>
@@ -129,9 +121,7 @@
                     <ul class="space-y-6">
                         <li class="flex items-start">
                             <div class="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
-                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
-                                </svg>
+                                <i class="fa-solid fa-check text-green-600 text-xs"></i>
                             </div>
                             <div class="ml-4">
                                 <h4 class="text-lg font-bold">Impor Dari Excel</h4>
@@ -140,35 +130,20 @@
                         </li>
                         <li class="flex items-start">
                             <div class="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
-                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
-                                </svg>
+                                <i class="fa-solid fa-check text-green-600 text-xs"></i>
                             </div>
                             <div class="ml-4">
-                                <h4 class="text-lg font-bold">Siap Pakai Untuk Label 121</h4>
-                                <p class="text-gray-600 text-sm mt-1">Template presisi untuk ukuran stiker label paling populer di Indonesia.</p>
+                                <h4 class="text-lg font-bold">Presisi Label 121 & Fitur Offset</h4>
+                                <p class="text-gray-600 text-sm mt-1">Template akurat untuk stiker 121 dengan kemampuan mulai cetak dari posisi mana pun. Hemat waktu dan kertas!</p>
                             </div>
                         </li>
                         <li class="flex items-start">
                             <div class="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
-                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
-                                </svg>
+                                <i class="fa-solid fa-check text-green-600 text-xs"></i>
                             </div>
                             <div class="ml-4">
                                 <h4 class="text-lg font-bold">Cetak Cerdas & Presisi</h4>
                                 <p class="text-gray-600 text-sm mt-1">Pratinjau layout realistis dan cetak langsung dari browser Anda tanpa aplikasi tambahan.</p>
-                            </div>
-                        </li>
-                        <li class="flex items-start">
-                            <div class="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
-                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <h4 class="text-lg font-bold">Fitur Offset (Hemat Kertas)</h4>
-                                <p class="text-gray-600 text-sm mt-1">Mulai cetak dari posisi mana pun pada kertas stiker yang sudah terpakai sebagian. Lebih hemat!</p>
                             </div>
                         </li>
                     </ul>
@@ -199,15 +174,15 @@
                     <div class="p-8 bg-gray-50">
                         <ul class="text-left space-y-4 mb-8">
                             <li class="flex items-start text-sm">
-                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
                                 Maksimal 1 Proyek
                             </li>
                             <li class="flex items-start text-sm">
-                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
                                 Maksimal 500 Tamu
                             </li>
                             <li class="flex items-start text-sm text-gray-400">
-                                <svg class="w-5 h-5 text-gray-300 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"></path></svg>
+                                <i class="fa-solid fa-xmark text-gray-300 mr-3 mt-0.5"></i>
                                 Tidak Ada Update Otomatis
                             </li>
                         </ul>
@@ -235,15 +210,15 @@
                     <div class="p-8">
                         <ul class="text-left space-y-4 mb-8">
                             <li class="flex items-start text-sm font-medium">
-                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
                                 Hingga 10 Proyek Event
                             </li>
                             <li class="flex items-start text-sm font-medium">
-                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
                                 Kapasitas 5.000 Tamu
                             </li>
                             <li class="flex items-start text-sm font-medium">
-                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
                                 Dukungan Prioritas 24/7
                             </li>
                         </ul>
@@ -265,15 +240,15 @@
                     <div class="p-8 bg-gray-50">
                         <ul class="text-left space-y-4 mb-8">
                             <li class="flex items-start text-sm">
-                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
                                 Proyek Tanpa Batas
                             </li>
                             <li class="flex items-start text-sm">
-                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
                                 Jumlah Tamu Tak Terbatas
                             </li>
                             <li class="flex items-start text-sm">
-                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
                                 Gratis Update Selamanya
                             </li>
                         </ul>
