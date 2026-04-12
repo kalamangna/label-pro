@@ -163,8 +163,8 @@
                 <div id="package-div">
                     <label for="package" class="block mb-2 text-sm font-bold text-gray-900">Paket</label>
                     <select name="package" id="package" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
-                        <option value="basic">Paket Basic (1 Proyek, 500 Tamu)</option>
-                        <option value="pro">Paket Pro (10 Proyek, 5.000 Tamu)</option>
+                        <option value="basic">Paket Basic (1 Acara, 500 Tamu)</option>
+                        <option value="pro">Paket Pro (10 Acara, 5.000 Tamu)</option>
                         <option value="unlimited">Paket Unlimited (Tanpa Batas)</option>
                     </select>
                 </div>
@@ -207,8 +207,8 @@
                 <div id="edit-package-div">
                     <label for="edit-package" class="block mb-2 text-sm font-bold text-gray-900">Paket</label>
                     <select name="package" id="edit-package" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
-                        <option value="basic">Paket Basic (1 Proyek, 500 Tamu)</option>
-                        <option value="pro">Paket Pro (10 Proyek, 5.000 Tamu)</option>
+                        <option value="basic">Paket Basic (1 Acara, 500 Tamu)</option>
+                        <option value="pro">Paket Pro (10 Acara, 5.000 Tamu)</option>
                         <option value="unlimited">Paket Unlimited (Tanpa Batas)</option>
                     </select>
                 </div>

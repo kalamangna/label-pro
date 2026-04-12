@@ -27,7 +27,6 @@
             background-color: #fef08a; /* Light yellow background for sticker backing */
             margin: 0 auto;
             display: flex;
-            justify-content: center;
             align-items: flex-start;
             position: relative;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -192,7 +191,7 @@
         </div>
     </div>
 
-    <div class="page">
+    <div class="page" style="justify-content: <?= esc($align ?? 'center') ?>;">
         <div class="sticker-sheet sheet-<?= $type ?>">
             <?php foreach ($recipients as $recipient): ?>
                 <div class="label" style="position: relative;">

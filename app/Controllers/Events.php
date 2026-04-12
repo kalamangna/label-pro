@@ -2,24 +2,24 @@
 
 namespace App\Controllers;
 
-use App\Models\ProjectModel;
+use App\Models\EventModel;
 use App\Models\RecipientModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class Projects extends BaseController
+class Events extends BaseController
 {
-    protected $projectModel;
+    protected $eventModel;
 
     public function __construct()
     {
-        $this->projectModel = new ProjectModel();
+        $this->eventModel = new EventModel();
     }
 
     private function applyScope($model = null)
     {
-        $model = $model ?? $this->projectModel;
+        $model = $model ?? $this->eventModel;
         if (session()->get('role') !== 'admin') {
-            return $model->where('projects.user_id', session()->get('user_id'));
+            return $model->where('events.user_id', session()->get('user_id'));
         }
         return $model;
     }
@@ -27,9 +27,9 @@ class Projects extends BaseController
     private function checkOwnership($id)
     {
         if (session()->get('role') === 'admin') {
-            return $this->projectModel->find($id);
+            return $this->eventModel->find($id);
         }
-        return $this->projectModel->where('projects.user_id', session()->get('user_id'))->find($id);
+        return $this->eventModel->where('events.user_id', session()->get('user_id'))->find($id);
     }
 
     public function index()
@@ -41,20 +41,20 @@ class Projects extends BaseController
 
         $model = $this->applyScope();
         
-        $model = $model->select('projects.*, users.username as added_by')
-                       ->join('users', 'users.id = projects.user_id', 'left');
+        $model = $model->select('events.*, users.username as added_by')
+                       ->join('users', 'users.id = events.user_id', 'left');
 
         if (!empty($search)) {
-            $model = $model->like('projects.name', $search);
+            $model = $model->like('events.name', $search);
         }
 
         if (session()->get('role') === 'admin' && !empty($userIdFilter)) {
-            $model = $model->where('projects.user_id', $userIdFilter);
+            $model = $model->where('events.user_id', $userIdFilter);
         }
 
         $allowedSort = ['id', 'name', 'created_at'];
         $sort = in_array($sort, $allowedSort) ? $sort : 'id';
-        $qualifiedSort = 'projects.' . $sort;
+        $qualifiedSort = 'events.' . $sort;
         
         if ($sort === 'id') {
             $dir = 'desc';
@@ -71,8 +71,8 @@ class Projects extends BaseController
         }
 
         $data = [
-            'title'    => 'Daftar Proyek',
-            'projects' => $model->paginate(10),
+            'title'    => 'Daftar Acara',
+            'events'   => $model->paginate(10),
             'pager'    => $model->pager,
             'search'   => $search,
             'userIdFilter' => $userIdFilter,
@@ -81,22 +81,22 @@ class Projects extends BaseController
             'users'    => $users,
         ];
 
-        return view('projects/index', $data);
+        return view('events/index', $data);
     }
 
     public function store()
     {
         if (session()->get('role') === 'admin') {
-            return redirect()->to('/projects')->with('error', 'Admin hanya dapat melihat data.');
+            return redirect()->to('/events')->with('error', 'Admin hanya dapat melihat data.');
         }
 
         $package = session()->get('package') ?? 'basic';
         $limits  = \App\Models\UserModel::getPackageLimits($package, session()->get('role'));
         
-        $currentProjectsCount = $this->projectModel->where('user_id', session()->get('user_id'))->countAllResults();
+        $currentEventsCount = $this->eventModel->where('user_id', session()->get('user_id'))->countAllResults();
         
-        if ($currentProjectsCount >= $limits['max_projects']) {
-            return redirect()->back()->withInput()->with('error', "Anda telah mencapai batas maksimal proyek untuk {$limits['name']} ({$limits['max_projects']} proyek). Silakan hubungi admin untuk upgrade.");
+        if ($currentEventsCount >= $limits['max_events']) {
+            return redirect()->back()->withInput()->with('error', "Anda telah mencapai batas maksimal acara untuk {$limits['name']} ({$limits['max_events']} acara). Silakan hubungi admin untuk upgrade.");
         }
 
         $rules = [
@@ -107,23 +107,23 @@ class Projects extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $this->projectModel->save([
+        $this->eventModel->save([
             'user_id' => session()->get('user_id'),
             'name'    => $this->request->getPost('name'),
         ]);
 
-        return redirect()->to('/projects')->with('message', 'Proyek berhasil ditambahkan.');
+        return redirect()->to('/events')->with('message', 'Acara berhasil ditambahkan.');
     }
 
     public function update($id)
     {
         if (session()->get('role') === 'admin') {
-            return redirect()->to('/projects')->with('error', 'Admin hanya dapat melihat data.');
+            return redirect()->to('/events')->with('error', 'Admin hanya dapat melihat data.');
         }
 
-        $project = $this->checkOwnership($id);
-        if (!$project) {
-            return redirect()->to('/projects')->with('error', 'Proyek tidak ditemukan.');
+        $event = $this->checkOwnership($id);
+        if (!$event) {
+            return redirect()->to('/events')->with('error', 'Acara tidak ditemukan.');
         }
 
         $rules = [
@@ -134,24 +134,24 @@ class Projects extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $this->projectModel->update($id, [
+        $this->eventModel->update($id, [
             'name' => $this->request->getPost('name'),
         ]);
 
-        return redirect()->to('/projects')->with('message', 'Proyek berhasil diperbarui.');
+        return redirect()->to('/events')->with('message', 'Acara berhasil diperbarui.');
     }
 
     public function delete($id)
     {
         if (session()->get('role') === 'admin') {
-            return redirect()->to('/projects')->with('error', 'Admin hanya dapat melihat data.');
+            return redirect()->to('/events')->with('error', 'Admin hanya dapat melihat data.');
         }
 
-        $project = $this->checkOwnership($id);
-        if ($project) {
-            $this->projectModel->delete($id);
-            return redirect()->to('/projects')->with('message', 'Proyek berhasil dihapus.');
+        $event = $this->checkOwnership($id);
+        if ($event) {
+            $this->eventModel->delete($id);
+            return redirect()->to('/events')->with('message', 'Acara berhasil dihapus.');
         }
-        return redirect()->to('/projects')->with('error', 'Proyek tidak ditemukan.');
+        return redirect()->to('/events')->with('error', 'Acara tidak ditemukan.');
     }
 }

@@ -67,18 +67,18 @@
     <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-8 text-center">
         <form action="/recipients/import" method="POST" enctype="multipart/form-data">
             <?= csrf_field() ?>
-            <input type="hidden" name="project_id" value="<?= esc($project['id']) ?>">
+            <input type="hidden" name="event_id" value="<?= esc($event['id']) ?>">
             
             <div class="mb-6 text-left max-w-sm mx-auto">
-                <label class="block mb-2 text-sm font-bold text-gray-900">Impor ke Proyek</label>
+                <label class="block mb-2 text-sm font-bold text-gray-900">Impor ke Acara</label>
                 <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold rounded-lg block w-full p-3 shadow-sm flex items-center justify-between">
                     <div class="flex items-center">
                         <i class="fa-solid fa-folder me-2 text-emerald-600"></i>
-                        <?= esc($project['name']) ?>
+                        <?= esc($event['name']) ?>
                     </div>
-                    <a href="/projects" class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest hover:underline px-2 py-1 bg-white rounded-md border border-emerald-200 shadow-sm transition-all hover:bg-emerald-100">Ubah</a>
+                    <a href="/events" class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest hover:underline px-2 py-1 bg-white rounded-md border border-emerald-200 shadow-sm transition-all hover:bg-emerald-100">Ubah</a>
                 </div>
-                <p class="mt-2 text-[10px] text-gray-500 italic">Semua data dari file Excel akan otomatis ditambahkan ke proyek ini.</p>
+                <p class="mt-2 text-[10px] text-gray-500 italic">Semua data dari file Excel akan otomatis ditambahkan ke acara ini.</p>
             </div>
             <div class="mb-6">
                 <label for="excel_file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">

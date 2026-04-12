@@ -78,9 +78,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/projects" class="flex items-center p-3 rounded-2xl transition-all <?= str_starts_with(current_url(), base_url('projects')) ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600' ?> group">
-                        <i class="fa-solid fa-folder-open w-5 h-5 flex items-center justify-center transition duration-75 <?= str_starts_with(current_url(), base_url('projects')) ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-600' ?>"></i>
-                        <span class="ms-3 whitespace-nowrap">Proyek</span>
+                    <a href="/events" class="flex items-center p-3 rounded-2xl transition-all <?= str_starts_with(current_url(), base_url('events')) ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600' ?> group">
+                        <i class="fa-solid fa-folder-open w-5 h-5 flex items-center justify-center transition duration-75 <?= str_starts_with(current_url(), base_url('events')) ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-600' ?>"></i>
+                        <span class="ms-3 whitespace-nowrap">Acara</span>
                     </a>
                 </li>
                 <li>

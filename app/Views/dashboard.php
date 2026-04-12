@@ -32,15 +32,15 @@
         </div>
     </div>
 
-    <!-- Total Projects Card -->
+    <!-- Total Events Card -->
     <div class="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-amber-200 transition-all group">
         <div class="flex items-center mb-4">
             <div class="p-3 mr-4 text-amber-600 bg-amber-50 rounded-xl">
                 <i class="fa-solid fa-folder-open text-2xl"></i>
             </div>
             <div>
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Proyek</p>
-                <p class="text-3xl font-extrabold tracking-tight text-gray-900"><?= number_format($totalProjects) ?></p>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Acara</p>
+                <p class="text-3xl font-extrabold tracking-tight text-gray-900"><?= number_format($totalEvents) ?></p>
             </div>
         </div>
 
@@ -48,16 +48,16 @@
             <p class="text-[10px] text-amber-600 font-bold uppercase tracking-widest mb-4 italic">Ringkasan Sistem</p>
         <?php elseif ($package !== 'unlimited'): ?>
             <div class="w-full bg-gray-100 rounded-full h-1.5 mb-1">
-                <div class="bg-amber-500 h-1.5 rounded-full" style="width: <?= min(100, ($totalProjects / $limits['max_projects']) * 100) ?>%"></div>
+                <div class="bg-amber-500 h-1.5 rounded-full" style="width: <?= min(100, ($totalEvents / $limits['max_events']) * 100) ?>%"></div>
             </div>
-            <p class="text-[10px] text-gray-500 font-medium mb-4">Quota: <?= number_format($totalProjects) ?> / <?= number_format($limits['max_projects']) ?> (<?= $limits['name'] ?>)</p>
+            <p class="text-[10px] text-gray-500 font-medium mb-4">Quota: <?= number_format($totalEvents) ?> / <?= number_format($limits['max_events']) ?> (<?= $limits['name'] ?>)</p>
         <?php else: ?>
             <p class="text-[10px] text-amber-600 font-bold uppercase tracking-widest mb-4 italic">Akses Tanpa Batas</p>
         <?php endif; ?>
 
         <div class="pt-4 border-t border-gray-50 flex justify-between items-center">
-            <a href="/projects" class="text-sm font-bold text-amber-600 hover:text-amber-700 inline-flex items-center">
-                Kelola Proyek
+            <a href="/events" class="text-sm font-bold text-amber-600 hover:text-amber-700 inline-flex items-center">
+                Kelola Acara
                 <i class="fa-solid fa-chevron-right ms-2 text-xs transition-transform group-hover:translate-x-1"></i>
             </a>
         </div>
@@ -98,8 +98,8 @@
             </div>
         </div>
         <div class="mt-4 pt-4 border-t border-gray-50">
-            <a href="/projects" class="text-sm font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center">
-                Pilih Proyek & Impor
+            <a href="/events" class="text-sm font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center">
+                Pilih Acara & Impor
                 <i class="fa-solid fa-upload ms-2 text-xs transition-transform group-hover:-translate-y-1"></i>
             </a>
         </div>
@@ -119,9 +119,9 @@
                 <i class="fa-solid fa-user-gear me-2"></i>
                 Kelola Pengguna
             </a>
-            <a href="/projects" class="text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-sm">
+            <a href="/events" class="text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-sm">
                 <i class="fa-solid fa-folder-open me-2"></i>
-                Pantau Proyek
+                Pantau Acara
             </a>
         </div>
         <?php else: ?>
@@ -129,9 +129,9 @@
             Kelola tamu undangan dan cetak label stiker secara instan. Gunakan menu di samping untuk mulai atau klik tombol di bawah.
         </p>
         <div class="flex flex-wrap gap-4 justify-center md:justify-start">
-            <a href="/projects" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-200 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-lg shadow-emerald-100">
+            <a href="/events" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-200 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-lg shadow-emerald-100">
                 <i class="fa-solid fa-folder-open me-2"></i>
-                Pilih Proyek
+                Pilih Acara
             </a>
             <a href="/recipients" class="text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-sm">
                 <i class="fa-solid fa-table-list me-2"></i>

@@ -40,9 +40,6 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center lg:text-left grid lg:grid-cols-2 gap-12 items-center">
                 <div>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-700 mb-6">
-                        🚀 Versi 2.0 Telah Rilis!
-                    </span>
                     <h1 class="text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 leading-tight mb-6">
                         Cetak Label Undangan <span class="text-emerald-600">Dalam Hitungan Detik!</span>
                     </h1>
@@ -58,18 +55,10 @@
                             Demo Gratis
                         </a>
                     </div>
-                    <div class="mt-10 flex items-center justify-center lg:justify-start space-x-4 text-sm text-gray-500">
-                        <div class="flex -space-x-2">
-                            <img class="w-8 h-8 rounded-full border-2 border-white bg-gray-200" src="https://i.pravatar.cc/100?u=1" alt="">
-                            <img class="w-8 h-8 rounded-full border-2 border-white bg-gray-200" src="https://i.pravatar.cc/100?u=2" alt="">
-                            <img class="w-8 h-8 rounded-full border-2 border-white bg-gray-200" src="https://i.pravatar.cc/100?u=3" alt="">
-                        </div>
-                        <p>Dipercaya oleh 500+ Wedding Organizer & Percetakan</p>
-                    </div>
                 </div>
                 <div class="relative">
                     <div class="absolute -inset-4 bg-emerald-500/10 rounded-3xl blur-2xl"></div>
-                    <img src="/img/hero.svg" alt="Ilustrasi Cetak Label" class="relative w-full mx-auto drop-shadow-2xl transform hover:scale-105 transition-transform duration-500">
+                    <img src="/img/hero.svg" alt="Ilustrasi Cetak Label" class="relative w-full mx-auto">
                 </div>
             </div>
         </div>
@@ -112,38 +101,43 @@
     <section class="py-24" id="fitur">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid lg:grid-cols-2 gap-16 items-center">
-                <div class="order-2 lg:order-1">
-                    <img src="/img/flow.svg" alt="Manajemen Data Tamu" class="w-full mx-auto drop-shadow-xl">
+                <div class="order-2 lg:order-1 flex justify-center">
+                    <div class="relative group">
+                        <div class="absolute -inset-10 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all duration-500"></div>
+                        <div class="relative w-64 h-64 lg:w-80 lg:h-80 bg-white rounded-[3rem] shadow-2xl border border-gray-100 flex items-center justify-center transform group-hover:scale-105 transition-all duration-500">
+                            <i class="fa-solid fa-wand-magic-sparkles text-8xl lg:text-9xl text-emerald-600"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="order-1 lg:order-2">
+                <div class="order-1 lg:order-2 text-left">
                     <h2 class="text-base font-bold text-emerald-600 uppercase tracking-widest mb-4">Solusi Cerdas</h2>
-                    <h3 class="text-4xl font-extrabold mb-8">Cara Profesional Mengelola Daftar Tamu.</h3>
-                    <ul class="space-y-6">
+                    <h3 class="text-4xl font-extrabold mb-8 text-gray-900">Segalanya Serba Otomatis.</h3>
+                    <ul class="space-y-10">
                         <li class="flex items-start">
-                            <div class="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
-                                <i class="fa-solid fa-check text-green-600 text-xs"></i>
+                            <div class="flex-shrink-0 w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center mt-1 border border-emerald-100 shadow-sm">
+                                <i class="fa-solid fa-bolt text-emerald-600 text-xl"></i>
                             </div>
-                            <div class="ml-4">
-                                <h4 class="text-lg font-bold">Impor Dari Excel</h4>
-                                <p class="text-gray-600 text-sm mt-1">Cukup drag and drop daftar tamu Anda. Biarkan sistem kami yang bekerja.</p>
+                            <div class="ml-5">
+                                <h4 class="text-lg font-bold text-gray-900">Impor Sekali Klik</h4>
+                                <p class="text-gray-600 text-sm mt-1 leading-relaxed">Tarik file Excel Anda, dan ribuan data tamu akan terproses akurat dalam sekejap.</p>
                             </div>
                         </li>
                         <li class="flex items-start">
-                            <div class="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
-                                <i class="fa-solid fa-check text-green-600 text-xs"></i>
+                            <div class="flex-shrink-0 w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center mt-1 border border-emerald-100 shadow-sm">
+                                <i class="fa-solid fa-check-double text-emerald-600 text-xl"></i>
                             </div>
-                            <div class="ml-4">
-                                <h4 class="text-lg font-bold">Presisi Label 121 & Fitur Offset</h4>
-                                <p class="text-gray-600 text-sm mt-1">Template akurat untuk stiker 121 dengan kemampuan mulai cetak dari posisi mana pun. Hemat waktu dan kertas!</p>
+                            <div class="ml-5">
+                                <h4 class="text-lg font-bold text-gray-900">Seleksi Pintar</h4>
+                                <p class="text-gray-600 text-sm mt-1 leading-relaxed">Pilih tamu lintas halaman tanpa takut pilihan hilang. Semua tersimpan aman di database.</p>
                             </div>
                         </li>
                         <li class="flex items-start">
-                            <div class="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
-                                <i class="fa-solid fa-check text-green-600 text-xs"></i>
+                            <div class="flex-shrink-0 w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center mt-1 border border-emerald-100 shadow-sm">
+                                <i class="fa-solid fa-expand text-emerald-600 text-xl"></i>
                             </div>
-                            <div class="ml-4">
-                                <h4 class="text-lg font-bold">Cetak Cerdas & Presisi</h4>
-                                <p class="text-gray-600 text-sm mt-1">Pratinjau layout realistis dan cetak langsung dari browser Anda tanpa aplikasi tambahan.</p>
+                            <div class="ml-5">
+                                <h4 class="text-lg font-bold text-gray-900">Layout Presisi & Hemat</h4>
+                                <p class="text-gray-600 text-sm mt-1 leading-relaxed">Cetak di mana saja dengan fitur Offset. Gunakan kembali kertas stiker sisa dengan akurasi 100%.</p>
                             </div>
                         </li>
                     </ul>
@@ -175,7 +169,7 @@
                         <ul class="text-left space-y-4 mb-8">
                             <li class="flex items-start text-sm">
                                 <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
-                                Maksimal 1 Proyek
+                                Maksimal 1 Acara
                             </li>
                             <li class="flex items-start text-sm">
                                 <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
@@ -211,7 +205,7 @@
                         <ul class="text-left space-y-4 mb-8">
                             <li class="flex items-start text-sm font-medium">
                                 <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
-                                Hingga 10 Proyek Event
+                                Hingga 10 Acara
                             </li>
                             <li class="flex items-start text-sm font-medium">
                                 <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
@@ -241,7 +235,7 @@
                         <ul class="text-left space-y-4 mb-8">
                             <li class="flex items-start text-sm">
                                 <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>
-                                Proyek Tanpa Batas
+                                Acara Tanpa Batas
                             </li>
                             <li class="flex items-start text-sm">
                                 <i class="fa-solid fa-check text-emerald-500 mr-3 mt-0.5"></i>

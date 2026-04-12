@@ -29,11 +29,11 @@ $routes->group('recipients', ['filter' => 'auth'], function($routes) {
     $routes->post('clear-selection', 'Recipients::clearSelection');
 });
 
-$routes->group('projects', ['filter' => 'auth'], function($routes) {
-    $routes->get('/', 'Projects::index');
-    $routes->post('store', 'Projects::store');
-    $routes->post('update/(:num)', 'Projects::update/$1');
-    $routes->get('delete/(:num)', 'Projects::delete/$1');
+$routes->group('events', ['filter' => 'auth'], function($routes) {
+    $routes->get('/', 'Events::index');
+    $routes->post('store', 'Events::store');
+    $routes->post('update/(:num)', 'Events::update/$1');
+    $routes->get('delete/(:num)', 'Events::delete/$1');
 });
 
 $routes->group('users', ['filter' => ['auth', 'admin']], function($routes) {

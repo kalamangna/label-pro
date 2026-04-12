@@ -34,19 +34,19 @@ class Recipients extends BaseController
 
     public function index()
     {
-        $search    = $this->request->getGet('search') ?? '';
-        $status    = $this->request->getGet('status') ?? '';
-        $sort      = $this->request->getGet('sort') ?? 'id';
-        $dir       = $this->request->getGet('dir') ?? 'desc';
-        $projectId = $this->request->getGet('project_id');
+        $search  = $this->request->getGet('search') ?? '';
+        $status  = $this->request->getGet('status') ?? '';
+        $sort    = $this->request->getGet('sort') ?? 'id';
+        $dir     = $this->request->getGet('dir') ?? 'desc';
+        $eventId = $this->request->getGet('event_id');
 
         // Start with a fresh query on the model
         $model = new RecipientModel();
 
-        // Join projects to get project name and users to get username
-        $model->select('recipients.*, users.username as added_by, projects.name as project_name')
+        // Join events to get event name and users to get username
+        $model->select('recipients.*, users.username as added_by, events.name as event_name')
               ->join('users', 'users.id = recipients.user_id', 'left')
-              ->join('projects', 'projects.id = recipients.project_id', 'left');
+              ->join('events', 'events.id = recipients.event_id', 'left');
 
         // Apply owner scope if not admin
         if (session()->get('role') !== 'admin') {
@@ -54,8 +54,8 @@ class Recipients extends BaseController
         }
 
         // Apply Filters
-        if ($projectId !== null && $projectId !== '') {
-            $model->where('recipients.project_id', $projectId);
+        if ($eventId !== null && $eventId !== '') {
+            $model->where('recipients.event_id', $eventId);
         }
 
         if ($search !== '') {
@@ -76,11 +76,11 @@ class Recipients extends BaseController
 
         $model->orderBy('recipients.' . $sort, $dir);
 
-        // Fetch project list for the filter dropdown
-        $projectModel = new \App\Models\ProjectModel();
-        $projects = session()->get('role') === 'admin' 
-            ? $projectModel->findAll() 
-            : $projectModel->where('user_id', session()->get('user_id'))->findAll();
+        // Fetch event list for the filter dropdown
+        $eventModel = new \App\Models\EventModel();
+        $events = session()->get('role') === 'admin' 
+            ? $eventModel->findAll() 
+            : $eventModel->where('user_id', session()->get('user_id'))->findAll();
 
         // Calculate selected count independently
         $selectedCount = 0;
@@ -99,8 +99,8 @@ class Recipients extends BaseController
             'status'        => $status,
             'sort'          => $sort,
             'dir'           => $dir,
-            'projectId'     => $projectId,
-            'projects'      => $projects,
+            'eventId'       => $eventId,
+            'events'        => $events,
             'selectedCount' => $selectedCount,
         ];
 
@@ -136,8 +136,8 @@ class Recipients extends BaseController
                 'label' => 'Alamat',
                 'rules' => 'permit_empty',
             ],
-            'project_id' => [
-                'label' => 'Proyek',
+            'event_id' => [
+                'label' => 'Acara',
                 'rules' => 'permit_empty|is_natural_no_zero',
             ],
         ];
@@ -146,18 +146,18 @@ class Recipients extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $name      = $this->request->getPost('name');
-        $address   = $this->request->getPost('address');
-        $projectId = $this->request->getPost('project_id') ?: null;
+        $name     = $this->request->getPost('name');
+        $address  = $this->request->getPost('address');
+        $eventId  = $this->request->getPost('event_id') ?: null;
         
         $existing = $this->applyScope()
                          ->where('name', $name)
                          ->where('address', $address);
         
-        if ($projectId) {
-            $existing = $existing->where('project_id', $projectId);
+        if ($eventId) {
+            $existing = $existing->where('event_id', $eventId);
         } else {
-            $existing = $existing->where('project_id', null);
+            $existing = $existing->where('event_id', null);
         }
 
         if ($existing->first()) {
@@ -165,10 +165,10 @@ class Recipients extends BaseController
         }
 
         $this->recipientModel->save([
-            'name'       => $name,
-            'address'    => $address,
-            'user_id'    => session()->get('user_id'),
-            'project_id' => $projectId,
+            'name'     => $name,
+            'address'  => $address,
+            'user_id'  => session()->get('user_id'),
+            'event_id' => $eventId,
         ]);
 
         return redirect()->to('/recipients')->with('message', 'Penerima berhasil ditambahkan.');
@@ -199,8 +199,8 @@ class Recipients extends BaseController
                 'label' => 'Alamat',
                 'rules' => 'permit_empty',
             ],
-            'project_id' => [
-                'label' => 'Proyek',
+            'event_id' => [
+                'label' => 'Acara',
                 'rules' => 'permit_empty|is_natural_no_zero',
             ],
         ];
@@ -210,9 +210,9 @@ class Recipients extends BaseController
         }
 
         $this->recipientModel->update($id, [
-            'name'       => $this->request->getPost('name'),
-            'address'    => $this->request->getPost('address'),
-            'project_id' => $this->request->getPost('project_id') ?: null,
+            'name'     => $this->request->getPost('name'),
+            'address'  => $this->request->getPost('address'),
+            'event_id' => $this->request->getPost('event_id') ?: null,
         ]);
 
         return redirect()->to('/recipients')->with('message', 'Penerima berhasil diperbarui.');
@@ -238,24 +238,24 @@ class Recipients extends BaseController
             return redirect()->to('/recipients')->with('error', 'Admin hanya dapat melihat data.');
         }
 
-        $projectId = $this->request->getGet('project_id');
+        $eventId = $this->request->getGet('event_id');
         
-        if (!$projectId) {
-            return redirect()->to('/projects')->with('error', 'Silakan pilih proyek terlebih dahulu untuk mengimpor data.');
+        if (!$eventId) {
+            return redirect()->to('/events')->with('error', 'Silakan pilih acara terlebih dahulu untuk mengimpor data.');
         }
 
-        $projectModel = new \App\Models\ProjectModel();
-        $project = session()->get('role') === 'admin' 
-            ? $projectModel->find($projectId)
-            : $projectModel->where('user_id', session()->get('user_id'))->find($projectId);
+        $eventModel = new \App\Models\EventModel();
+        $event = session()->get('role') === 'admin' 
+            ? $eventModel->find($eventId)
+            : $eventModel->where('user_id', session()->get('user_id'))->find($eventId);
 
-        if (!$project) {
-            return redirect()->to('/projects')->with('error', 'Proyek tidak ditemukan.');
+        if (!$event) {
+            return redirect()->to('/events')->with('error', 'Acara tidak ditemukan.');
         }
 
         $data = [
-            'title'   => 'Impor Penerima',
-            'project' => $project,
+            'title' => 'Impor Penerima',
+            'event' => $event,
         ];
 
         return view('recipients/import', $data);
@@ -273,19 +273,19 @@ class Recipients extends BaseController
         $currentRecipientsCount = $this->recipientModel->where('user_id', session()->get('user_id'))->countAllResults();
 
         $file = $this->request->getFile('excel_file');
-        $projectId = $this->request->getPost('project_id');
+        $eventId = $this->request->getPost('event_id');
 
-        if (!$projectId) {
-            return redirect()->to('/projects')->with('error', 'Proyek tidak valid.');
+        if (!$eventId) {
+            return redirect()->to('/events')->with('error', 'Acara tidak valid.');
         }
 
-        $projectModel = new \App\Models\ProjectModel();
-        $project = session()->get('role') === 'admin' 
-            ? $projectModel->find($projectId)
-            : $projectModel->where('user_id', session()->get('user_id'))->find($projectId);
+        $eventModel = new \App\Models\EventModel();
+        $event = session()->get('role') === 'admin' 
+            ? $eventModel->find($eventId)
+            : $eventModel->where('user_id', session()->get('user_id'))->find($eventId);
 
-        if (!$project) {
-            return redirect()->to('/projects')->with('error', 'Proyek tidak ditemukan atau akses ditolak.');
+        if (!$event) {
+            return redirect()->to('/events')->with('error', 'Acara tidak ditemukan atau akses ditolak.');
         }
 
         if (!$file || !$file->isValid()) {
@@ -329,10 +329,10 @@ class Recipients extends BaseController
                                  ->where('name', $name)
                                  ->where('address', $address);
                 
-                if ($projectId) {
-                    $existing = $existing->where('project_id', $projectId);
+                if ($eventId) {
+                    $existing = $existing->where('event_id', $eventId);
                 } else {
-                    $existing = $existing->where('project_id', null);
+                    $existing = $existing->where('event_id', null);
                 }
 
                 if ($existing->first()) {
@@ -341,10 +341,10 @@ class Recipients extends BaseController
                 }
 
                 $this->recipientModel->insert([
-                    'name'       => $name,
-                    'address'    => $address,
-                    'user_id'    => session()->get('user_id'),
-                    'project_id' => $projectId,
+                    'name'     => $name,
+                    'address'  => $address,
+                    'user_id'  => session()->get('user_id'),
+                    'event_id' => $eventId,
                 ]);
                 $successCount++;
                 $currentRecipientsCount++;
@@ -358,7 +358,7 @@ class Recipients extends BaseController
                 $message .= " Melewati $errorCount baris karena nama kosong, duplikat, atau batas kuota tercapai.";
             }
 
-            return redirect()->to('/recipients' . ($projectId ? '?project_id=' . $projectId : ''))->with('message', $message);
+            return redirect()->to('/recipients' . ($eventId ? '?event_id=' . $eventId : ''))->with('message', $message);
 
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses file: ' . $e->getMessage());
@@ -371,6 +371,10 @@ class Recipients extends BaseController
         $offsetStr = $this->request->getGet('offset');
         $offset = (is_numeric($offsetStr) && (int)$offsetStr > 0) ? (int)$offsetStr : 0;
         
+        $alignRaw = $this->request->getGet('align') ?? 'center';
+        $validAlignments = ['flex-start', 'center', 'flex-end'];
+        $align = in_array($alignRaw, $validAlignments) ? $alignRaw : 'center';
+
         // Limit offset to max 9 for label 121 (which has 10 positions, index 0-9)
         if ($offset > 9) $offset = 9;
 
@@ -398,6 +402,7 @@ class Recipients extends BaseController
         $data = [
             'recipients' => $recipients,
             'type'       => $type,
+            'align'      => $align,
         ];
 
         return view('recipients/print', $data);

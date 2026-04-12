@@ -32,7 +32,7 @@ class UserModel extends Model
     {
         if ($role === 'admin') {
             return [
-                'max_projects'   => 999999,
+                'max_events'     => 999999,
                 'max_recipients' => 999999,
                 'name'           => 'Administrator',
             ];
@@ -40,7 +40,7 @@ class UserModel extends Model
 
         if ($role === 'demo') {
             return [
-                'max_projects'   => 1,
+                'max_events'     => 1,
                 'max_recipients' => 10,
                 'name'           => 'Mode Demo',
             ];
@@ -48,22 +48,22 @@ class UserModel extends Model
 
         return match ($package) {
             'basic' => [
-                'max_projects'   => 1,
+                'max_events'     => 1,
                 'max_recipients' => 500,
                 'name'           => 'Paket Basic',
             ],
             'pro' => [
-                'max_projects'   => 10,
+                'max_events'     => 10,
                 'max_recipients' => 5000,
                 'name'           => 'Paket Pro',
             ],
             'unlimited' => [
-                'max_projects'   => 999999,
+                'max_events'     => 999999,
                 'max_recipients' => 999999,
                 'name'           => 'Paket Unlimited',
             ],
             default => [
-                'max_projects'   => 0,
+                'max_events'     => 0,
                 'max_recipients' => 0,
                 'name'           => 'Tanpa Paket',
             ],

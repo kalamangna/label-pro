@@ -16,8 +16,8 @@
     <div class="flex flex-wrap items-center gap-3">
         <?php if (session()->get('role') !== 'admin'): ?>
         <div class="flex gap-2 w-full sm:w-auto">
-            <?php if (!empty($projectId)): ?>
-                <a href="/recipients/import?project_id=<?= esc($projectId) ?>" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
+            <?php if (!empty($eventId)): ?>
+                <a href="/recipients/import?event_id=<?= esc($eventId) ?>" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
                     <i class="fa-solid fa-file-import me-2 text-emerald-600"></i>
                     Impor Data
                 </a>
@@ -76,12 +76,12 @@
             </select>
         </div>
 
-        <!-- Project Filter -->
+        <!-- Event Filter -->
         <div class="md:col-span-3">
-            <select name="project_id" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-slate-500 focus:border-slate-500 block w-full h-[42px] px-2.5 transition-all">
-                <option value="">Semua Proyek</option>
-                <?php foreach ($projects as $project): ?>
-                    <option value="<?= $project['id'] ?>" <?= (string)($projectId ?? '') === (string)$project['id'] ? 'selected' : '' ?>><?= esc($project['name']) ?></option>
+            <select name="event_id" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-slate-500 focus:border-slate-500 block w-full h-[42px] px-2.5 transition-all">
+                <option value="">Semua Acara</option>
+                <?php foreach ($events as $event): ?>
+                    <option value="<?= $event['id'] ?>" <?= (string)($eventId ?? '') === (string)$event['id'] ? 'selected' : '' ?>><?= esc($event['name']) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -103,7 +103,7 @@
         <!-- Buttons -->
         <div class="md:col-span-12 flex justify-end gap-2">
             <button type="submit" class="w-full sm:w-32 h-[42px] bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-900 focus:ring-4 focus:ring-slate-200 transition-all active:scale-95 shadow-md shadow-slate-200 flex items-center justify-center">Filter</button>
-            <?php if (!empty($search) || ($status ?? '') !== '' || ($sort ?? 'id') !== 'id' || !empty($projectId)): ?>
+            <?php if (!empty($search) || ($status ?? '') !== '' || ($sort ?? 'id') !== 'id' || !empty($eventId)): ?>
                 <a href="/recipients" class="w-full sm:w-32 h-[42px] flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all active:scale-95 text-center">Reset</a>
             <?php endif; ?>
         </div>
@@ -141,7 +141,7 @@
                 <?php endif; ?>
                 <th scope="col" class="px-6 py-4 font-bold">Nama Penerima</th>
                 <th scope="col" class="px-6 py-4 font-bold">Alamat</th>
-                <th scope="col" class="px-6 py-4 font-bold">Proyek</th>
+                <th scope="col" class="px-6 py-4 font-bold">Acara</th>
                 <?php if (session()->get('role') === 'admin'): ?>
                     <th scope="col" class="px-6 py-4 font-bold text-center">Ditambahkan Oleh</th>
                 <?php endif; ?>
@@ -168,7 +168,7 @@
                     <td class="px-6 py-4">
                         <span class="text-xs font-medium text-gray-500">
                             <i class="fa-solid fa-folder me-1 text-[10px] opacity-40"></i>
-                            <?= esc($recipient['project_name'] ?? 'Tanpa Proyek') ?>
+                            <?= esc($recipient['event_name'] ?? 'Tanpa Acara') ?>
                         </span>
                     </td>
                     <?php if (session()->get('role') === 'admin'): ?>
@@ -196,7 +196,7 @@
                                     data-id="<?= $recipient['id'] ?>" 
                                     data-name="<?= esc($recipient['name']) ?>" 
                                     data-address="<?= esc($recipient['address']) ?>"
-                                    data-project-id="<?= $recipient['project_id'] ?>"
+                                    data-event-id="<?= $recipient['event_id'] ?>"
                                     title="Edit">
                                 <i class="fa-solid fa-pen-to-square text-xs"></i>
                             </button>
@@ -616,46 +616,63 @@
             </div>
             <!-- Modal body -->
             <div class="p-6 md:p-8">
-                <p class="text-sm text-gray-500 mb-6 font-medium">Pilih ukuran label stiker yang akan Anda gunakan untuk mencetak data terpilih.</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start mb-6">
-                    <!-- Left: Inputs -->
-                    <div class="space-y-6">
-                        <div>
-                            <label for="print-offset" class="block mb-2 text-sm font-bold text-gray-900">Mulai cetak dari posisi ke-</label>
-                            <input type="number" id="print-offset" min="1" max="10" value="1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="1-10" required>
-                            <p class="mt-1 text-xs text-gray-500 italic">Bermanfaat jika Anda menggunakan kertas stiker yang sudah sebagian terpakai.</p>
+                <div class="space-y-10">
+                    <!-- Section 1: Settings -->
+                    <section>
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">1</div>
+                            <h4 class="text-sm font-extrabold text-gray-900 uppercase tracking-wider">Pengaturan Posisi & Perataan</h4>
                         </div>
+                        
+                        <div class="grid grid-cols-2 gap-x-8 gap-y-4 items-start">
+                            <!-- Row 1: Inputs -->
+                            <div>
+                                <label for="print-offset" class="block mb-2 text-sm font-bold text-gray-900">Mulai cetak dari posisi ke-</label>
+                                <input type="number" id="print-offset" min="1" max="10" value="1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="1-10" required>
+                            </div>
 
-                        <div>
-                            <label for="print-align" class="block mb-2 text-sm font-bold text-gray-900">Perataan Horizontal</label>
-                            <select id="print-align" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
-                                <option value="center">Tengah (Default)</option>
-                                <option value="flex-start">Kiri</option>
-                                <option value="flex-end">Kanan</option>
-                            </select>
-                            <p class="mt-1 text-xs text-gray-500 italic">Sesuaikan dengan posisi masuk kertas pada printer Anda.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Right: Visualizations -->
-                    <div class="space-y-4">
-                        <div class="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100 flex flex-col items-center justify-center h-48 overflow-hidden relative">
-                            <span class="absolute top-2 left-3 text-[10px] font-bold text-emerald-800 uppercase tracking-widest z-10">Panduan Posisi</span>
-                            <img src="/img/posisi.png" alt="Panduan Posisi" class="h-full w-full object-contain mix-blend-multiply scale-110 mt-2">
-                        </div>
-                        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col items-center justify-center h-48 overflow-hidden relative">
-                            <span class="absolute top-2 left-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest z-10">Pratinjau Perataan</span>
-                            <img id="align-preview-img" src="/img/tengah.png" alt="Panduan Perataan" class="h-full w-full object-contain mix-blend-multiply scale-110 mt-2">
-                        </div>
-                    </div>
-                </div>
+                            <div>
+                                <label for="print-align" class="block mb-2 text-sm font-bold text-gray-900">Perataan Horizontal</label>
+                                <select id="print-align" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
+                                    <option value="center">Tengah (Default)</option>
+                                    <option value="flex-start">Kiri</option>
+                                    <option value="flex-end">Kanan</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Row 2: Visualizations -->
+                            <div class="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100 flex flex-col items-center justify-center h-40 overflow-hidden relative">
+                                <span class="absolute top-2 left-3 text-[10px] font-bold text-emerald-800 uppercase tracking-widest z-10">Panduan Posisi</span>
+                                <img src="/img/posisi.png" alt="Panduan Posisi" class="h-full w-full object-contain mix-blend-multiply scale-90 mt-4">
+                            </div>
+                            <div class="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100 flex flex-col items-center justify-center h-40 overflow-hidden relative">
+                                <span class="absolute top-2 left-3 text-[10px] font-bold text-emerald-800 uppercase tracking-widest z-10">Pratinjau Perataan</span>
+                                <img id="align-preview-img" src="/img/tengah.png" alt="Panduan Perataan" class="h-full w-full object-contain mix-blend-multiply scale-90 mt-4">
+                            </div>
 
-                <div class="grid grid-cols-1 max-w-sm mx-auto gap-4 mt-8">
-                    <a id="print-121-link" href="/recipients/print?type=121" target="_blank" class="flex flex-col items-center justify-center p-6 bg-emerald-50 border-2 border-emerald-100 rounded-2xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all group">
-                        <span class="text-3xl font-black mb-2 tracking-tighter">121</span>
-                        <span class="text-xs font-bold opacity-60 uppercase tracking-widest group-hover:opacity-100 transition-opacity">38 x 75 mm</span>
-                    </a>
+                            <!-- Helper Texts -->
+                            <p class="text-[11px] text-gray-500 italic leading-relaxed">Bermanfaat jika Anda menggunakan kertas stiker yang sudah sebagian terpakai.</p>
+                            <p class="text-[11px] text-gray-500 italic leading-relaxed">Sesuaikan dengan posisi masuk kertas pada printer Anda.</p>
+                        </div>
+                    </section>
+
+                    <!-- Section 2: Model & Action -->
+                    <section class="pt-8 border-t border-gray-100 text-left">
+                        <div class="flex items-center justify-start gap-3 mb-6">
+                            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">2</div>
+                            <h4 class="text-sm font-extrabold text-gray-900 uppercase tracking-wider">Pilih Model & Cetak</h4>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 max-w-xs">
+                            <a id="print-121-link" href="/recipients/print?type=121" target="_blank" class="flex flex-col items-center justify-center p-6 bg-emerald-50 border-2 border-emerald-100 rounded-3xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all group shadow-xl shadow-emerald-900/5 hover:-translate-y-1">
+                                <span class="text-4xl font-black mb-1 tracking-tighter">121</span>
+                                <span class="text-[10px] font-black opacity-60 uppercase tracking-[0.2em] group-hover:opacity-100 transition-opacity">38x75mm</span>
+                                <div class="mt-4 flex items-center text-xs font-bold">
+                                    Buka Pratinjau <i class="fa-solid fa-arrow-right ms-2"></i>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
                 </div>
             </div>
             <!-- Modal footer -->

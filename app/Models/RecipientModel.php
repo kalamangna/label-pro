@@ -12,7 +12,7 @@ class RecipientModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['name', 'address', 'is_marked', 'is_printed', 'is_selected', 'user_id', 'project_id'];
+    protected $allowedFields    = ['name', 'address', 'is_marked', 'is_printed', 'is_selected', 'user_id', 'event_id'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -29,9 +29,9 @@ class RecipientModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'name'       => 'required|min_length[3]|max_length[255]',
-        'address'    => 'permit_empty',
-        'project_id' => 'permit_empty|is_natural_no_zero',
+        'name'     => 'required|min_length[3]|max_length[255]',
+        'address'  => 'permit_empty',
+        'event_id' => 'permit_empty|is_natural_no_zero',
     ];
     protected $validationMessages   = [];
     protected $skipValidation       = false;
