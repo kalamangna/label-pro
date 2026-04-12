@@ -4,6 +4,7 @@ LabelPro adalah aplikasi berbasis web modern untuk manajemen daftar tamu dan pen
 
 ## Fitur Utama
 - **Sistem Pengguna**: Mendukung Multi-User RBAC (Admin, User) serta Mode Demo instan.
+- **Manajemen Acara**: Kelola daftar tamu berdasarkan Acara (Event) untuk pengelompokan yang lebih rapi.
 - **Manajemen Data**: Tambah, ubah, dan impor data penerima dengan mudah. Mendukung persistensi seleksi antar halaman (server-side).
 - **Impor Excel**: Impor ribuan data tamu secara massal menggunakan file Excel (.xlsx).
 - **Sticky Selection Toolbar**: Pantau jumlah penerima terpilih dan cetak label secara instan dari halaman mana pun.

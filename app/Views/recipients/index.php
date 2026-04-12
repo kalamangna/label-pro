@@ -404,6 +404,9 @@
             });
         });
 
+        const bulkDeleteModalEl = document.getElementById('bulk-delete-modal');
+        const bulkDeleteModal = bulkDeleteModalEl ? new Modal(bulkDeleteModalEl) : null;
+
         const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
         if (bulkDeleteBtn) {
             bulkDeleteBtn.addEventListener('click', function() {
@@ -413,23 +416,35 @@
                     return;
                 }
                 
-                if (confirm('Hapus ' + ids.length + ' data terpilih?')) {
-                    fetch('/recipients/bulk-delete', {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify({ ids: ids })
-                    }).then(response => response.json()).then(data => {
-                        if (data.success) {
-                            window.location.reload();
-                        } else {
-                            alert('Gagal menghapus data.');
-                        }
-                    }).catch(() => {
-                        alert('Terjadi kesalahan jaringan.');
-                    });
-                }
+                const countEl = document.getElementById('bulk-delete-count');
+                if (countEl) countEl.innerText = ids.length;
+                if (bulkDeleteModal) bulkDeleteModal.show();
             });
         }
+
+        const confirmBulkDeleteBtn = document.getElementById('confirmBulkDeleteBtn');
+        if (confirmBulkDeleteBtn) {
+            confirmBulkDeleteBtn.addEventListener('click', function() {
+                const ids = Array.from(document.querySelectorAll('.toggle-select:checked')).map(cb => cb.getAttribute('data-id'));
+                fetch('/recipients/bulk-delete', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ ids: ids })
+                }).then(response => response.json()).then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Gagal menghapus data.');
+                    }
+                }).catch(() => {
+                    alert('Terjadi kesalahan jaringan.');
+                });
+            });
+        }
+
+        const bulkStatusModalEl = document.getElementById('bulk-status-modal');
+        const bulkStatusModal = bulkStatusModalEl ? new Modal(bulkStatusModalEl) : null;
+        let pendingStatusState = null;
 
         // Bulk Printed Actions
         const handleBulkPrinted = (state) => {
@@ -439,12 +454,47 @@
                 return;
             }
 
-            const actionText = state === 1 ? 'menandai sudah cetak' : 'menandai belum cetak';
-            if (confirm('Apakah Anda yakin ingin ' + actionText + ' ' + ids.length + ' data terpilih?')) {
+            pendingStatusState = state;
+            const titleEl = document.getElementById('bulk-status-title');
+            const countEl = document.getElementById('bulk-status-count');
+            const descEl = document.getElementById('bulk-status-desc');
+            const iconContainer = document.getElementById('bulk-status-icon-container');
+            const icon = document.getElementById('bulk-status-icon');
+            const confirmBtn = document.getElementById('confirmBulkStatusBtn');
+
+            if (countEl) countEl.innerText = ids.length;
+
+            if (state === 1) {
+                if (titleEl) titleEl.innerText = 'Tandai sudah cetak';
+                if (descEl) descEl.innerText = 'Data terpilih akan ditandai sebagai sudah dicetak (coret).';
+                if (iconContainer) iconContainer.className = 'w-10 h-10 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4';
+                if (icon) icon.className = 'fa-solid fa-check-double text-xl';
+                if (confirmBtn) {
+                    confirmBtn.innerText = 'Sudah Cetak';
+                    confirmBtn.className = 'px-5 py-2.5 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100';
+                }
+            } else {
+                if (titleEl) titleEl.innerText = 'Tandai belum cetak';
+                if (descEl) descEl.innerText = 'Data terpilih akan dikembalikan ke status belum dicetak.';
+                if (iconContainer) iconContainer.className = 'w-10 h-10 bg-slate-50 text-slate-600 rounded-full flex items-center justify-center mx-auto mb-4';
+                if (icon) icon.className = 'fa-solid fa-rotate-left text-xl';
+                if (confirmBtn) {
+                    confirmBtn.innerText = 'Belum Cetak';
+                    confirmBtn.className = 'px-5 py-2.5 text-sm font-bold text-white bg-slate-600 rounded-xl hover:bg-slate-700 transition-all shadow-lg shadow-slate-100';
+                }
+            }
+
+            if (bulkStatusModal) bulkStatusModal.show();
+        };
+
+        const confirmBulkStatusBtn = document.getElementById('confirmBulkStatusBtn');
+        if (confirmBulkStatusBtn) {
+            confirmBulkStatusBtn.addEventListener('click', function() {
+                const ids = Array.from(document.querySelectorAll('.toggle-select:checked')).map(cb => cb.getAttribute('data-id'));
                 fetch('/recipients/bulk-printed', {
                     method: 'POST',
                     headers: headers,
-                    body: JSON.stringify({ ids: ids, state: state })
+                    body: JSON.stringify({ ids: ids, state: pendingStatusState })
                 }).then(response => response.json()).then(data => {
                     if (data.success) {
                         window.location.reload();
@@ -454,8 +504,8 @@
                 }).catch(() => {
                     alert('Terjadi kesalahan jaringan.');
                 });
-            }
-        };
+            });
+        }
 
         const bulkMarkPrintedBtn = document.getElementById('bulkMarkPrintedBtn');
         const bulkMarkNotPrintedBtn = document.getElementById('bulkMarkNotPrintedBtn');
@@ -593,6 +643,44 @@
                     <button type="submit" class="px-6 py-2 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">Simpan Perubahan</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Delete Modal -->
+<div id="bulk-delete-modal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100 text-left">
+            <div class="p-6 text-center">
+                <div class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-circle-exclamation text-xl"></i>
+                </div>
+                <h3 class="mb-2 text-lg font-bold text-gray-900">Hapus <span id="bulk-delete-count">0</span> data terpilih?</h3>
+                <p class="mb-6 text-sm text-gray-500 italic">Tindakan ini tidak dapat dibatalkan dan data akan terhapus permanen.</p>
+                <div class="flex justify-center gap-3">
+                    <button data-modal-hide="bulk-delete-modal" type="button" class="px-5 py-2.5 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
+                    <button id="confirmBulkDeleteBtn" type="button" class="px-5 py-2.5 text-sm font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100">Hapus Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Status Modal -->
+<div id="bulk-status-modal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100 text-left">
+            <div class="p-6 text-center">
+                <div id="bulk-status-icon-container" class="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i id="bulk-status-icon" class="fa-solid text-xl"></i>
+                </div>
+                <h3 class="mb-2 text-lg font-bold text-gray-900"><span id="bulk-status-title">Perbarui</span> <span id="bulk-status-count">0</span> data?</h3>
+                <p class="mb-6 text-sm text-gray-500 italic" id="bulk-status-desc">Tindakan ini akan mengubah status cetak pada data terpilih.</p>
+                <div class="flex justify-center gap-3">
+                    <button data-modal-hide="bulk-status-modal" type="button" class="px-5 py-2.5 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
+                    <button id="confirmBulkStatusBtn" type="button" class="px-5 py-2.5 text-sm font-bold text-white rounded-xl transition-all shadow-lg"></button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
