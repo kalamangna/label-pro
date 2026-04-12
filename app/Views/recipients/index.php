@@ -1,5 +1,4 @@
 <?= $this->extend('layout/main') ?>
-
 <?= $this->section('content') ?>
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-6">
     <div class="flex items-center gap-4">
@@ -15,24 +14,21 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-3">
+        <?php if (session()->get('role') !== 'admin'): ?>
         <div class="flex gap-2 w-full sm:w-auto">
-            <a href="/recipients/import" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
-                <i class="fa-solid fa-file-import me-2 text-emerald-600"></i>
-                Impor
-            </a>
+            <?php if (!empty($projectId)): ?>
+                <a href="/recipients/import?project_id=<?= esc($projectId) ?>" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
+                    <i class="fa-solid fa-file-import me-2 text-emerald-600"></i>
+                    Impor Data
+                </a>
+            <?php endif; ?>
 
             <button data-modal-target="add-recipient-modal" data-modal-toggle="add-recipient-modal" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">
                 <i class="fa-solid fa-plus me-2"></i>
                 Tambah
             </button>
         </div>
-
-        <div class="h-10 w-px bg-gray-200 hidden sm:block mx-2"></div>
-
-        <button id="printLabelBtn" class="flex-1 sm:flex-none text-white bg-amber-500 border border-amber-600 hover:bg-amber-600 focus:ring-4 focus:ring-amber-100 font-bold rounded-xl text-sm px-8 py-3 inline-flex items-center justify-center transition-all shadow-xl shadow-amber-100 active:scale-95" type="button">
-            <i class="fa-solid fa-print me-2 text-lg"></i>
-            Cetak Label
-        </button>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -72,7 +68,7 @@
         </div>
 
         <!-- Status Filter -->
-        <div class="md:col-span-3">
+        <div class="md:col-span-2">
             <select name="status" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-slate-500 focus:border-slate-500 block w-full h-[42px] px-2.5 transition-all">
                 <option value="">Semua Status</option>
                 <option value="0" <?= (string)($status ?? '') === '0' ? 'selected' : '' ?>>Belum Dicetak</option>
@@ -80,30 +76,42 @@
             </select>
         </div>
 
+        <!-- Project Filter -->
+        <div class="md:col-span-3">
+            <select name="project_id" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-slate-500 focus:border-slate-500 block w-full h-[42px] px-2.5 transition-all">
+                <option value="">Semua Proyek</option>
+                <?php foreach ($projects as $project): ?>
+                    <option value="<?= $project['id'] ?>" <?= (string)($projectId ?? '') === (string)$project['id'] ? 'selected' : '' ?>><?= esc($project['name']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
         <!-- Sort Filter -->
         <div class="md:col-span-3">
-            <select name="sort_select" id="sort-select" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-slate-500 focus:border-slate-500 block w-full h-[42px] px-2.5 transition-all">
-                <option value="id|desc" <?= ($sort ?? '') == 'id' ? 'selected' : '' ?>>Urutan: Terbaru</option>
-                <option value="name|asc" <?= ($sort ?? '') == 'name' && ($dir ?? 'asc') == 'asc' ? 'selected' : '' ?>>Nama: A-Z</option>
-                <option value="name|desc" <?= ($sort ?? '') == 'name' && ($dir ?? 'asc') == 'desc' ? 'selected' : '' ?>>Nama: Z-A</option>
-                <option value="address|asc" <?= ($sort ?? '') == 'address' && ($dir ?? 'asc') == 'asc' ? 'selected' : '' ?>>Alamat: A-Z</option>
-                <option value="address|desc" <?= ($sort ?? '') == 'address' && ($dir ?? 'asc') == 'desc' ? 'selected' : '' ?>>Alamat: Z-A</option>
+            <select id="sort-select" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-slate-500 focus:border-slate-500 block w-full h-[42px] px-2.5 transition-all">
+                <option value="id|desc" <?= ($sort == 'id' && $dir == 'desc') ? 'selected' : '' ?>>Urutan: Terbaru</option>
+                <option value="id|asc" <?= ($sort == 'id' && $dir == 'asc') ? 'selected' : '' ?>>Urutan: Terlama</option>
+                <option value="name|asc" <?= ($sort == 'name' && $dir == 'asc') ? 'selected' : '' ?>>Nama: A-Z</option>
+                <option value="name|desc" <?= ($sort == 'name' && $dir == 'desc') ? 'selected' : '' ?>>Nama: Z-A</option>
+                <option value="address|asc" <?= ($sort == 'address' && $dir == 'asc') ? 'selected' : '' ?>>Alamat: A-Z</option>
+                <option value="address|desc" <?= ($sort == 'address' && $dir == 'desc') ? 'selected' : '' ?>>Alamat: Z-A</option>
             </select>
             <input type="hidden" name="sort" id="real-sort" value="<?= esc($sort ?? 'id') ?>">
             <input type="hidden" name="dir" id="real-dir" value="<?= esc($dir ?? 'desc') ?>">
         </div>
 
         <!-- Buttons -->
-        <div class="md:col-span-2 flex gap-2">
-            <button type="submit" class="flex-1 h-[42px] bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-900 focus:ring-4 focus:ring-slate-200 transition-all active:scale-95 shadow-md shadow-slate-200 flex items-center justify-center">Filter</button>
-            <?php if (!empty($search) || ($status ?? '') !== '' || ($sort ?? 'id') !== 'id'): ?>
-                <a href="/recipients" class="flex-1 h-[42px] flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all active:scale-95 text-center">Reset</a>
+        <div class="md:col-span-12 flex justify-end gap-2">
+            <button type="submit" class="w-full sm:w-32 h-[42px] bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-900 focus:ring-4 focus:ring-slate-200 transition-all active:scale-95 shadow-md shadow-slate-200 flex items-center justify-center">Filter</button>
+            <?php if (!empty($search) || ($status ?? '') !== '' || ($sort ?? 'id') !== 'id' || !empty($projectId)): ?>
+                <a href="/recipients" class="w-full sm:w-32 h-[42px] flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all active:scale-95 text-center">Reset</a>
             <?php endif; ?>
         </div>
     </form>
 </div>
 
 <!-- Bulk Actions Bar -->
+<?php if (session()->get('role') !== 'admin'): ?>
 <div class="mb-6 flex flex-wrap items-center gap-2 p-2 bg-emerald-50/50 border border-emerald-100 rounded-xl">
     <span class="text-[10px] uppercase tracking-widest font-black text-emerald-800 px-3 py-1">Aksi Massal:</span>
     <button id="bulkDeleteBtn" type="button" class="text-red-600 bg-white border border-gray-200 hover:bg-red-50 focus:ring-4 focus:ring-red-100 font-bold rounded-lg text-[10px] px-3 py-1.5 inline-flex items-center transition-all">
@@ -119,55 +127,76 @@
         Tandai Belum Cetak
     </button>
 </div>
+<?php endif; ?>
 
 <!-- Table -->
 <div class="relative overflow-x-auto border border-gray-100 sm:rounded-2xl shadow-sm bg-white">
     <table class="w-full text-sm text-left text-gray-500">
         <thead class="text-xs text-gray-400 uppercase bg-gray-50/50 border-b border-gray-100">
             <tr>
+                <?php if (session()->get('role') !== 'admin'): ?>
                 <th scope="col" class="p-4 w-4 text-center">
                     <input id="select-all" type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer">
                 </th>
+                <?php endif; ?>
                 <th scope="col" class="px-6 py-4 font-bold">Nama Penerima</th>
                 <th scope="col" class="px-6 py-4 font-bold">Alamat</th>
+                <th scope="col" class="px-6 py-4 font-bold">Proyek</th>
                 <?php if (session()->get('role') === 'admin'): ?>
                     <th scope="col" class="px-6 py-4 font-bold text-center">Ditambahkan Oleh</th>
                 <?php endif; ?>
                 <th scope="col" class="px-6 py-4 text-center font-bold">Status</th>
+                <?php if (session()->get('role') !== 'admin'): ?>
                 <th scope="col" class="px-6 py-4 text-right font-bold">Aksi</th>
+                <?php endif; ?>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
             <?php foreach ($recipients as $recipient): ?>
                 <tr id="row-<?= $recipient['id'] ?>" class="bg-white hover:bg-emerald-50/30 transition-colors <?= ($recipient['is_printed'] ?? 0) ? 'bg-gray-50/30' : '' ?>">
+                    <?php if (session()->get('role') !== 'admin'): ?>
                     <td class="p-4 text-center">
-                        <input type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer toggle-select" data-id="<?= $recipient['id'] ?>">
+                        <input type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer toggle-select" data-id="<?= $recipient['id'] ?>" <?= ($recipient['is_selected'] ?? 0) ? 'checked' : '' ?>>
                     </td>
-                    <th scope="row" class="px-6 py-4 font-bold text-gray-900 whitespace-nowrap <?= ($recipient['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : '' ?>">
+                    <?php endif; ?>
+                    <th scope="row" class="px-6 py-4 font-bold text-gray-900 <?= ($recipient['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : '' ?>">
                         <?= esc($recipient['name']) ?>
                     </th>
                     <td class="px-6 py-4 <?= ($recipient['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : 'text-gray-600 font-medium' ?>">
                         <div class="line-clamp-1"><?= esc($recipient['address']) ?></div>
                     </td>
+                    <td class="px-6 py-4">
+                        <span class="text-xs font-medium text-gray-500">
+                            <i class="fa-solid fa-folder me-1 text-[10px] opacity-40"></i>
+                            <?= esc($recipient['project_name'] ?? 'Tanpa Proyek') ?>
+                        </span>
+                    </td>
                     <?php if (session()->get('role') === 'admin'): ?>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-gray-100 text-gray-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-gray-200">
-                                <?= esc($recipient['added_by'] ?? 'Tidak diketahui') ?>
-                            </span>
-                        </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-800">
+                            <i class="fa-solid fa-user me-1.5 text-[10px] opacity-50"></i>
+                            <?= esc($recipient['added_by'] ?? 'Sistem') ?>
+                        </span>
+                    </td>
                     <?php endif; ?>
                     <td class="px-6 py-4 text-center">
+                        <?php if (session()->get('role') !== 'admin'): ?>
                         <label class="inline-flex items-center cursor-pointer">
                             <input type="checkbox" class="sr-only peer toggle-printed" data-id="<?= $recipient['id'] ?>" <?= ($recipient['is_printed'] ?? 0) ? 'checked' : '' ?>>
                             <div class="relative w-8 h-4 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-500"></div>
                         </label>
+                        <?php else: ?>
+                            <?= ($recipient['is_printed'] ?? 0) ? '<span class="text-xs text-emerald-600 font-bold"><i class="fa-solid fa-check me-1"></i>Sudah</span>' : '<span class="text-xs text-gray-400 font-bold">Belum</span>' ?>
+                        <?php endif; ?>
                     </td>
+                    <?php if (session()->get('role') !== 'admin'): ?>
                     <td class="px-6 py-4 text-right">
                         <div class="flex justify-end gap-2">
                             <button type="button" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors edit-recipient-btn" 
                                     data-id="<?= $recipient['id'] ?>" 
                                     data-name="<?= esc($recipient['name']) ?>" 
                                     data-address="<?= esc($recipient['address']) ?>"
+                                    data-project-id="<?= $recipient['project_id'] ?>"
                                     title="Edit">
                                 <i class="fa-solid fa-pen-to-square text-xs"></i>
                             </button>
@@ -195,15 +224,20 @@
                             </div>
                         </div>
                     </td>
+                    <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
             <?php if (empty($recipients)): ?>
                 <tr>
-                    <td colspan="<?= session()->get('role') === 'admin' ? '6' : '5' ?>" class="px-6 py-16 text-center bg-gray-50/30 text-gray-400 font-medium">
+                    <td colspan="<?= session()->get('role') === 'admin' ? '5' : '6' ?>" class="px-6 py-16 text-center bg-gray-50/30 text-gray-400 font-medium">
                         <div class="max-w-xs mx-auto text-center">
                             <i class="fa-solid fa-inbox text-4xl mb-4 opacity-20 text-emerald-600"></i>
                             <p class="text-sm font-bold text-gray-900 mb-1">Belum ada data</p>
-                            <p class="text-xs text-gray-500 leading-relaxed">Gunakan tombol Tambah atau Impor untuk mengisi daftar penerima label Anda.</p>
+                            <?php if (session()->get('role') === 'admin'): ?>
+                                <p class="text-xs text-gray-500 leading-relaxed">Sistem belum memiliki data penerima yang ditambahkan oleh pengguna.</p>
+                            <?php else: ?>
+                                <p class="text-xs text-gray-500 leading-relaxed">Gunakan tombol Tambah atau Impor untuk mengisi daftar penerima label Anda.</p>
+                            <?php endif; ?>
                         </div>
                     </td>
                 </tr>
@@ -216,6 +250,22 @@
     <?= $pager->links('default', 'tailwind') ?>
 </div>
 
+<?php if (session()->get('role') !== 'admin'): ?>
+<!-- Sticky Selection Toolbar -->
+<div id="selection-toolbar" class="<?= ($selectedCount ?? 0) > 0 ? 'flex' : 'hidden' ?> fixed bottom-0 left-0 w-full z-50 items-center justify-between px-6 py-4 bg-slate-900 shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t border-slate-700 text-white transition-all duration-300">
+    <div class="flex items-center gap-3">
+        <div class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold" id="selected-count-badge"><?= esc($selectedCount ?? 0) ?></div>
+        <span class="text-base font-medium">Penerima Terpilih</span>
+    </div>
+    <div class="flex gap-3">
+        <button type="button" id="clearSelectionBtn" class="text-sm font-bold text-slate-300 hover:text-white transition-colors px-3 py-2 border border-transparent hover:border-slate-700 rounded-xl">Batal</button>
+        <button type="button" id="openPrintModalBtn" class="text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-900 px-6 py-2 rounded-xl transition-colors shadow-lg shadow-amber-900/20">
+            <i class="fa-solid fa-print me-2"></i> Cetak Label
+        </button>
+    </div>
+</div>
+<?php endif; ?>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const headers = {
@@ -226,6 +276,21 @@
 
         const selectAllCheckbox = document.getElementById('select-all');
         const selectCheckboxes = document.querySelectorAll('.toggle-select');
+        const selectionToolbar = document.getElementById('selection-toolbar');
+        const countBadge = document.getElementById('selected-count-badge');
+
+        function updateToolbar(count) {
+            if (countBadge) countBadge.textContent = count;
+            if (selectionToolbar) {
+                if (count > 0) {
+                    selectionToolbar.classList.remove('hidden');
+                    selectionToolbar.classList.add('flex');
+                } else {
+                    selectionToolbar.classList.add('hidden');
+                    selectionToolbar.classList.remove('flex');
+                }
+            }
+        }
 
         function updateSelectAllState() {
             const checkedCount = document.querySelectorAll('.toggle-select:checked').length;
@@ -237,35 +302,73 @@
 
         selectCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', function() {
-                const checkedCount = document.querySelectorAll('.toggle-select:checked').length;
+                const id = this.getAttribute('data-id');
+                const originalState = !this.checked;
 
-                if (this.checked && checkedCount > 10) {
-                    alert('Maksimal 10 penerima yang dapat dipilih.');
-                    this.checked = false;
-                    return;
-                }
-                updateSelectAllState();
+                fetch(`/recipients/toggle-selection/${id}`, {
+                    method: 'POST',
+                    headers: headers,
+                }).then(response => response.json()).then(data => {
+                    if (data.success) {
+                        updateToolbar(data.count);
+                        updateSelectAllState();
+                    } else {
+                        if (data.limit_reached) alert(data.message);
+                        else alert('Gagal memperbarui status pilihan.');
+                        this.checked = originalState;
+                        updateSelectAllState();
+                    }
+                }).catch(() => {
+                    alert('Terjadi kesalahan jaringan.');
+                    this.checked = originalState;
+                    updateSelectAllState();
+                });
             });
         });
 
         if (selectAllCheckbox) {
             selectAllCheckbox.addEventListener('change', function() {
                 const isChecked = this.checked;
-                
-                let count = 0;
-                selectCheckboxes.forEach((cb) => {
-                    if (isChecked && count < 10) {
-                        cb.checked = true;
-                        count++;
+                const ids = Array.from(selectCheckboxes).map(cb => cb.getAttribute('data-id'));
+                const action = isChecked ? 'select' : 'deselect';
+
+                fetch('/recipients/bulk-toggle-selection', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ ids: ids, action: action })
+                }).then(response => response.json()).then(data => {
+                    if (data.success) {
+                        updateToolbar(data.count);
+                        // If limit reached partially, we should reload to reflect correct checked states
+                        if (isChecked && action === 'select' && data.count >= 10 && ids.length > (10 - data.count)) {
+                            window.location.reload();
+                        } else {
+                            selectCheckboxes.forEach(cb => cb.checked = isChecked);
+                            updateSelectAllState();
+                        }
                     } else {
-                        cb.checked = false;
+                        if (data.limit_reached) alert(data.message);
+                        else alert('Gagal memperbarui status pilihan.');
+                        this.checked = !isChecked;
+                    }
+                }).catch(() => {
+                    alert('Terjadi kesalahan jaringan.');
+                    this.checked = !isChecked;
+                });
+            });
+        }
+
+        const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+        if (clearSelectionBtn) {
+            clearSelectionBtn.addEventListener('click', function() {
+                fetch('/recipients/clear-selection', {
+                    method: 'POST',
+                    headers: headers,
+                }).then(response => response.json()).then(data => {
+                    if (data.success) {
+                        window.location.reload();
                     }
                 });
-
-                if (isChecked && selectCheckboxes.length > 10) {
-                    alert('Hanya 10 data pertama yang dipilih karena batas maksimal cetak.');
-                }
-                updateSelectAllState();
             });
         }
 
@@ -361,21 +464,33 @@
         if (bulkMarkNotPrintedBtn) bulkMarkNotPrintedBtn.addEventListener('click', () => handleBulkPrinted(0));
 
         const printModal = new Modal(document.getElementById('print-options-modal'));
-        const printLabelBtn = document.getElementById('printLabelBtn');
+        const openPrintModalBtn = document.getElementById('openPrintModalBtn');
         const print121Link = document.getElementById('print-121-link');
+        const printOffsetInput = document.getElementById('print-offset');
         
-        if (printLabelBtn) {
-            printLabelBtn.addEventListener('click', function() {
-                const checkedCheckboxes = document.querySelectorAll('.toggle-select:checked');
-                if (checkedCheckboxes.length === 0) {
-                    alert('Harap pilih setidaknya satu penerima untuk dicetak.');
-                    return;
-                }
-                
-                const selectedIds = Array.from(checkedCheckboxes).map(cb => cb.getAttribute('data-id')).join(',');
-                if (print121Link) print121Link.href = `/recipients/print?type=121&ids=${selectedIds}`;
-                
-                printModal.show();
+        function updatePrintLink() {
+            if (print121Link && printOffsetInput) {
+                let offset = parseInt(printOffsetInput.value) || 1;
+                if (offset < 1) offset = 1;
+                if (offset > 10) offset = 10;
+                print121Link.href = `/recipients/print?type=121&offset=${offset - 1}`;
+            }
+        }
+
+        if (printOffsetInput) {
+            printOffsetInput.addEventListener('input', updatePrintLink);
+            printOffsetInput.addEventListener('change', updatePrintLink);
+        }
+
+        function openPrintModal() {
+            if (printOffsetInput) printOffsetInput.value = 1;
+            updatePrintLink();
+            printModal.show();
+        }
+
+        if (openPrintModalBtn) {
+            openPrintModalBtn.addEventListener('click', function() {
+                openPrintModal();
             });
         }
 
@@ -487,6 +602,13 @@
             <!-- Modal body -->
             <div class="p-6 md:p-8">
                 <p class="text-sm text-gray-500 mb-6 font-medium">Pilih ukuran label stiker yang akan Anda gunakan untuk mencetak data terpilih.</p>
+                
+                <div class="mb-6">
+                    <label for="print-offset" class="block mb-2 text-sm font-bold text-gray-900">Mulai cetak dari posisi ke-</label>
+                    <input type="number" id="print-offset" min="1" max="10" value="1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="1-10" required>
+                    <p class="mt-1 text-xs text-gray-500 italic">Bermanfaat jika Anda menggunakan kertas stiker yang sudah sebagian terpakai.</p>
+                </div>
+
                 <div class="grid grid-cols-1 max-w-sm mx-auto gap-4">
                     <a id="print-121-link" href="/recipients/print?type=121" target="_blank" class="flex flex-col items-center justify-center p-6 bg-emerald-50 border-2 border-emerald-100 rounded-2xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all group">
                         <span class="text-3xl font-black mb-2 tracking-tighter">121</span>

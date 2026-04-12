@@ -71,7 +71,7 @@
                 </div>
                 <div class="relative">
                     <div class="absolute -inset-4 bg-emerald-500/10 rounded-3xl blur-2xl"></div>
-                    <img src="/img/undraw_printing.svg" alt="Ilustrasi Cetak Label" class="relative w-full max-w-lg mx-auto drop-shadow-2xl transform hover:scale-105 transition-transform duration-500">
+                    <img src="/img/hero.svg" alt="Ilustrasi Cetak Label" class="relative w-full mx-auto drop-shadow-2xl transform hover:scale-105 transition-transform duration-500">
                 </div>
             </div>
         </div>
@@ -121,7 +121,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid lg:grid-cols-2 gap-16 items-center">
                 <div class="order-2 lg:order-1">
-                    <img src="/img/undraw_spreadsheet.svg" alt="Manajemen Data Tamu" class="w-full max-w-md mx-auto drop-shadow-xl">
+                    <img src="/img/flow.svg" alt="Manajemen Data Tamu" class="w-full mx-auto drop-shadow-xl">
                 </div>
                 <div class="order-1 lg:order-2">
                     <h2 class="text-base font-bold text-emerald-600 uppercase tracking-widest mb-4">Solusi Cerdas</h2>
@@ -175,45 +175,101 @@
                 <p class="text-emerald-200 text-lg">Tanpa biaya bulanan. Tanpa biaya tersembunyi. Fokus saja pada kesuksesan event Anda.</p>
             </div>
 
-            <div class="max-w-md mx-auto bg-white rounded-3xl overflow-hidden text-gray-900 shadow-2xl relative">
-                <div class="absolute top-0 right-0 bg-amber-500 text-white px-6 py-2 rounded-bl-3xl text-sm font-bold">
-                    BEST SELLER
-                </div>
-                <div class="p-10 text-center">
-                    <h4 class="text-2xl font-bold mb-4">Akses Unlimited</h4>
-                    <div class="flex items-baseline justify-center mb-8">
-                        <span class="text-5xl font-extrabold tracking-tight">Rp 99rb</span>
-                        <span class="ml-1 text-xl text-gray-500 line-through">Rp 250rb</span>
+            <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto items-center">
+                <!-- Paket Basic -->
+                <div class="bg-white rounded-3xl overflow-hidden text-gray-900 shadow-xl relative opacity-90 hover:opacity-100 transition-opacity">
+                    <div class="p-8 text-center border-b border-gray-100">
+                        <h4 class="text-xl font-bold mb-2">Paket Basic</h4>
+                        <p class="text-sm text-gray-500 mb-6">Cocok untuk acara kecil</p>
+                        <div class="flex items-baseline justify-center">
+                            <span class="text-4xl font-extrabold tracking-tight">Rp 49rb</span>
+                        </div>
                     </div>
-                    <ul class="text-left space-y-4 mb-10">
-                        <li class="flex items-center text-sm">
-                            <svg class="w-5 h-5 text-emerald-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
-                            </svg>
-                            Jumlah Tamu Tak Terbatas
-                        </li>
-                        <li class="flex items-center text-sm">
-                            <svg class="w-5 h-5 text-emerald-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
-                            </svg>
-                            Akses Template Label 121
-                        </li>
-                        <li class="flex items-center text-sm">
-                            <svg class="w-5 h-5 text-emerald-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
-                            </svg>
-                            Gratis Update Selamanya
-                        </li>
-                        <li class="flex items-center text-sm">
-                            <svg class="w-5 h-5 text-emerald-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
-                            </svg>
-                            Dukungan Prioritas
-                        </li>
-                    </ul>
-                    <a href="https://wa.me/6282188344982?text=Halo%20LabelPro%2C%20saya%20ingin%20memesan%20paket%20Akses%20Unlimited." class="block bg-amber-500 text-white py-4 rounded-xl text-lg font-bold hover:bg-amber-600 transition-all shadow-xl shadow-amber-100">
-                        Pesan Sekarang
-                    </a>
+                    <div class="p-8 bg-gray-50">
+                        <ul class="text-left space-y-4 mb-8">
+                            <li class="flex items-start text-sm">
+                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                Maksimal 1 Proyek
+                            </li>
+                            <li class="flex items-start text-sm">
+                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                Maksimal 500 Tamu
+                            </li>
+                            <li class="flex items-start text-sm text-gray-400">
+                                <svg class="w-5 h-5 text-gray-300 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"></path></svg>
+                                Tidak Ada Update Otomatis
+                            </li>
+                        </ul>
+                        <a href="https://wa.me/6282188344982?text=Halo%20LabelPro%2C%20saya%20ingin%20memesan%20Paket%20Basic." class="block w-full bg-white text-emerald-600 border-2 border-emerald-600 py-3 rounded-xl text-sm font-bold hover:bg-emerald-50 transition-all text-center">
+                            Pesan Basic
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Paket Pro -->
+                <div class="bg-white rounded-3xl overflow-hidden text-gray-900 shadow-2xl relative transform scale-105 z-10 border-2 border-amber-400">
+                    <div class="absolute top-0 inset-x-0 flex justify-center">
+                        <span class="bg-amber-500 text-white px-4 py-1 rounded-b-xl text-xs font-bold tracking-wider uppercase shadow-md">
+                            Best Seller
+                        </span>
+                    </div>
+                    <div class="p-8 pt-10 text-center border-b border-gray-100">
+                        <h4 class="text-2xl font-bold mb-2 text-emerald-600">Paket Pro</h4>
+                        <p class="text-sm text-gray-500 mb-6">Pilihan paling populer</p>
+                        <div class="flex items-baseline justify-center">
+                            <span class="text-5xl font-extrabold tracking-tight">Rp 99rb</span>
+                            <span class="ml-2 text-lg text-gray-400 line-through">Rp 150rb</span>
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <ul class="text-left space-y-4 mb-8">
+                            <li class="flex items-start text-sm font-medium">
+                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                Hingga 10 Proyek Event
+                            </li>
+                            <li class="flex items-start text-sm font-medium">
+                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                Kapasitas 5.000 Tamu
+                            </li>
+                            <li class="flex items-start text-sm font-medium">
+                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                Dukungan Prioritas 24/7
+                            </li>
+                        </ul>
+                        <a href="https://wa.me/6282188344982?text=Halo%20LabelPro%2C%20saya%20ingin%20memesan%20Paket%20Pro." class="block w-full bg-amber-500 text-white py-4 rounded-xl text-lg font-bold hover:bg-amber-600 transition-all shadow-xl shadow-amber-100 text-center">
+                            Pesan Paket Pro
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Paket Unlimited -->
+                <div class="bg-white rounded-3xl overflow-hidden text-gray-900 shadow-xl relative opacity-90 hover:opacity-100 transition-opacity">
+                    <div class="p-8 text-center border-b border-gray-100">
+                        <h4 class="text-xl font-bold mb-2">Unlimited</h4>
+                        <p class="text-sm text-gray-500 mb-6">Untuk EO & Percetakan</p>
+                        <div class="flex items-baseline justify-center">
+                            <span class="text-4xl font-extrabold tracking-tight">Rp 199rb</span>
+                        </div>
+                    </div>
+                    <div class="p-8 bg-gray-50">
+                        <ul class="text-left space-y-4 mb-8">
+                            <li class="flex items-start text-sm">
+                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                Proyek Tanpa Batas
+                            </li>
+                            <li class="flex items-start text-sm">
+                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                Jumlah Tamu Tak Terbatas
+                            </li>
+                            <li class="flex items-start text-sm">
+                                <svg class="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                Gratis Update Selamanya
+                            </li>
+                        </ul>
+                        <a href="https://wa.me/6282188344982?text=Halo%20LabelPro%2C%20saya%20ingin%20memesan%20Paket%20Unlimited." class="block w-full bg-white text-emerald-600 border-2 border-emerald-600 py-3 rounded-xl text-sm font-bold hover:bg-emerald-50 transition-all text-center">
+                            Pesan Unlimited
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -230,4 +286,4 @@
 
 </body>
 
-</html>>l>>
+</html>

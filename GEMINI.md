@@ -18,17 +18,19 @@
   - UI: 100% **Bahasa Indonesia**.
   - Timezone: `Asia/Jakarta` (WIB).
 - **Excel Import**: Uses `phpoffice/phpspreadsheet`. Skips headers and duplicate name+address pairs.
-- **PDF Export**: Uses `dompdf/dompdf`. Table-based layout for high precision on A4.
 - **Printing & Selection**:
-  - Selection is strictly client-side via JavaScript (no `is_selected` in database).
-  - Supports label type **121** (38x75mm).
-  - Automatic print trigger via `window.print()`.
-  - Hard limit of **10 recipients** per print batch to ensure alignment.
-  - Prefix "di-" added automatically. If address is empty, uses "Tempat".
+  - **Server-side Selection**: Persistent selection state stored in the database (`is_selected`).
+  - **Sticky Toolbar**: Real-time selected count and actions (Print/Clear) in a full-width footer toolbar.
+  - **Label Offset**: Supports starting print from any position (1-10) to reuse partially spent sticker sheets.
+  - **Label Type 121**: Precision layout for 38x75mm stickers (2 columns x 5 rows).
+  - **Print Layout**: Visualized with yellow backing and white stickers in the browser preview.
+  - **Auto-Print**: Triggers `window.print()` automatically when parameters are met.
+  - **Batch Limit**: Strictly enforces a maximum of 10 recipients per print page.
+  - **Auto-Prefix**: "di-" added automatically. If address is empty, uses "Tempat".
 
 ## Preferred Styles
 - Controller logic: Concise; use models for DB interaction.
 - UI Design: Minimal dashboard style, using modern standard web conventions (modals, client-side interactions where appropriate).
 - Interaction: Single-page workflow using Modals for CRUD (Recipients and Users).
-- Data State: Use fetch API for background updates (e.g., printed status).
-- Bulk Actions: Client-side gathering of IDs for mass operations.
+- Data State: Use fetch API for background updates (e.g., printed status, selection state).
+- Bulk Actions: Handled via AJAX with immediate UI feedback.

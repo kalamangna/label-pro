@@ -1,5 +1,4 @@
 <?= $this->extend('layout/main') ?>
-
 <?= $this->section('content') ?>
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-6">
     <div class="flex items-center gap-4">
@@ -53,6 +52,7 @@
             <tr>
                 <th scope="col" class="px-6 py-4 font-bold">Username</th>
                 <th scope="col" class="px-6 py-4 font-bold text-center">Peran (Role)</th>
+                <th scope="col" class="px-6 py-4 font-bold text-center">Paket</th>
                 <th scope="col" class="px-6 py-4 font-bold text-center">Dibuat Pada</th>
                 <th scope="col" class="px-6 py-4 text-right font-bold">Aksi</th>
             </tr>
@@ -80,6 +80,14 @@
                             <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-emerald-100 uppercase tracking-wider">Standard User</span>
                         <?php endif; ?>
                     </td>
+                    <td class="px-6 py-4 text-center">
+                        <?php 
+                            $userLimits = \App\Models\UserModel::getPackageLimits($user['package'] ?? 'basic', $user['role']);
+                        ?>
+                        <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 uppercase tracking-wider">
+                            <?= esc($userLimits['name']) ?>
+                        </span>
+                    </td>
                     <td class="px-6 py-4 text-center text-gray-400 text-xs">
                         <?= date('d M Y, H:i', strtotime($user['created_at'])) ?> WIB
                     </td>
@@ -89,6 +97,7 @@
                                     data-id="<?= $user['id'] ?>" 
                                     data-username="<?= esc($user['username']) ?>" 
                                     data-role="<?= esc($user['role']) ?>"
+                                    data-package="<?= esc($user['package'] ?? 'basic') ?>"
                                     title="Edit">
                                 <i class="fa-solid fa-pen-to-square text-xs"></i>
                             </button>
@@ -151,6 +160,14 @@
                         <option value="admin">Administrator</option>
                     </select>
                 </div>
+                <div id="package-div">
+                    <label for="package" class="block mb-2 text-sm font-bold text-gray-900">Paket</label>
+                    <select name="package" id="package" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
+                        <option value="basic">Paket Basic (1 Proyek, 500 Tamu)</option>
+                        <option value="pro">Paket Pro (10 Proyek, 5.000 Tamu)</option>
+                        <option value="unlimited">Paket Unlimited (Tanpa Batas)</option>
+                    </select>
+                </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" data-modal-hide="add-user-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
                     <button type="submit" class="px-6 py-2 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">Simpan</button>
@@ -187,6 +204,14 @@
                         <option value="admin">Administrator</option>
                     </select>
                 </div>
+                <div id="edit-package-div">
+                    <label for="edit-package" class="block mb-2 text-sm font-bold text-gray-900">Paket</label>
+                    <select name="package" id="edit-package" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
+                        <option value="basic">Paket Basic (1 Proyek, 500 Tamu)</option>
+                        <option value="pro">Paket Pro (10 Proyek, 5.000 Tamu)</option>
+                        <option value="unlimited">Paket Unlimited (Tanpa Batas)</option>
+                    </select>
+                </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" data-modal-hide="edit-user-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
                     <button type="submit" class="px-6 py-2 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">Simpan Perubahan</button>
@@ -198,6 +223,30 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Toggle package visibility based on role
+        const togglePackageVisibility = (roleSelectId, packageDivId) => {
+            const roleSelect = document.getElementById(roleSelectId);
+            const packageDiv = document.getElementById(packageDivId);
+            
+            if (roleSelect && packageDiv) {
+                const updateVisibility = () => {
+                    if (roleSelect.value === 'admin') {
+                        packageDiv.classList.add('hidden');
+                        packageDiv.querySelector('select').removeAttribute('required');
+                    } else {
+                        packageDiv.classList.remove('hidden');
+                        packageDiv.querySelector('select').setAttribute('required', 'required');
+                    }
+                };
+                
+                roleSelect.addEventListener('change', updateVisibility);
+                updateVisibility(); // Initial check
+            }
+        };
+
+        togglePackageVisibility('role', 'package-div');
+        togglePackageVisibility('edit-role', 'edit-package-div');
+
         // Edit User Modal Logic
         const editUserModalElement = document.getElementById('edit-user-modal');
         const editUserModal = editUserModalElement ? new Modal(editUserModalElement) : null;
@@ -207,10 +256,12 @@
                 const id = this.getAttribute('data-id');
                 const username = this.getAttribute('data-username');
                 const role = this.getAttribute('data-role');
+                const userPackage = this.getAttribute('data-package');
                 
                 const modal = document.getElementById('edit-user-modal');
                 modal.querySelector('#edit-username').value = username;
                 modal.querySelector('#edit-role').value = role;
+                modal.querySelector('#edit-package').value = userPackage;
                 modal.querySelector('#edit-password').value = '';
                 modal.querySelector('#edit-user-form').action = '/users/update/' + id;
                 

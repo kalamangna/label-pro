@@ -26,11 +26,16 @@ class Users extends BaseController
 
     public function store()
     {
+        $role = $this->request->getPost('role');
         $rules = [
             'username' => 'required|min_length[3]|is_unique[users.username]',
             'password' => 'required|min_length[5]',
             'role'     => 'required|in_list[admin,user]',
         ];
+
+        if ($role === 'user') {
+            $rules['package'] = 'required|in_list[basic,pro,unlimited]';
+        }
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
@@ -39,7 +44,8 @@ class Users extends BaseController
         $this->userModel->save([
             'username' => $this->request->getPost('username'),
             'password' => password_hash((string)$this->request->getPost('password'), PASSWORD_DEFAULT),
-            'role'     => $this->request->getPost('role'),
+            'role'     => $role,
+            'package'  => $role === 'admin' ? 'basic' : $this->request->getPost('package'),
         ]);
 
         return redirect()->to('/users')->with('message', 'Pengguna berhasil ditambahkan.');
@@ -52,10 +58,15 @@ class Users extends BaseController
             return redirect()->to('/users')->with('error', 'Pengguna tidak ditemukan.');
         }
 
+        $role = $this->request->getPost('role');
         $rules = [
             'username' => "required|min_length[3]|is_unique[users.username,id,{$id}]",
             'role'     => 'required|in_list[admin,user]',
         ];
+
+        if ($role === 'user') {
+            $rules['package'] = 'required|in_list[basic,pro,unlimited]';
+        }
 
         $password = $this->request->getPost('password');
         if (!empty($password)) {
@@ -68,14 +79,17 @@ class Users extends BaseController
 
         $data = [
             'username' => $this->request->getPost('username'),
-            'role'     => $this->request->getPost('role'),
+            'role'     => $role,
+            'package'  => $role === 'admin' ? 'basic' : $this->request->getPost('package'),
         ];
 
         if (!empty($password)) {
             $data['password'] = password_hash((string)$password, PASSWORD_DEFAULT);
         }
 
-        $this->userModel->update($id, $data);
+        if (!$this->userModel->skipValidation()->update($id, $data)) {
+            return redirect()->back()->with('error', 'Gagal memperbarui pengguna. Silakan coba lagi.');
+        }
 
         return redirect()->to('/users')->with('message', 'Pengguna berhasil diperbarui.');
     }

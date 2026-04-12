@@ -24,13 +24,14 @@
         .page {
             width: 210mm;
             height: 297mm;
-            background: white;
+            background-color: #fef08a; /* Light yellow background for sticker backing */
             margin: 0 auto;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             position: relative;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding-top: 5mm;
         }
 
         /* The actual sticker sheet area */
@@ -47,7 +48,7 @@
             grid-template-columns: repeat(2, 75mm);
             grid-template-rows: repeat(5, 38mm);
             column-gap: 2mm;
-            row-gap: 2mm;
+            row-gap: 1mm;
         }
 
         .label {
@@ -61,11 +62,12 @@
             align-items: center;
             text-align: center;
             overflow: hidden;
-            border: 1px dashed #cbd5e1;
+            background-color: white; /* White sticker */
+            border-radius: 2mm; /* Rounded corners typical for stickers */
         }
 
         .name {
-            font-size: 12pt;
+            font-size: 10pt;
             font-weight: bold;
             line-height: 1.2;
             margin-bottom: 0.5mm;
@@ -77,13 +79,13 @@
         }
 
         .prefix {
-            font-size: 10pt;
+            font-size: 9pt;
             margin-bottom: 0.5mm;
             width: 100%;
         }
 
         .address {
-            font-size: 10pt;
+            font-size: 9pt;
             line-height: 1.1;
         }
 
@@ -97,7 +99,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         .btn {
@@ -120,7 +122,7 @@
         .btn:hover {
             opacity: 0.9;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .btn:active {
@@ -133,15 +135,32 @@
             box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
         }
 
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 16pt;
+            font-weight: 900;
+            color: rgba(239, 68, 68, 0.15);
+            /* red-500 with low opacity */
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 10;
+            letter-spacing: 2px;
+        }
+
         @media print {
-            body {
-                background: none;
+            body, .page {
+                background: none !important;
+                background-color: white !important;
             }
 
             .page {
                 box-shadow: none;
                 margin: 0;
                 border: none;
+                padding-top: 0;
             }
 
             .toolbar {
@@ -150,6 +169,7 @@
 
             .label {
                 border: none;
+                background-color: transparent !important;
             }
 
             .sticker-sheet {
@@ -167,13 +187,6 @@
         <button onclick="window.print()" class="btn btn-amber">
             <i class="fa-solid fa-print" style="margin-right: 8px;"></i> Cetak Sekarang
         </button>
-        <?php
-        $ids = service('request')->getGet('ids');
-        $queryString = http_build_query(['type' => $type, 'ids' => $ids]);
-        ?>
-        <a href="/recipients/export-pdf?<?= $queryString ?>" class="btn">
-            <i class="fa-solid fa-file-pdf" style="margin-right: 8px;"></i> Unduh PDF
-        </a>
         <div style="font-size: 11px; margin-top: 12px; opacity: 0.7; font-style: italic;">
             * Penting: Atur "Margin" ke "None" dan "Scale" ke "100%" pada pengaturan browser Anda.
         </div>
@@ -182,14 +195,21 @@
     <div class="page">
         <div class="sticker-sheet sheet-<?= $type ?>">
             <?php foreach ($recipients as $recipient): ?>
-            <div class="label">
-                <div class="name"><?= esc($recipient['name']) ?></div>
-                <div style="height: 3mm;">&nbsp;</div>
-                <div class="details">
-                    <div class="prefix">di-</div>
-                    <div class="address"><?= empty(trim((string)$recipient['address'])) ? 'Tempat' : esc($recipient['address']) ?></div>
+                <div class="label" style="position: relative;">
+                    <?php if (!empty($recipient)): ?>
+                        <?php if (session()->get('role') === 'demo'): ?>
+                            <div class="watermark">DEMO VERSION</div>
+                        <?php endif; ?>
+                        <div class="name"><?= esc($recipient['name'] ?? '') ?></div>
+                        <div style="height: 3mm;">&nbsp;</div>
+                        <div class="details">
+                            <div class="prefix">di-</div>
+                            <div class="address"><?= empty(trim((string)($recipient['address'] ?? ''))) ? 'Tempat' : esc($recipient['address']) ?></div>
+                        </div>
+                    <?php else: ?>
+                        <div class="name">&nbsp;</div>
+                    <?php endif; ?>
                 </div>
-            </div>
             <?php endforeach; ?>
         </div>
     </div>

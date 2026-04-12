@@ -10,7 +10,7 @@ class AuthController extends BaseController
     {
         // If already logged in, redirect to dashboard or recipients
         if (session()->get('logged_in')) {
-            return redirect()->to('/recipients');
+            return redirect()->to('/dashboard');
         }
 
         return view('auth/login');
@@ -38,10 +38,11 @@ class AuthController extends BaseController
                 'user_id'   => $user['id'],
                 'username'  => $user['username'],
                 'role'      => $user['role'],
+                'package'   => $user['package'] ?? 'basic',
                 'logged_in' => true
             ]);
 
-            return redirect()->to('/recipients');
+            return redirect()->to('/dashboard');
         }
 
         return redirect()->back()->withInput()->with('error', 'Username atau password salah.');
@@ -60,6 +61,7 @@ class AuthController extends BaseController
             'username' => $username,
             'password' => $password,
             'role'     => 'demo',
+            'package'  => 'pro',
         ]);
 
         $userId = $userModel->insertID();
@@ -68,6 +70,7 @@ class AuthController extends BaseController
             'user_id'   => $userId,
             'username'  => 'Pengguna Demo',
             'role'      => 'demo',
+            'package'   => 'pro',
             'logged_in' => true
         ]);
 

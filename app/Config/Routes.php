@@ -21,10 +21,19 @@ $routes->group('recipients', ['filter' => 'auth'], function($routes) {
     $routes->get('import', 'Recipients::import');
     $routes->post('import', 'Recipients::processImport');
     $routes->get('print', 'Recipients::printLabels');
-    $routes->get('export-pdf', 'Recipients::exportPdf');
     $routes->post('bulk-delete', 'Recipients::bulkDelete');
     $routes->post('bulk-printed', 'Recipients::bulkUpdatePrinted');
     $routes->post('printed/(:num)', 'Recipients::updatePrinted/$1');
+    $routes->post('toggle-selection/(:num)', 'Recipients::toggleSelection/$1');
+    $routes->post('bulk-toggle-selection', 'Recipients::bulkToggleSelection');
+    $routes->post('clear-selection', 'Recipients::clearSelection');
+});
+
+$routes->group('projects', ['filter' => 'auth'], function($routes) {
+    $routes->get('/', 'Projects::index');
+    $routes->post('store', 'Projects::store');
+    $routes->post('update/(:num)', 'Projects::update/$1');
+    $routes->get('delete/(:num)', 'Projects::delete/$1');
 });
 
 $routes->group('users', ['filter' => ['auth', 'admin']], function($routes) {

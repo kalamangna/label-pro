@@ -44,6 +44,15 @@
                                 <span class="hidden sm:inline-flex items-center bg-amber-50 text-amber-700 text-xs font-bold px-3 py-1 rounded-full border border-amber-100 shadow-sm">
                                     Mode Demo
                                 </span>
+                            <?php elseif (session()->get('role') !== 'admin'): ?>
+                                <?php 
+                                    $userPackage = session()->get('package') ?? 'basic';
+                                    $pkgLimits = \App\Models\UserModel::getPackageLimits($userPackage, session()->get('role'));
+                                ?>
+                                <span class="hidden sm:inline-flex items-center bg-slate-50 text-slate-600 text-xs font-bold px-3 py-1 rounded-full border border-slate-200 shadow-sm">
+                                    <i class="fa-solid fa-cube me-1.5 text-slate-400"></i>
+                                    <?= esc($pkgLimits['name']) ?>
+                                </span>
                             <?php endif; ?>
                             <span class="hidden sm:block text-sm font-semibold text-gray-700"><?= esc(session()->get('username')) ?></span>
                             <a href="/logout" class="text-gray-400 hover:text-red-600 transition-all p-2 rounded-xl hover:bg-red-50" title="Keluar">
@@ -65,26 +74,26 @@
                 <li>
                     <a href="/dashboard" class="flex items-center p-3 rounded-2xl transition-all <?= current_url() == base_url('dashboard') ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600' ?> group">
                         <i class="fa-solid fa-house w-5 h-5 flex items-center justify-center transition duration-75 <?= current_url() == base_url('dashboard') ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-600' ?>"></i>
-                        <span class="ms-3">Beranda</span>
+                        <span class="ms-3">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/projects" class="flex items-center p-3 rounded-2xl transition-all <?= str_starts_with(current_url(), base_url('projects')) ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600' ?> group">
+                        <i class="fa-solid fa-folder-open w-5 h-5 flex items-center justify-center transition duration-75 <?= str_starts_with(current_url(), base_url('projects')) ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-600' ?>"></i>
+                        <span class="ms-3 whitespace-nowrap">Proyek</span>
                     </a>
                 </li>
                 <li>
                     <a href="/recipients" class="flex items-center p-3 rounded-2xl transition-all <?= str_starts_with(current_url(), base_url('recipients')) && current_url() != base_url('recipients/import') ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600' ?> group">
                         <i class="fa-solid fa-users w-5 h-5 flex items-center justify-center transition duration-75 <?= str_starts_with(current_url(), base_url('recipients')) && current_url() != base_url('recipients/import') ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-600' ?>"></i>
-                        <span class="ms-3 whitespace-nowrap">Data Penerima</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/recipients/import" class="flex items-center p-3 rounded-2xl transition-all <?= current_url() == base_url('recipients/import') ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600' ?> group">
-                        <i class="fa-solid fa-file-excel w-5 h-5 flex items-center justify-center transition duration-75 <?= current_url() == base_url('recipients/import') ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-600' ?>"></i>
-                        <span class="ms-3 whitespace-nowrap">Impor Excel</span>
+                        <span class="ms-3 whitespace-nowrap">Penerima</span>
                     </a>
                 </li>
                 <?php if (session()->get('role') === 'admin'): ?>
                     <li>
                         <a href="/users" class="flex items-center p-3 rounded-2xl transition-all <?= str_starts_with(current_url(), base_url('users')) ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600' ?> group">
                             <i class="fa-solid fa-user-gear w-5 h-5 flex items-center justify-center transition duration-75 <?= str_starts_with(current_url(), base_url('users')) ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-600' ?>"></i>
-                            <span class="ms-3 whitespace-nowrap">Kelola Pengguna</span>
+                            <span class="ms-3 whitespace-nowrap">Pengguna</span>
                         </a>
                     </li>
                 <?php endif; ?>
