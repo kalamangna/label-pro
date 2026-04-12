@@ -467,13 +467,23 @@
         const openPrintModalBtn = document.getElementById('openPrintModalBtn');
         const print121Link = document.getElementById('print-121-link');
         const printOffsetInput = document.getElementById('print-offset');
+        const printAlignInput = document.getElementById('print-align');
         
         function updatePrintLink() {
             if (print121Link && printOffsetInput) {
                 let offset = parseInt(printOffsetInput.value) || 1;
                 if (offset < 1) offset = 1;
                 if (offset > 10) offset = 10;
-                print121Link.href = `/recipients/print?type=121&offset=${offset - 1}`;
+                
+                let align = printAlignInput ? printAlignInput.value : 'center';
+                print121Link.href = `/recipients/print?type=121&offset=${offset - 1}&align=${align}`;
+
+                const alignImg = document.getElementById('align-preview-img');
+                if (alignImg) {
+                    if (align === 'flex-start') alignImg.src = '/img/kiri.png';
+                    else if (align === 'flex-end') alignImg.src = '/img/kanan.png';
+                    else alignImg.src = '/img/tengah.png';
+                }
             }
         }
 
@@ -481,9 +491,14 @@
             printOffsetInput.addEventListener('input', updatePrintLink);
             printOffsetInput.addEventListener('change', updatePrintLink);
         }
+        
+        if (printAlignInput) {
+            printAlignInput.addEventListener('change', updatePrintLink);
+        }
 
         function openPrintModal() {
             if (printOffsetInput) printOffsetInput.value = 1;
+            if (printAlignInput) printAlignInput.value = 'center';
             updatePrintLink();
             printModal.show();
         }
@@ -584,7 +599,7 @@
 
 <!-- Print Options Modal -->
 <div id="print-options-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div class="relative p-4 w-full max-w-lg max-h-full">
+    <div class="relative p-4 w-full max-w-3xl max-h-full">
         <!-- Modal content -->
         <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100 text-left">
             <!-- Modal header -->
@@ -603,13 +618,40 @@
             <div class="p-6 md:p-8">
                 <p class="text-sm text-gray-500 mb-6 font-medium">Pilih ukuran label stiker yang akan Anda gunakan untuk mencetak data terpilih.</p>
                 
-                <div class="mb-6">
-                    <label for="print-offset" class="block mb-2 text-sm font-bold text-gray-900">Mulai cetak dari posisi ke-</label>
-                    <input type="number" id="print-offset" min="1" max="10" value="1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="1-10" required>
-                    <p class="mt-1 text-xs text-gray-500 italic">Bermanfaat jika Anda menggunakan kertas stiker yang sudah sebagian terpakai.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start mb-6">
+                    <!-- Left: Inputs -->
+                    <div class="space-y-6">
+                        <div>
+                            <label for="print-offset" class="block mb-2 text-sm font-bold text-gray-900">Mulai cetak dari posisi ke-</label>
+                            <input type="number" id="print-offset" min="1" max="10" value="1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="1-10" required>
+                            <p class="mt-1 text-xs text-gray-500 italic">Bermanfaat jika Anda menggunakan kertas stiker yang sudah sebagian terpakai.</p>
+                        </div>
+
+                        <div>
+                            <label for="print-align" class="block mb-2 text-sm font-bold text-gray-900">Perataan Horizontal</label>
+                            <select id="print-align" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
+                                <option value="center">Tengah (Default)</option>
+                                <option value="flex-start">Kiri</option>
+                                <option value="flex-end">Kanan</option>
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500 italic">Sesuaikan dengan posisi masuk kertas pada printer Anda.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Visualizations -->
+                    <div class="space-y-4">
+                        <div class="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100 flex flex-col items-center justify-center h-48 overflow-hidden relative">
+                            <span class="absolute top-2 left-3 text-[10px] font-bold text-emerald-800 uppercase tracking-widest z-10">Panduan Posisi</span>
+                            <img src="/img/posisi.png" alt="Panduan Posisi" class="h-full w-full object-contain mix-blend-multiply scale-110 mt-2">
+                        </div>
+                        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col items-center justify-center h-48 overflow-hidden relative">
+                            <span class="absolute top-2 left-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest z-10">Pratinjau Perataan</span>
+                            <img id="align-preview-img" src="/img/tengah.png" alt="Panduan Perataan" class="h-full w-full object-contain mix-blend-multiply scale-110 mt-2">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 max-w-sm mx-auto gap-4">
+                <div class="grid grid-cols-1 max-w-sm mx-auto gap-4 mt-8">
                     <a id="print-121-link" href="/recipients/print?type=121" target="_blank" class="flex flex-col items-center justify-center p-6 bg-emerald-50 border-2 border-emerald-100 rounded-2xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all group">
                         <span class="text-3xl font-black mb-2 tracking-tighter">121</span>
                         <span class="text-xs font-bold opacity-60 uppercase tracking-widest group-hover:opacity-100 transition-opacity">38 x 75 mm</span>
