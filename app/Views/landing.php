@@ -58,7 +58,7 @@
                 </div>
                 <div class="relative">
                     <div class="absolute -inset-4 bg-emerald-500/10 rounded-3xl blur-2xl"></div>
-                    <img src="/img/hero.svg" alt="Ilustrasi Cetak Label" class="relative w-full mx-auto">
+                    <img src="/img/hero.svg" alt="Ilustrasi Cetak Label" class="relative w-full mx-auto drop-shadow-2xl transform hover:scale-105 transition-transform duration-500">
                 </div>
             </div>
         </div>
@@ -72,26 +72,26 @@
                 <h3 class="text-3xl lg:text-4xl font-extrabold text-gray-900 mb-6 italic">"Ngetik manual 500 label tamu adalah mimpi buruk bagi siapapun."</h3>
             </div>
             <div class="grid md:grid-cols-3 gap-8 text-center">
-                <div class="p-8 bg-white rounded-2xl shadow-sm">
-                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div class="p-8 bg-white rounded-2xl shadow-sm border border-gray-50">
+                    <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
                         <i class="fa-regular fa-clock text-2xl text-red-600"></i>
                     </div>
-                    <h4 class="text-xl font-bold mb-4 text-gray-900">Boros Waktu & Tenaga</h4>
-                    <p class="text-gray-600 text-sm leading-relaxed">Ngetik manual di Word sangat lambat dan melelahkan. Waktu Anda terlalu berharga untuk input data satu per satu.</p>
+                    <h4 class="text-xl font-bold mb-4 text-gray-900">Lambat & Manual</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">Mengetik tamu satu per satu sangat membosankan dan menyita waktu produktif Anda berjam-jam.</p>
                 </div>
-                <div class="p-8 bg-white rounded-2xl shadow-sm">
-                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div class="p-8 bg-white rounded-2xl shadow-sm border border-gray-50">
+                    <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
                         <i class="fa-solid fa-triangle-exclamation text-2xl text-red-600"></i>
                     </div>
-                    <h4 class="text-xl font-bold mb-4 text-gray-900">Sering Salah Cetak</h4>
-                    <p class="text-gray-600 text-sm leading-relaxed">Margin meleset atau typo bikin kertas stiker dan tinta terbuang percuma. Rugi material, rugi perasaan.</p>
+                    <h4 class="text-xl font-bold mb-4 text-gray-900">Boros Kertas</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">Margin meleset atau typo membuat kertas stiker dan tinta terbuang percuma setiap kali gagal.</p>
                 </div>
-                <div class="p-8 bg-white rounded-2xl shadow-sm">
-                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div class="p-8 bg-white rounded-2xl shadow-sm border border-gray-50">
+                    <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
                         <i class="fa-solid fa-arrows-up-down-left-right text-2xl text-red-600"></i>
                     </div>
-                    <h4 class="text-xl font-bold mb-4 text-gray-900">Presisi Rendah</h4>
-                    <p class="text-gray-600 text-sm leading-relaxed">Sangat sulit menjaga posisi nama tetap pas di tengah label secara konsisten menggunakan software office biasa.</p>
+                    <h4 class="text-xl font-bold mb-4 text-gray-900">Layout Berantakan</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">Sulit mengatur posisi teks tetap presisi di tengah label. Hasil cetak seringkali mengecewakan.</p>
                 </div>
             </div>
         </div>
@@ -101,13 +101,8 @@
     <section class="py-24" id="fitur">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid lg:grid-cols-2 gap-16 items-center">
-                <div class="order-2 lg:order-1 flex justify-center">
-                    <div class="relative group">
-                        <div class="absolute -inset-10 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all duration-500"></div>
-                        <div class="relative w-64 h-64 lg:w-80 lg:h-80 bg-white rounded-[3rem] shadow-2xl border border-gray-100 flex items-center justify-center">
-                            <i class="fa-solid fa-wand-magic-sparkles text-8xl lg:text-9xl text-emerald-600"></i>
-                        </div>
-                    </div>
+                <div class="order-2 lg:order-1">
+                    <img src="/img/flow.svg" alt="Workflow LabelPro" class="w-full drop-shadow-2xl transform hover:scale-[1.02] transition-all duration-700">
                 </div>
                 <div class="order-1 lg:order-2 text-left">
                     <h2 class="text-base font-bold text-emerald-600 uppercase tracking-widest mb-4">Solusi Cerdas</h2>
@@ -118,8 +113,8 @@
                                 <i class="fa-solid fa-bolt text-emerald-600 text-xl"></i>
                             </div>
                             <div class="ml-5">
-                                <h4 class="text-lg font-bold text-gray-900">Otomasi Data Excel</h4>
-                                <p class="text-gray-600 text-sm mt-1 leading-relaxed">Impor ribuan nama secara instan. Sistem mengolah data secara otomatis tanpa perlu input manual yang membosankan.</p>
+                                <h4 class="text-lg font-bold text-gray-900">Instant Import</h4>
+                                <p class="text-gray-600 text-sm mt-1 leading-relaxed">Upload Excel, ribuan data siap cetak dalam hitungan detik. Lupakan input manual yang membosankan.</p>
                             </div>
                         </li>
                         <li class="flex items-start">
@@ -127,8 +122,8 @@
                                 <i class="fa-solid fa-check-double text-emerald-600 text-xl"></i>
                             </div>
                             <div class="ml-5">
-                                <h4 class="text-lg font-bold text-gray-900">Seleksi Pintar & Aman</h4>
-                                <p class="text-gray-600 text-sm mt-1 leading-relaxed">Pilih tamu lintas halaman dengan sinkronisasi database. Pilihan Anda tetap aman dan tersimpan meski berganti halaman.</p>
+                                <h4 class="text-lg font-bold text-gray-900">Database Selection</h4>
+                                <p class="text-gray-600 text-sm mt-1 leading-relaxed">Seleksi tamu tersimpan permanen. Pilih di satu halaman, lanjut di halaman lain tanpa takut pilihan hilang.</p>
                             </div>
                         </li>
                         <li class="flex items-start">
@@ -136,8 +131,8 @@
                                 <i class="fa-solid fa-expand text-emerald-600 text-xl"></i>
                             </div>
                             <div class="ml-5">
-                                <h4 class="text-lg font-bold text-gray-900">Teknologi Hemat Kertas</h4>
-                                <p class="text-gray-600 text-sm mt-1 leading-relaxed">Gunakan kembali stok stiker sisa dengan Fitur Offset yang sangat presisi. Nol pemborosan, hasil maksimal.</p>
+                                <h4 class="text-lg font-bold text-gray-900">Smart Offset</h4>
+                                <p class="text-gray-600 text-sm mt-1 leading-relaxed">Cetak mulai dari label mana saja. Gunakan kembali sisa kertas stiker dengan presisi layout yang sempurna.</p>
                             </div>
                         </li>
                     </ul>

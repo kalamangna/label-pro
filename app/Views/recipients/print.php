@@ -10,7 +10,7 @@
         /* Base Print Settings */
         @page {
             size: A4 portrait;
-            margin: 0;
+            margin: 2mm;
         }
 
         body {

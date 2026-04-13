@@ -82,6 +82,13 @@ class Recipients extends BaseController
             ? $eventModel->findAll() 
             : $eventModel->where('user_id', session()->get('user_id'))->findAll();
 
+        // Calculate absolute total independently
+        $totalInDatabase = (new RecipientModel());
+        if (session()->get('role') !== 'admin') {
+            $totalInDatabase->where('user_id', session()->get('user_id'));
+        }
+        $totalInDatabase = $totalInDatabase->countAllResults();
+
         // Calculate selected count independently
         $selectedCount = 0;
         if (session()->get('role') !== 'admin') {
@@ -92,16 +99,17 @@ class Recipients extends BaseController
         }
 
         $data = [
-            'title'         => 'Daftar Penerima',
-            'recipients'    => $model->paginate(10),
-            'pager'         => $model->pager,
-            'search'        => $search,
-            'status'        => $status,
-            'sort'          => $sort,
-            'dir'           => $dir,
-            'eventId'       => $eventId,
-            'events'        => $events,
-            'selectedCount' => $selectedCount,
+            'title'           => 'Daftar Penerima',
+            'recipients'      => $model->paginate(10),
+            'pager'           => $model->pager,
+            'search'          => $search,
+            'status'          => $status,
+            'sort'            => $sort,
+            'dir'             => $dir,
+            'eventId'         => $eventId,
+            'events'          => $events,
+            'selectedCount'   => $selectedCount,
+            'totalInDatabase' => $totalInDatabase,
         ];
 
         return view('recipients/index', $data);

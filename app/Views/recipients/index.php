@@ -8,7 +8,7 @@
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight text-gray-900 leading-none mb-1">Daftar Penerima</h1>
             <p class="text-sm text-gray-500 font-medium">
-                Total <span class="text-emerald-600 font-bold"><?= number_format($pager->getTotal()) ?></span> penerima dalam database Anda
+                Total <span class="text-emerald-600 font-bold"><?= number_format($totalInDatabase ?? 0) ?></span> penerima dalam database
             </p>
         </div>
     </div>
@@ -58,18 +58,22 @@
 
 <!-- Filters -->
 <div class="mb-4 p-6 bg-gray-50/50 border border-gray-200 rounded-2xl">
-    <form action="/recipients" method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+    <form action="/recipients" method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-x-4 gap-y-5">
         <!-- Search -->
-        <div class="md:col-span-4 relative">
-            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs"></i>
+        <div class="md:col-span-4">
+            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Cari Nama / Alamat</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs"></i>
+                </div>
+                <input type="text" name="search" value="<?= esc($search ?? '') ?>" class="block w-full ps-9 text-sm text-gray-900 border border-slate-300 rounded-xl bg-white focus:ring-emerald-500 focus:border-emerald-500 h-[42px] transition-all placeholder-slate-400" placeholder="Ketik pencarian...">
             </div>
-            <input type="text" name="search" value="<?= esc($search ?? '') ?>" class="block w-full ps-9 text-sm text-gray-900 border border-slate-300 rounded-xl bg-white focus:ring-slate-500 focus:border-slate-500 h-[42px] transition-all placeholder-slate-400" placeholder="Cari nama atau alamat...">
         </div>
 
         <!-- Status Filter -->
         <div class="md:col-span-2">
-            <select name="status" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-slate-500 focus:border-slate-500 block w-full h-[42px] px-2.5 transition-all">
+            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Status</label>
+            <select name="status" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full h-[42px] px-2.5 transition-all">
                 <option value="">Semua Status</option>
                 <option value="0" <?= (string)($status ?? '') === '0' ? 'selected' : '' ?>>Belum Dicetak</option>
                 <option value="1" <?= (string)($status ?? '') === '1' ? 'selected' : '' ?>>Sudah Dicetak</option>
@@ -78,7 +82,8 @@
 
         <!-- Event Filter -->
         <div class="md:col-span-3">
-            <select name="event_id" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-slate-500 focus:border-slate-500 block w-full h-[42px] px-2.5 transition-all">
+            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Acara</label>
+            <select name="event_id" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full h-[42px] px-2.5 transition-all">
                 <option value="">Semua Acara</option>
                 <?php foreach ($events as $event): ?>
                     <option value="<?= $event['id'] ?>" <?= (string)($eventId ?? '') === (string)$event['id'] ? 'selected' : '' ?>><?= esc($event['name']) ?></option>
@@ -88,9 +93,10 @@
 
         <!-- Sort Filter -->
         <div class="md:col-span-3">
-            <select id="sort-select" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-slate-500 focus:border-slate-500 block w-full h-[42px] px-2.5 transition-all">
-                <option value="id|desc" <?= ($sort == 'id' && $dir == 'desc') ? 'selected' : '' ?>>Urutan: Terbaru</option>
-                <option value="id|asc" <?= ($sort == 'id' && $dir == 'asc') ? 'selected' : '' ?>>Urutan: Terlama</option>
+            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Urutan</label>
+            <select id="sort-select" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full h-[42px] px-2.5 transition-all">
+                <option value="id|desc" <?= ($sort == 'id' && $dir == 'desc') ? 'selected' : '' ?>>Terbaru</option>
+                <option value="id|asc" <?= ($sort == 'id' && $dir == 'asc') ? 'selected' : '' ?>>Terlama</option>
                 <option value="name|asc" <?= ($sort == 'name' && $dir == 'asc') ? 'selected' : '' ?>>Nama: A-Z</option>
                 <option value="name|desc" <?= ($sort == 'name' && $dir == 'desc') ? 'selected' : '' ?>>Nama: Z-A</option>
                 <option value="address|asc" <?= ($sort == 'address' && $dir == 'asc') ? 'selected' : '' ?>>Alamat: A-Z</option>
@@ -100,12 +106,32 @@
             <input type="hidden" name="dir" id="real-dir" value="<?= esc($dir ?? 'desc') ?>">
         </div>
 
-        <!-- Buttons -->
-        <div class="md:col-span-12 flex justify-end gap-2">
-            <button type="submit" class="w-full sm:w-32 h-[42px] bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-900 focus:ring-4 focus:ring-slate-200 transition-all active:scale-95 shadow-md shadow-slate-200 flex items-center justify-center">Filter</button>
-            <?php if (!empty($search) || ($status ?? '') !== '' || ($sort ?? 'id') !== 'id' || !empty($eventId)): ?>
-                <a href="/recipients" class="w-full sm:w-32 h-[42px] flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all active:scale-95 text-center">Reset</a>
-            <?php endif; ?>
+        <!-- Buttons & Results Info -->
+        <div class="md:col-span-12 flex flex-col md:flex-row items-center justify-between gap-4 mt-2 pt-4 border-t border-gray-200/60">
+            <div class="text-xs font-bold text-slate-500">
+                <?php 
+                    $activeFilters = [];
+                    if (!empty($search)) $activeFilters[] = "Pencarian: '" . esc($search) . "'";
+                    if (($status ?? '') !== '') $activeFilters[] = "Status: " . ($status == '1' ? 'Sudah Dicetak' : 'Belum Dicetak');
+                    if (!empty($eventId)) {
+                        $currentEventName = 'Acara';
+                        foreach ($events as $e) {
+                            if ($e['id'] == $eventId) { $currentEventName = $e['name']; break; }
+                        }
+                        $activeFilters[] = "Acara: " . esc($currentEventName);
+                    }
+                ?>
+                <?php if (!empty($activeFilters)): ?>
+                    Ditemukan <span class="text-emerald-600"><?= number_format($pager->getTotal()) ?></span> data untuk 
+                    <span class="text-slate-700 italic"><?= implode(', ', $activeFilters) ?></span>
+                <?php endif; ?>
+            </div>
+            <div class="flex gap-2 w-full md:w-auto">
+                <?php if (!empty($search) || ($status ?? '') !== '' || ($sort ?? 'id') !== 'id' || !empty($eventId)): ?>
+                    <a href="/recipients" class="flex-1 md:w-32 h-[42px] flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all active:scale-95 text-center">Reset</a>
+                <?php endif; ?>
+                <button type="submit" class="flex-1 md:w-32 h-[42px] bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-900 focus:ring-4 focus:ring-slate-200 transition-all active:scale-95 shadow-md shadow-slate-200 flex items-center justify-center">Filter</button>
+            </div>
         </div>
     </form>
 </div>
@@ -530,9 +556,9 @@
 
                 const alignImg = document.getElementById('align-preview-img');
                 if (alignImg) {
-                    if (align === 'flex-start') alignImg.src = '/img/kiri.png';
-                    else if (align === 'flex-end') alignImg.src = '/img/kanan.png';
-                    else alignImg.src = '/img/tengah.png';
+                    if (align === 'flex-start') alignImg.src = '/img/kiri.svg';
+                    else if (align === 'flex-end') alignImg.src = '/img/kanan.svg';
+                    else alignImg.src = '/img/tengah.svg';
                 }
             }
         }
@@ -585,6 +611,24 @@
                 
                 if (editModal) editModal.show();
             });
+        });
+
+        // Image Fullscreen Preview Logic
+        const fullscreenModalEl = document.getElementById('image-fullscreen-modal');
+        const fullscreenModal = new Modal(fullscreenModalEl);
+        const fullscreenImg = document.getElementById('fullscreen-preview-img');
+        const previewTitle = document.getElementById('preview-modal-title');
+
+        document.querySelectorAll('.img-preview-trigger').forEach(trigger => {
+            trigger.addEventListener('click', function() {
+                fullscreenImg.src = this.src;
+                previewTitle.textContent = this.getAttribute('data-title') || 'Preview';
+                fullscreenModal.show();
+            });
+        });
+
+        document.querySelectorAll('[data-modal-hide="image-fullscreen-modal"]').forEach(btn => {
+            btn.addEventListener('click', () => fullscreenModal.hide());
         });
     });
 </script>
@@ -731,11 +775,11 @@
                             <!-- Row 2: Visualizations -->
                             <div class="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100 flex flex-col items-center justify-center h-40 overflow-hidden relative">
                                 <span class="absolute top-2 left-3 text-[10px] font-bold text-emerald-800 uppercase tracking-widest z-10">Panduan Posisi</span>
-                                <img src="/img/posisi.png" alt="Panduan Posisi" class="h-full w-full object-contain mix-blend-multiply scale-90 mt-4">
+                                <img src="/img/posisi.svg" alt="Panduan Posisi" class="h-full w-full object-contain mt-4 cursor-pointer hover:scale-105 transition-transform duration-300 img-preview-trigger" data-title="Panduan Posisi">
                             </div>
                             <div class="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100 flex flex-col items-center justify-center h-40 overflow-hidden relative">
                                 <span class="absolute top-2 left-3 text-[10px] font-bold text-emerald-800 uppercase tracking-widest z-10">Pratinjau Perataan</span>
-                                <img id="align-preview-img" src="/img/tengah.png" alt="Panduan Perataan" class="h-full w-full object-contain mix-blend-multiply scale-90 mt-4">
+                                <img id="align-preview-img" src="/img/tengah.svg" alt="Panduan Perataan" class="h-full w-full object-contain mt-4 cursor-pointer hover:scale-105 transition-transform duration-300 img-preview-trigger" data-title="Pratinjau Perataan">
                             </div>
 
                             <!-- Helper Texts -->
@@ -768,6 +812,29 @@
                 <i class="fa-solid fa-circle-info me-2 text-emerald-500"></i>
                 Hanya data yang telah Anda centang di tabel yang akan dicetak.
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div id="image-fullscreen-modal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 transition-all duration-300">
+    <div class="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-zoom-in">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-100">
+            <h3 id="preview-modal-title" class="text-sm font-bold text-gray-900 uppercase tracking-widest px-2">Preview</h3>
+            <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-100 hover:text-gray-900 rounded-xl text-sm w-10 h-10 inline-flex justify-center items-center transition-colors" data-modal-hide="image-fullscreen-modal">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        
+        <!-- Image Container -->
+        <div class="p-6 md:p-10 bg-gray-50 flex items-center justify-center">
+            <img id="fullscreen-preview-img" src="" alt="Preview" class="max-w-full h-auto max-h-[60vh] object-contain rounded-xl shadow-sm border border-gray-200">
+        </div>
+        
+        <!-- Footer -->
+        <div class="p-4 bg-white border-t border-gray-100 text-center">
+            <p class="text-[10px] text-gray-400 font-medium uppercase tracking-[0.2em]">LabelPro Visualization Guide</p>
         </div>
     </div>
 </div>

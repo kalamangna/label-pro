@@ -27,6 +27,8 @@
   - **Auto-Print**: Triggers `window.print()` automatically when parameters are met.
   - **Batch Limit**: Strictly enforces a maximum of 10 recipients per print page.
   - **Auto-Prefix**: "di-" added automatically. If address is empty, uses "Tempat".
+- **Visual Assets**: Uses high-quality SVGs for all technical illustrations (Printer, Alignment, Flow).
+- **Interactive Guides**: Print alignment and position guides include a click-to-preview modal for better visibility.
 
 ## Preferred Styles
 - Controller logic: Concise; use models for DB interaction.

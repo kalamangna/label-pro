@@ -1,0 +1,45 @@
+<svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow-printer" x="-5%" y="-5%" width="110%" height="120%">
+      <feDropShadow dx="0" dy="-4" stdDeviation="8" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadow-slider" x="-20%" y="-10%" width="140%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0F172A" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Printer Tray (Slate-50) -->
+  <rect x="40" y="20" width="420" height="260" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="2"/>
+  <line x1="40" y1="240" x2="460" y2="240" stroke="#CBD5E1" stroke-width="4" stroke-dasharray="10 10"/>
+
+  <!-- Left Guide (Slate-800) -->
+  <rect x="40" y="20" width="16" height="240" fill="#1E293B"/>
+
+  <!-- Paper with Stickers -->
+  <rect x="56" y="20" width="200" height="240" fill="#FEF3C7" stroke="#FBBF24" stroke-width="1"/>
+  <g fill="#FFFFFF" stroke="#FEF3C7" stroke-width="1">
+    <rect x="66" y="30" width="85" height="40" rx="8"/><rect x="161" y="30" width="85" height="40" rx="8"/>
+    <rect x="66" y="80" width="85" height="40" rx="8"/><rect x="161" y="80" width="85" height="40" rx="8"/>
+    <rect x="66" y="130" width="85" height="40" rx="8"/><rect x="161" y="130" width="85" height="40" rx="8"/>
+    <rect x="66" y="180" width="85" height="40" rx="8"/><rect x="161" y="180" width="85" height="40" rx="8"/>
+  </g>
+
+  <!-- Emerald Slider Adjustment (Paper Guide) -->
+  <g filter="url(#shadow-slider)">
+    <rect x="256" y="80" width="28" height="130" rx="14" fill="#10B981"/>
+    <path d="M264 130 h12 M264 145 h12 M264 160 h12" stroke="#D1FAE5" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Emerald Arrow Adjustment -->
+  <g fill="none" stroke="#059669" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M350 145 h-50 m0 0 l10 -10 m-10 10 l10 10"/>
+  </g>
+
+  <!-- Printer Body (Slate-700) -->
+  <rect x="20" y="260" width="460" height="120" rx="24" fill="#334155" filter="url(#shadow-printer)"/>
+  <rect x="40" y="250" width="420" height="20" rx="10" fill="#1E293B"/>
+  
+  <!-- Indicator Lights -->
+  <circle cx="440" cy="300" r="10" fill="#10B981" opacity="0.9"/>
+  <circle cx="440" cy="340" r="10" fill="#EF4444" opacity="0.9"/>
+</svg>
