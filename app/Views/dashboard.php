@@ -1,15 +1,15 @@
 <?= $this->extend('layout/main') ?>
 <?= $this->section('content') ?>
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-    <!-- Total Recipients Card -->
+    <!-- Total Guests Card -->
     <div class="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-emerald-200 transition-all group">
         <div class="flex items-center mb-4">
             <div class="p-3 mr-4 text-emerald-600 bg-emerald-50 rounded-xl">
                 <i class="fa-solid fa-users text-2xl"></i>
             </div>
             <div>
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Penerima</p>
-                <p class="text-3xl font-extrabold tracking-tight text-gray-900"><?= number_format($totalRecipients) ?></p>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Tamu</p>
+                <p class="text-3xl font-extrabold tracking-tight text-gray-900"><?= number_format($totalGuests) ?></p>
             </div>
         </div>
         
@@ -17,15 +17,15 @@
             <p class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-4 italic">Ringkasan Sistem</p>
         <?php elseif ($package !== 'unlimited'): ?>
             <div class="w-full bg-gray-100 rounded-full h-1.5 mb-1">
-                <div class="bg-emerald-500 h-1.5 rounded-full" style="width: <?= min(100, ($totalRecipients / $limits['max_recipients']) * 100) ?>%"></div>
+                <div class="bg-emerald-500 h-1.5 rounded-full" style="width: <?= min(100, ($totalGuests / $limits['max_guests']) * 100) ?>%"></div>
             </div>
-            <p class="text-[10px] text-gray-500 font-medium mb-4">Quota: <?= number_format($totalRecipients) ?> / <?= number_format($limits['max_recipients']) ?> (<?= $limits['name'] ?>)</p>
+            <p class="text-[10px] text-gray-500 font-medium mb-4">Quota: <?= number_format($totalGuests) ?> / <?= number_format($limits['max_guests']) ?> (<?= $limits['name'] ?>)</p>
         <?php else: ?>
             <p class="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mb-4 italic">Akses Tanpa Batas</p>
         <?php endif; ?>
 
         <div class="pt-4 border-t border-gray-50 flex justify-between items-center">
-            <a href="/recipients" class="text-sm font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center">
+            <a href="/guests" class="text-sm font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center">
                 Kelola Data
                 <i class="fa-solid fa-chevron-right ms-2 text-xs transition-transform group-hover:translate-x-1"></i>
             </a>
@@ -133,7 +133,7 @@
                 <i class="fa-solid fa-folder-open me-2"></i>
                 Pilih Acara
             </a>
-            <a href="/recipients" class="text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-sm">
+            <a href="/guests" class="text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-sm">
                 <i class="fa-solid fa-table-list me-2"></i>
                 Lihat Semua Data
             </a>

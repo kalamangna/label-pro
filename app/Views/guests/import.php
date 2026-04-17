@@ -67,7 +67,7 @@
     </div>
 
     <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-8 text-center">
-        <form action="/recipients/import" method="POST" enctype="multipart/form-data">
+        <form action="/guests/import" method="POST" enctype="multipart/form-data">
             <?= csrf_field() ?>
             <input type="hidden" name="event_id" value="<?= esc($event['id']) ?>">
             

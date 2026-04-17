@@ -4,11 +4,11 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class AddJabatanToRecipients extends Migration
+class AddJabatanToGuests extends Migration
 {
     public function up()
     {
-        $this->forge->addColumn('recipients', [
+        $this->forge->addColumn('guests', [
             'jabatan' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
@@ -20,6 +20,6 @@ class AddJabatanToRecipients extends Migration
 
     public function down()
     {
-        $this->forge->dropColumn('recipients', 'jabatan');
+        $this->forge->dropColumn('guests', 'jabatan');
     }
 }

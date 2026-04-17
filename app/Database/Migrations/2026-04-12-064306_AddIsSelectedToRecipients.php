@@ -4,11 +4,11 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class AddIsSelectedToRecipients extends Migration
+class AddIsSelectedToGuests extends Migration
 {
     public function up()
     {
-        $this->forge->addColumn('recipients', [
+        $this->forge->addColumn('guests', [
             'is_selected' => [
                 'type'       => 'TINYINT',
                 'constraint' => 1,
@@ -19,6 +19,6 @@ class AddIsSelectedToRecipients extends Migration
 
     public function down()
     {
-        $this->forge->dropColumn('recipients', 'is_selected');
+        $this->forge->dropColumn('guests', 'is_selected');
     }
 }

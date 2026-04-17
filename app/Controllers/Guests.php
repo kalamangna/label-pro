@@ -2,24 +2,24 @@
 
 namespace App\Controllers;
 
-use App\Models\RecipientModel;
+use App\Models\GuestModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class Recipients extends BaseController
+class Guests extends BaseController
 {
-    protected $recipientModel;
+    protected $guestModel;
 
     public function __construct()
     {
-        $this->recipientModel = new RecipientModel();
+        $this->guestModel = new GuestModel();
     }
 
     private function applyScope($model = null)
     {
-        $model = $model ?? $this->recipientModel;
+        $model = $model ?? $this->guestModel;
         if (session()->get('role') !== 'admin') {
-            return $model->where('recipients.user_id', session()->get('user_id'));
+            return $model->where('guests.user_id', session()->get('user_id'));
         }
         return $model;
     }
@@ -27,9 +27,9 @@ class Recipients extends BaseController
     private function checkOwnership($id)
     {
         if (session()->get('role') === 'admin') {
-            return $this->recipientModel->find($id);
+            return $this->guestModel->find($id);
         }
-        return $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->find($id);
+        return $this->guestModel->where('guests.user_id', session()->get('user_id'))->find($id);
     }
 
     public function index()
@@ -41,33 +41,33 @@ class Recipients extends BaseController
         $eventId = $this->request->getGet('event_id');
 
         // Start with a fresh query on the model
-        $model = new RecipientModel();
+        $model = new GuestModel();
 
         // Join events to get event name and users to get username
-        $model->select('recipients.*, users.username as added_by, events.name as event_name')
-              ->join('users', 'users.id = recipients.user_id', 'left')
-              ->join('events', 'events.id = recipients.event_id', 'left');
+        $model->select('guests.*, users.username as added_by, events.name as event_name')
+              ->join('users', 'users.id = guests.user_id', 'left')
+              ->join('events', 'events.id = guests.event_id', 'left');
 
         // Apply owner scope if not admin
         if (session()->get('role') !== 'admin') {
-            $model->where('recipients.user_id', session()->get('user_id'));
+            $model->where('guests.user_id', session()->get('user_id'));
         }
 
         // Apply Filters
         if ($eventId !== null && $eventId !== '') {
-            $model->where('recipients.event_id', $eventId);
+            $model->where('guests.event_id', $eventId);
         }
 
         if ($search !== '') {
             $model->groupStart()
-                  ->like('recipients.name', $search)
-                  ->orLike('recipients.jabatan', $search)
-                  ->orLike('recipients.address', $search)
+                  ->like('guests.name', $search)
+                  ->orLike('guests.jabatan', $search)
+                  ->orLike('guests.address', $search)
                   ->groupEnd();
         }
 
         if ($status !== null && $status !== '') {
-            $model->where('recipients.is_printed', $status);
+            $model->where('guests.is_printed', $status);
         }
 
         // Apply Sorting
@@ -75,7 +75,7 @@ class Recipients extends BaseController
         $sort = in_array($sort, $allowedSort) ? $sort : 'id';
         $dir = strtolower($dir) === 'asc' ? 'asc' : 'desc';
 
-        $model->orderBy('recipients.' . $sort, $dir);
+        $model->orderBy('guests.' . $sort, $dir);
 
         // Fetch event list for the filter dropdown
         $eventModel = new \App\Models\EventModel();
@@ -84,7 +84,7 @@ class Recipients extends BaseController
             : $eventModel->where('user_id', session()->get('user_id'))->findAll();
 
         // Calculate absolute total independently
-        $totalInDatabase = (new RecipientModel());
+        $totalInDatabase = (new GuestModel());
         if (session()->get('role') !== 'admin') {
             $totalInDatabase->where('user_id', session()->get('user_id'));
         }
@@ -94,12 +94,12 @@ class Recipients extends BaseController
         $selectedCount = 0;
         $unprintedSelectedCount = 0;
         if (session()->get('role') !== 'admin') {
-            $selectedCount = (new RecipientModel())
+            $selectedCount = (new GuestModel())
                 ->where('user_id', session()->get('user_id'))
                 ->where('is_selected', 1)
                 ->countAllResults();
             
-            $unprintedSelectedCount = (new RecipientModel())
+            $unprintedSelectedCount = (new GuestModel())
                 ->where('user_id', session()->get('user_id'))
                 ->where('is_selected', 1)
                 ->where('is_printed', 0)
@@ -107,8 +107,8 @@ class Recipients extends BaseController
         }
 
         $data = [
-            'title'                  => 'Daftar Penerima',
-            'recipients'             => $model->paginate(10),
+            'title'                  => 'Daftar Tamu',
+            'guests'             => $model->paginate(10),
             'pager'                  => $model->pager,
             'search'                 => $search,
             'status'                 => $status,
@@ -121,22 +121,22 @@ class Recipients extends BaseController
             'totalInDatabase'        => $totalInDatabase,
         ];
 
-        return view('recipients/index', $data);
+        return view('guests/index', $data);
     }
 
     public function store()
     {
         if (session()->get('role') === 'admin') {
-            return redirect()->to('/recipients')->with('error', 'Admin hanya dapat melihat data.');
+            return redirect()->to('/guests')->with('error', 'Admin hanya dapat melihat data.');
         }
 
         $package = session()->get('package') ?? 'basic';
         $limits  = \App\Models\UserModel::getPackageLimits($package, session()->get('role'));
         
-        $currentRecipientsCount = $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->countAllResults();
+        $currentGuestsCount = $this->guestModel->where('guests.user_id', session()->get('user_id'))->countAllResults();
         
-        if ($currentRecipientsCount >= $limits['max_recipients']) {
-            return redirect()->back()->withInput()->with('error', "Anda telah mencapai batas maksimal penerima untuk {$limits['name']} ({$limits['max_recipients']} penerima). Silakan hubungi admin untuk upgrade.");
+        if ($currentGuestsCount >= $limits['max_guests']) {
+            return redirect()->back()->withInput()->with('error', "Anda telah mencapai batas maksimal tamu untuk {$limits['name']} ({$limits['max_guests']} tamu). Silakan hubungi admin untuk upgrade.");
         }
 
         $rules = [
@@ -184,10 +184,10 @@ class Recipients extends BaseController
         }
 
         if ($existing->first()) {
-            return redirect()->back()->withInput()->with('error', 'Penerima dengan nama, jabatan, dan alamat tersebut sudah ada di daftar ini.');
+            return redirect()->back()->withInput()->with('error', 'Tamu dengan nama, jabatan, dan alamat tersebut sudah ada di daftar ini.');
         }
 
-        $this->recipientModel->save([
+        $this->guestModel->save([
             'name'     => $name,
             'jabatan'  => $jabatan,
             'address'  => $address,
@@ -195,18 +195,18 @@ class Recipients extends BaseController
             'event_id' => $eventId,
         ]);
 
-        return redirect()->to('/recipients')->with('message', 'Penerima berhasil ditambahkan.');
+        return redirect()->to('/guests')->with('message', 'Tamu berhasil ditambahkan.');
     }
 
     public function update($id)
     {
         if (session()->get('role') === 'admin') {
-            return redirect()->to('/recipients')->with('error', 'Admin hanya dapat melihat data.');
+            return redirect()->to('/guests')->with('error', 'Admin hanya dapat melihat data.');
         }
 
-        $recipient = $this->checkOwnership($id);
-        if (!$recipient) {
-            return redirect()->to('/recipients')->with('error', 'Penerima tidak ditemukan atau Anda tidak memiliki akses.');
+        $guest = $this->checkOwnership($id);
+        if (!$guest) {
+            return redirect()->to('/guests')->with('error', 'Tamu tidak ditemukan atau Anda tidak memiliki akses.');
         }
 
         $rules = [
@@ -241,7 +241,7 @@ class Recipients extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $this->recipientModel->update($id, [
+        $this->guestModel->update($id, [
             'name'       => $this->request->getPost('name'),
             'jabatan'    => $this->request->getPost('jabatan'),
             'address'    => $this->request->getPost('address'),
@@ -249,27 +249,27 @@ class Recipients extends BaseController
             'is_printed' => $this->request->getPost('is_printed') ?? 0,
         ]);
 
-        return redirect()->to('/recipients')->with('message', 'Penerima berhasil diperbarui.');
+        return redirect()->to('/guests')->with('message', 'Tamu berhasil diperbarui.');
     }
 
     public function delete($id)
     {
         if (session()->get('role') === 'admin') {
-            return redirect()->to('/recipients')->with('error', 'Admin hanya dapat melihat data.');
+            return redirect()->to('/guests')->with('error', 'Admin hanya dapat melihat data.');
         }
 
-        $recipient = $this->checkOwnership($id);
-        if ($recipient) {
-            $this->recipientModel->delete($id);
-            return redirect()->to('/recipients')->with('message', 'Penerima berhasil dihapus.');
+        $guest = $this->checkOwnership($id);
+        if ($guest) {
+            $this->guestModel->delete($id);
+            return redirect()->to('/guests')->with('message', 'Tamu berhasil dihapus.');
         }
-        return redirect()->to('/recipients')->with('error', 'Penerima tidak ditemukan atau Anda tidak memiliki akses.');
+        return redirect()->to('/guests')->with('error', 'Tamu tidak ditemukan atau Anda tidak memiliki akses.');
     }
 
     public function import()
     {
         if (session()->get('role') === 'admin') {
-            return redirect()->to('/recipients')->with('error', 'Admin hanya dapat melihat data.');
+            return redirect()->to('/guests')->with('error', 'Admin hanya dapat melihat data.');
         }
 
         $eventId = $this->request->getGet('event_id');
@@ -288,23 +288,23 @@ class Recipients extends BaseController
         }
 
         $data = [
-            'title' => 'Impor Penerima',
+            'title' => 'Impor Tamu',
             'event' => $event,
         ];
 
-        return view('recipients/import', $data);
+        return view('guests/import', $data);
     }
 
     public function processImport()
     {
         if (session()->get('role') === 'admin') {
-            return redirect()->to('/recipients')->with('error', 'Admin hanya dapat melihat data.');
+            return redirect()->to('/guests')->with('error', 'Admin hanya dapat melihat data.');
         }
 
         $package = session()->get('package') ?? 'basic';
         $limits  = \App\Models\UserModel::getPackageLimits($package, session()->get('role'));
         
-        $currentRecipientsCount = $this->recipientModel->where('user_id', session()->get('user_id'))->countAllResults();
+        $currentGuestsCount = $this->guestModel->where('user_id', session()->get('user_id'))->countAllResults();
 
         $file = $this->request->getFile('excel_file');
         $eventId = $this->request->getPost('event_id');
@@ -345,7 +345,7 @@ class Recipients extends BaseController
             $errorCount = 0;
 
             foreach ($rows as $row) {
-                if ($currentRecipientsCount >= $limits['max_recipients']) {
+                if ($currentGuestsCount >= $limits['max_guests']) {
                     $errorCount += (count($rows) - $successCount - $errorCount);
                     break;
                 }
@@ -376,7 +376,7 @@ class Recipients extends BaseController
                     continue;
                 }
 
-                $this->recipientModel->insert([
+                $this->guestModel->insert([
                     'name'     => $name,
                     'jabatan'  => $jabatan,
                     'address'  => $address,
@@ -384,18 +384,18 @@ class Recipients extends BaseController
                     'event_id' => $eventId,
                 ]);
                 $successCount++;
-                $currentRecipientsCount++;
+                $currentGuestsCount++;
             }
 
-            $message = "Berhasil mengimpor $successCount penerima.";
-            if ($currentRecipientsCount >= $limits['max_recipients'] && $successCount < count($rows)) {
-                $message .= " Impor terhenti karena Anda mencapai batas maksimal {$limits['max_recipients']} penerima.";
+            $message = "Berhasil mengimpor $successCount tamu.";
+            if ($currentGuestsCount >= $limits['max_guests'] && $successCount < count($rows)) {
+                $message .= " Impor terhenti karena Anda mencapai batas maksimal {$limits['max_guests']} tamu.";
             }
             if ($errorCount > 0) {
                 $message .= " Melewati $errorCount baris karena nama kosong, duplikat, atau batas kuota tercapai.";
             }
 
-            return redirect()->to('/recipients' . ($eventId ? '?event_id=' . $eventId : ''))->with('message', $message);
+            return redirect()->to('/guests' . ($eventId ? '?event_id=' . $eventId : ''))->with('message', $message);
 
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses file: ' . $e->getMessage());
@@ -415,23 +415,23 @@ class Recipients extends BaseController
         // Limit offset to max 9 for label 121 (which has 10 positions, index 0-9)
         if ($offset > 9) $offset = 9;
 
-        $recipients = $this->applyScope()
-            ->where('recipients.is_selected', 1)
-            ->where('recipients.is_printed', 0)
+        $guests = $this->applyScope()
+            ->where('guests.is_selected', 1)
+            ->where('guests.is_printed', 0)
             ->findAll();
 
-        if (empty($recipients)) {
-            return redirect()->to('/recipients')->with('error', 'Harap pilih penerima terlebih dahulu.');
+        if (empty($guests)) {
+            return redirect()->to('/guests')->with('error', 'Harap pilih tamu terlebih dahulu.');
         }
 
         // Apply offset padding (only affects the first page)
         if ($offset > 0) {
             $placeholders = array_fill(0, $offset, []);
-            $recipients = array_merge($placeholders, $recipients);
+            $guests = array_merge($placeholders, $guests);
         }
 
         // Chunk into pages of 10 items
-        $pages = array_chunk($recipients, 10);
+        $pages = array_chunk($guests, 10);
 
         // Pad the last page to exactly 10 items so the grid layout is preserved
         if (!empty($pages)) {
@@ -448,7 +448,7 @@ class Recipients extends BaseController
             'align'      => $align,
         ];
 
-        return view('recipients/print', $data);
+        return view('guests/print', $data);
     }
 
     public function updatePrinted($id)
@@ -457,15 +457,15 @@ class Recipients extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Admin tidak dapat mengubah data.'], 403);
         }
 
-        $recipient = $this->checkOwnership($id);
-        if ($recipient) {
-            $newValue = $recipient['is_printed'] ? 0 : 1;
+        $guest = $this->checkOwnership($id);
+        if ($guest) {
+            $newValue = $guest['is_printed'] ? 0 : 1;
 
             $updateData = ['is_printed' => $newValue];
 
-            $this->recipientModel->update($id, $updateData);
-            $newCount = $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->where('recipients.is_selected', 1)->countAllResults();
-            $newUnprintedCount = $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->where('recipients.is_selected', 1)->where('recipients.is_printed', 0)->countAllResults();
+            $this->guestModel->update($id, $updateData);
+            $newCount = $this->guestModel->where('guests.user_id', session()->get('user_id'))->where('guests.is_selected', 1)->countAllResults();
+            $newUnprintedCount = $this->guestModel->where('guests.user_id', session()->get('user_id'))->where('guests.is_selected', 1)->where('guests.is_printed', 0)->countAllResults();
 
             return $this->response->setJSON([
                 'success' => true, 
@@ -487,11 +487,11 @@ class Recipients extends BaseController
         if (!empty($ids) && is_array($ids)) {
             if (session()->get('role') !== 'admin') {
                 // Ensure all IDs belong to the user
-                $owned = $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->whereIn('id', $ids)->findAll();
+                $owned = $this->guestModel->where('guests.user_id', session()->get('user_id'))->whereIn('id', $ids)->findAll();
                 $ids = array_column($owned, 'id');
             }
             if (!empty($ids)) {
-                $this->recipientModel->whereIn('id', $ids)->delete();
+                $this->guestModel->whereIn('id', $ids)->delete();
             }
             return $this->response->setJSON(['success' => true]);
         }
@@ -510,11 +510,11 @@ class Recipients extends BaseController
         if (!empty($ids) && is_array($ids)) {
             if (session()->get('role') !== 'admin') {
                 // Ensure all IDs belong to the user
-                $owned = $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->whereIn('id', $ids)->findAll();
+                $owned = $this->guestModel->where('guests.user_id', session()->get('user_id'))->whereIn('id', $ids)->findAll();
                 $ids = array_column($owned, 'id');
             }
             if (!empty($ids)) {
-                $this->recipientModel->whereIn('id', $ids)->set(['is_printed' => $state])->update();
+                $this->guestModel->whereIn('id', $ids)->set(['is_printed' => $state])->update();
             }
             return $this->response->setJSON(['success' => true]);
         }
@@ -527,17 +527,17 @@ class Recipients extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Admin tidak dapat mengubah data.'], 403);
         }
 
-        $recipient = $this->checkOwnership($id);
-        if (!$recipient) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Penerima tidak ditemukan atau tidak diizinkan.']);
+        $guest = $this->checkOwnership($id);
+        if (!$guest) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Tamu tidak ditemukan atau tidak diizinkan.']);
         }
 
-        $newState = $recipient['is_selected'] ? 0 : 1;
+        $newState = $guest['is_selected'] ? 0 : 1;
 
-        $this->recipientModel->update($id, ['is_selected' => $newState]);
+        $this->guestModel->update($id, ['is_selected' => $newState]);
 
-        $newCount = $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->where('recipients.is_selected', 1)->countAllResults();
-        $newUnprintedCount = $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->where('recipients.is_selected', 1)->where('recipients.is_printed', 0)->countAllResults();
+        $newCount = $this->guestModel->where('guests.user_id', session()->get('user_id'))->where('guests.is_selected', 1)->countAllResults();
+        $newUnprintedCount = $this->guestModel->where('guests.user_id', session()->get('user_id'))->where('guests.is_selected', 1)->where('guests.is_printed', 0)->countAllResults();
 
         return $this->response->setJSON([
             'success' => true, 
@@ -564,26 +564,26 @@ class Recipients extends BaseController
 
         if ($action === 'select') {
             // Select all requested IDs that belong to the user
-            $validRecipients = $this->recipientModel->whereIn('id', $ids)
-                                                   ->where('recipients.user_id', $userId)
+            $validGuests = $this->guestModel->whereIn('id', $ids)
+                                                   ->where('guests.user_id', $userId)
                                                    ->findAll();
             
-            $validIds = array_column($validRecipients, 'id');
+            $validIds = array_column($validGuests, 'id');
 
             if (!empty($validIds)) {
-                $this->recipientModel->whereIn('id', $validIds)
+                $this->guestModel->whereIn('id', $validIds)
                                      ->set(['is_selected' => 1])
                                      ->update();
             }
         } else {
-            $this->recipientModel->whereIn('id', $ids)
-                                 ->where('recipients.user_id', $userId)
+            $this->guestModel->whereIn('id', $ids)
+                                 ->where('guests.user_id', $userId)
                                  ->set(['is_selected' => 0])
                                  ->update();
         }
 
-        $newCount = $this->recipientModel->where('recipients.user_id', $userId)->where('recipients.is_selected', 1)->countAllResults();
-        $newUnprintedCount = $this->recipientModel->where('recipients.user_id', $userId)->where('recipients.is_selected', 1)->where('recipients.is_printed', 0)->countAllResults();
+        $newCount = $this->guestModel->where('guests.user_id', $userId)->where('guests.is_selected', 1)->countAllResults();
+        $newUnprintedCount = $this->guestModel->where('guests.user_id', $userId)->where('guests.is_selected', 1)->where('guests.is_printed', 0)->countAllResults();
 
         return $this->response->setJSON([
             'success' => true, 
@@ -598,7 +598,7 @@ class Recipients extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Admin tidak dapat mengubah data.'], 403);
         }
 
-        $this->recipientModel->where('recipients.user_id', session()->get('user_id'))
+        $this->guestModel->where('guests.user_id', session()->get('user_id'))
                              ->set(['is_selected' => 0])
                              ->update();
 

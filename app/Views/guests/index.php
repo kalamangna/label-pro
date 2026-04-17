@@ -6,9 +6,9 @@
             <i class="fa-solid fa-users text-white text-xl"></i>
         </div>
         <div>
-            <h1 class="text-2xl font-extrabold tracking-tight text-gray-900 leading-none mb-1">Daftar Penerima</h1>
+            <h1 class="text-2xl font-extrabold tracking-tight text-gray-900 leading-none mb-1">Daftar Tamu</h1>
             <p class="text-sm text-gray-500 font-medium">
-                Total <span class="text-emerald-600 font-bold"><?= number_format($totalInDatabase ?? 0) ?></span> penerima dalam database
+                Total <span class="text-emerald-600 font-bold"><?= number_format($totalInDatabase ?? 0) ?></span> tamu dalam database
             </p>
         </div>
     </div>
@@ -17,13 +17,13 @@
         <?php if (session()->get('role') !== 'admin'): ?>
         <div class="flex gap-2 w-full sm:w-auto">
             <?php if (!empty($eventId)): ?>
-                <a href="/recipients/import?event_id=<?= esc($eventId) ?>" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
+                <a href="/guests/import?event_id=<?= esc($eventId) ?>" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
                     <i class="fa-solid fa-file-import me-2 text-emerald-600"></i>
                     Impor Data
                 </a>
             <?php endif; ?>
 
-            <button data-modal-target="add-recipient-modal" data-modal-toggle="add-recipient-modal" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">
+            <button data-modal-target="add-guest-modal" data-modal-toggle="add-guest-modal" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">
                 <i class="fa-solid fa-plus me-2"></i>
                 Tambah
             </button>
@@ -58,7 +58,7 @@
 
 <!-- Filters -->
 <div class="mb-4 p-6 bg-gray-50/50 border border-gray-200 rounded-2xl">
-    <form action="/recipients" method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-x-4 gap-y-5">
+    <form action="/guests" method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-x-4 gap-y-5">
         <!-- Search -->
         <div class="md:col-span-4">
             <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Cari Nama / Jabatan / Alamat</label>
@@ -128,7 +128,7 @@
             </div>
             <div class="flex gap-2 w-full md:w-auto">
                 <?php if (!empty($search) || ($status ?? '') !== '' || ($sort ?? 'id') !== 'id' || !empty($eventId)): ?>
-                    <a href="/recipients" class="flex-1 md:w-32 h-[42px] flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all active:scale-95 text-center">Reset</a>
+                    <a href="/guests" class="flex-1 md:w-32 h-[42px] flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all active:scale-95 text-center">Reset</a>
                 <?php endif; ?>
                 <button type="submit" class="flex-1 md:w-32 h-[42px] bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-900 focus:ring-4 focus:ring-slate-200 transition-all active:scale-95 shadow-md shadow-slate-200 flex items-center justify-center">Filter</button>
             </div>
@@ -165,7 +165,7 @@
                     <input id="select-all" type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer">
                 </th>
                 <?php endif; ?>
-                <th scope="col" class="px-6 py-4 font-bold">Nama Penerima</th>
+                <th scope="col" class="px-6 py-4 font-bold">Nama Tamu</th>
                 <th scope="col" class="px-6 py-4 font-bold">Jabatan</th>
                 <th scope="col" class="px-6 py-4 font-bold">Alamat</th>
                 <th scope="col" class="px-6 py-4 font-bold whitespace-nowrap">Acara</th>
@@ -179,38 +179,38 @@
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
-            <?php foreach ($recipients as $recipient): ?>
-                <tr id="row-<?= $recipient['id'] ?>" class="bg-white hover:bg-emerald-50/30 transition-colors <?= ($recipient['is_printed'] ?? 0) ? 'bg-gray-50/30' : '' ?>">
+            <?php foreach ($guests as $guest): ?>
+                <tr id="row-<?= $guest['id'] ?>" class="bg-white hover:bg-emerald-50/30 transition-colors <?= ($guest['is_printed'] ?? 0) ? 'bg-gray-50/30' : '' ?>">
                     <?php if (session()->get('role') !== 'admin'): ?>
                     <td class="p-4 text-center">
-                        <input type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer toggle-select" data-id="<?= $recipient['id'] ?>" <?= ($recipient['is_selected'] ?? 0) ? 'checked' : '' ?>>
+                        <input type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer toggle-select" data-id="<?= $guest['id'] ?>" <?= ($guest['is_selected'] ?? 0) ? 'checked' : '' ?>>
                     </td>
                     <?php endif; ?>
-                    <th scope="row" class="px-6 py-4 font-bold text-gray-900 <?= ($recipient['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : '' ?>">
-                        <?= esc($recipient['name']) ?>
+                    <th scope="row" class="px-6 py-4 font-bold text-gray-900 <?= ($guest['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : '' ?>">
+                        <?= esc($guest['name']) ?>
                     </th>
-                    <td class="px-6 py-4 <?= ($recipient['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : 'text-gray-600 font-medium' ?>">
-                        <?= !empty(trim((string)($recipient['jabatan'] ?? ''))) ? esc($recipient['jabatan']) : '-' ?>
+                    <td class="px-6 py-4 <?= ($guest['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : 'text-gray-600 font-medium' ?>">
+                        <?= !empty(trim((string)($guest['jabatan'] ?? ''))) ? esc($guest['jabatan']) : '-' ?>
                     </td>
-                    <td class="px-6 py-4 <?= ($recipient['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : 'text-gray-600 font-medium' ?>">
-                        <div class="line-clamp-1"><?= esc($recipient['address']) ?></div>
+                    <td class="px-6 py-4 <?= ($guest['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : 'text-gray-600 font-medium' ?>">
+                        <div class="line-clamp-1"><?= esc($guest['address']) ?></div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="text-xs font-medium text-gray-500">
                             <i class="fa-solid fa-folder me-1 text-[10px] opacity-40"></i>
-                            <?= esc($recipient['event_name'] ?? 'Tanpa Acara') ?>
+                            <?= esc($guest['event_name'] ?? 'Tanpa Acara') ?>
                         </span>
                     </td>
                     <?php if (session()->get('role') === 'admin'): ?>
                     <td class="px-6 py-4 text-center">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-800">
                             <i class="fa-solid fa-user me-1.5 text-[10px] opacity-50"></i>
-                            <?= esc($recipient['added_by'] ?? 'Sistem') ?>
+                            <?= esc($guest['added_by'] ?? 'Sistem') ?>
                         </span>
                     </td>
                     <?php endif; ?>
                     <td class="px-6 py-4 text-center whitespace-nowrap">
-                        <?php if ($recipient['is_printed'] ?? 0): ?>
+                        <?php if ($guest['is_printed'] ?? 0): ?>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                                 <i class="fa-solid fa-check me-1.5 text-[10px]"></i>
                                 Sudah
@@ -224,22 +224,22 @@
                     <?php if (session()->get('role') !== 'admin'): ?>
                     <td class="px-6 py-4 text-right">
                         <div class="flex justify-end gap-2">
-                            <button type="button" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors edit-recipient-btn" 
-                                    data-id="<?= $recipient['id'] ?>" 
-                                    data-name="<?= esc($recipient['name']) ?>" 
-                                    data-address="<?= esc($recipient['address']) ?>"
-                                    data-event-id="<?= $recipient['event_id'] ?>"
-                                    data-is-printed="<?= $recipient['is_printed'] ?? 0 ?>"
+                            <button type="button" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors edit-guest-btn" 
+                                    data-id="<?= $guest['id'] ?>" 
+                                    data-name="<?= esc($guest['name']) ?>" 
+                                    data-address="<?= esc($guest['address']) ?>"
+                                    data-event-id="<?= $guest['event_id'] ?>"
+                                    data-is-printed="<?= $guest['is_printed'] ?? 0 ?>"
                                     title="Edit">
                                 <i class="fa-solid fa-pen-to-square text-xs"></i>
                             </button>
-                            <button type="button" data-modal-target="delete-modal-<?= $recipient['id'] ?>" data-modal-toggle="delete-modal-<?= $recipient['id'] ?>" class="p-2 text-gray-400 hover:text-red-600 transition-colors" title="Hapus">
+                            <button type="button" data-modal-target="delete-modal-<?= $guest['id'] ?>" data-modal-toggle="delete-modal-<?= $guest['id'] ?>" class="p-2 text-gray-400 hover:text-red-600 transition-colors" title="Hapus">
                                 <i class="fa-solid fa-trash text-xs"></i>
                             </button>
                         </div>
 
                         <!-- Delete Modal -->
-                        <div id="delete-modal-<?= $recipient['id'] ?>" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                        <div id="delete-modal-<?= $guest['id'] ?>" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                             <div class="relative p-4 w-full max-w-md max-h-full">
                                 <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100 text-left">
                                     <div class="p-6 text-center">
@@ -247,10 +247,10 @@
                                             <i class="fa-solid fa-circle-exclamation text-xl"></i>
                                         </div>
                                         <h3 class="mb-2 text-lg font-bold text-gray-900">Hapus data ini?</h3>
-                                        <p class="mb-6 text-sm text-gray-500 italic">"<?= esc($recipient['name']) ?>"</p>
+                                        <p class="mb-6 text-sm text-gray-500 italic">"<?= esc($guest['name']) ?>"</p>
                                         <div class="flex justify-center gap-3">
-                                            <button data-modal-hide="delete-modal-<?= $recipient['id'] ?>" type="button" class="px-5 py-2.5 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
-                                            <a href="/recipients/delete/<?= $recipient['id'] ?>" class="px-5 py-2.5 text-sm font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100">Hapus Data</a>
+                                            <button data-modal-hide="delete-modal-<?= $guest['id'] ?>" type="button" class="px-5 py-2.5 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
+                                            <a href="/guests/delete/<?= $guest['id'] ?>" class="px-5 py-2.5 text-sm font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100">Hapus Data</a>
                                         </div>
                                     </div>
                                 </div>
@@ -260,16 +260,16 @@
                     <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
-            <?php if (empty($recipients)): ?>
+            <?php if (empty($guests)): ?>
                 <tr>
                     <td colspan="<?= session()->get('role') === 'admin' ? '5' : '6' ?>" class="px-6 py-16 text-center bg-gray-50/30 text-gray-400 font-medium">
                         <div class="max-w-xs mx-auto text-center">
                             <i class="fa-solid fa-inbox text-4xl mb-4 opacity-20 text-emerald-600"></i>
                             <p class="text-sm font-bold text-gray-900 mb-1">Belum ada data</p>
                             <?php if (session()->get('role') === 'admin'): ?>
-                                <p class="text-xs text-gray-500 leading-relaxed">Sistem belum memiliki data penerima yang ditambahkan oleh pengguna.</p>
+                                <p class="text-xs text-gray-500 leading-relaxed">Sistem belum memiliki data tamu yang ditambahkan oleh pengguna.</p>
                             <?php else: ?>
-                                <p class="text-xs text-gray-500 leading-relaxed">Gunakan tombol Tambah atau Impor untuk mengisi daftar penerima label Anda.</p>
+                                <p class="text-xs text-gray-500 leading-relaxed">Gunakan tombol Tambah atau Impor untuk mengisi daftar tamu label Anda.</p>
                             <?php endif; ?>
                         </div>
                     </td>
@@ -288,7 +288,7 @@
 <div id="selection-toolbar" class="<?= ($selectedCount ?? 0) > 0 ? 'flex' : 'hidden' ?> fixed bottom-0 left-0 w-full z-50 items-center justify-between px-6 py-4 bg-slate-900 shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t border-slate-700 text-white transition-all duration-300">
     <div class="flex items-center gap-3">
         <div class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold" id="selected-count-badge"><?= esc($selectedCount ?? 0) ?></div>
-        <span class="text-base font-medium">Penerima Terpilih</span>
+        <span class="text-base font-medium">Tamu Terpilih</span>
     </div>
     <div class="flex gap-3">
         <button type="button" id="clearSelectionBtn" class="text-sm font-bold text-slate-300 hover:text-white transition-colors px-3 py-2 border border-transparent hover:border-slate-700 rounded-xl">Batal</button>
@@ -377,7 +377,7 @@
                 const id = this.getAttribute('data-id');
                 const originalState = !this.checked;
 
-                fetch(`/recipients/toggle-selection/${id}`, {
+                fetch(`/guests/toggle-selection/${id}`, {
                     method: 'POST',
                     headers: headers,
                 }).then(response => response.json()).then(data => {
@@ -403,7 +403,7 @@
                 const ids = Array.from(selectCheckboxes).map(cb => cb.getAttribute('data-id'));
                 const action = isChecked ? 'select' : 'deselect';
 
-                fetch('/recipients/bulk-toggle-selection', {
+                fetch('/guests/bulk-toggle-selection', {
                     method: 'POST',
                     headers: headers,
                     body: JSON.stringify({ ids: ids, action: action })
@@ -426,7 +426,7 @@
         const clearSelectionBtn = document.getElementById('clearSelectionBtn');
         if (clearSelectionBtn) {
             clearSelectionBtn.addEventListener('click', function() {
-                fetch('/recipients/clear-selection', {
+                fetch('/guests/clear-selection', {
                     method: 'POST',
                     headers: headers,
                 }).then(response => response.json()).then(data => {
@@ -461,13 +461,13 @@
         if (confirmBulkDeleteBtn) {
             confirmBulkDeleteBtn.addEventListener('click', function() {
                 const ids = Array.from(document.querySelectorAll('.toggle-select:checked')).map(cb => cb.getAttribute('data-id'));
-                fetch('/recipients/bulk-delete', {
+                fetch('/guests/bulk-delete', {
                     method: 'POST',
                     headers: headers,
                     body: JSON.stringify({ ids: ids })
                 }).then(response => response.json()).then(data => {
                     if (data.success) {
-                        fetch('/recipients/clear-selection', { method: 'POST', headers: headers })
+                        fetch('/guests/clear-selection', { method: 'POST', headers: headers })
                             .finally(() => window.location.reload());
                     } else {
                         alert('Gagal menghapus data.');
@@ -527,13 +527,13 @@
         if (confirmBulkStatusBtn) {
             confirmBulkStatusBtn.addEventListener('click', function() {
                 const ids = Array.from(document.querySelectorAll('.toggle-select:checked')).map(cb => cb.getAttribute('data-id'));
-                fetch('/recipients/bulk-printed', {
+                fetch('/guests/bulk-printed', {
                     method: 'POST',
                     headers: headers,
                     body: JSON.stringify({ ids: ids, state: pendingStatusState })
                 }).then(response => response.json()).then(data => {
                     if (data.success) {
-                        fetch('/recipients/clear-selection', { method: 'POST', headers: headers })
+                        fetch('/guests/clear-selection', { method: 'POST', headers: headers })
                             .finally(() => window.location.reload());
                     } else {
                         alert('Gagal memperbarui data.');
@@ -563,7 +563,7 @@
                 if (offset > 10) offset = 10;
                 
                 let align = printAlignInput ? printAlignInput.value : 'center';
-                print121Link.href = `/recipients/print?type=121&offset=${offset - 1}&align=${align}`;
+                print121Link.href = `/guests/print?type=121&offset=${offset - 1}&align=${align}`;
 
                 const alignImg = document.getElementById('align-preview-img');
                 if (alignImg) {
@@ -614,10 +614,10 @@
         }
 
         // Edit Modal Logic
-        const editModalElement = document.getElementById('edit-recipient-modal');
+        const editModalElement = document.getElementById('edit-guest-modal');
         const editModal = editModalElement ? new Modal(editModalElement) : null;
         
-        document.querySelectorAll('.edit-recipient-btn').forEach(btn => {
+        document.querySelectorAll('.edit-guest-btn').forEach(btn => {
            btn.addEventListener('click', function() {
                const id = this.getAttribute('data-id');
                const name = this.getAttribute('data-name');
@@ -626,7 +626,7 @@
                const eventId = this.getAttribute('data-event-id');
                const isPrinted = this.getAttribute('data-is-printed');
 
-               const modal = document.getElementById('edit-recipient-modal');
+               const modal = document.getElementById('edit-guest-modal');
                modal.querySelector('#edit-name').value = name;
                modal.querySelector('#edit-jabatan').value = jabatan || '';
                modal.querySelector('#edit-address').value = address;
@@ -638,7 +638,7 @@
                    modal.querySelector('#edit-status-belum').checked = true;
                }
 
-               modal.querySelector('#edit-form').action = '/recipients/update/' + id;
+               modal.querySelector('#edit-form').action = '/guests/update/' + id;
 
                if (editModal) editModal.show();
            });
@@ -663,17 +663,17 @@
     });
 </script>
 
-<!-- Add Recipient Modal -->
-<div id="add-recipient-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+<!-- Add Guest Modal -->
+<div id="add-guest-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-md max-h-full">
         <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
-                <h3 class="text-lg font-bold text-gray-900">Tambah Penerima</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="add-recipient-modal">
+                <h3 class="text-lg font-bold text-gray-900">Tambah Tamu</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="add-guest-modal">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <form action="/recipients/store" method="POST" class="p-4 md:p-5 space-y-4 text-left">
+            <form action="/guests/store" method="POST" class="p-4 md:p-5 space-y-4 text-left">
                <?= csrf_field() ?>
                <div>
                    <label for="name" class="block mb-2 text-sm font-bold text-gray-900">Nama Lengkap</label>
@@ -693,7 +693,7 @@
                    </select>
                </div>
                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" data-modal-hide="add-recipient-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
+                    <button type="button" data-modal-hide="add-guest-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
                     <button type="submit" class="px-6 py-2 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">Simpan</button>
                 </div>
             </form>
@@ -701,13 +701,13 @@
     </div>
 </div>
 
-<!-- Edit Recipient Modal -->
-<div id="edit-recipient-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+<!-- Edit Guest Modal -->
+<div id="edit-guest-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-md max-h-full">
         <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
-                <h3 class="text-lg font-bold text-gray-900">Edit Penerima</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="edit-recipient-modal">
+                <h3 class="text-lg font-bold text-gray-900">Edit Tamu</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="edit-guest-modal">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -748,7 +748,7 @@
                    </div>
                </div>
                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" data-modal-hide="edit-recipient-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
+                    <button type="button" data-modal-hide="edit-guest-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
                     <button type="submit" class="px-6 py-2 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">Simpan Perubahan</button>
                 </div>
             </form>
@@ -861,7 +861,7 @@
                         </div>
                         
                         <div class="grid grid-cols-1 max-w-xs">
-                            <a id="print-121-link" href="/recipients/print?type=121" target="_blank" class="flex flex-col items-center justify-center p-6 bg-emerald-50 border-2 border-emerald-100 rounded-3xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all group shadow-xl shadow-emerald-900/5 hover:-translate-y-1">
+                            <a id="print-121-link" href="/guests/print?type=121" target="_blank" class="flex flex-col items-center justify-center p-6 bg-emerald-50 border-2 border-emerald-100 rounded-3xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all group shadow-xl shadow-emerald-900/5 hover:-translate-y-1">
                                 <span class="text-4xl font-black mb-1 tracking-tighter">121</span>
                                 <span class="text-[10px] font-black opacity-60 uppercase tracking-[0.2em] group-hover:opacity-100 transition-opacity">38x75mm</span>
                                 <div class="mt-4 flex items-center text-xs font-bold">

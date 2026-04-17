@@ -203,23 +203,23 @@
         </div>
     </div>
 
-    <?php foreach ($pages as $recipients): ?>
+    <?php foreach ($pages as $guests): ?>
     <div class="page" style="justify-content: <?= esc($align ?? 'center') ?>;">
         <div class="sticker-sheet sheet-<?= $type ?>">
-            <?php foreach ($recipients as $recipient): ?>
+            <?php foreach ($guests as $guest): ?>
                 <div class="label" style="position: relative;">
-                    <?php if (!empty($recipient)): ?>
+                    <?php if (!empty($guest)): ?>
                         <?php if (session()->get('role') === 'demo'): ?>
                             <div class="watermark">DEMO VERSION</div>
                         <?php endif; ?>
-                        <div class="name"><?= esc($recipient['name'] ?? '') ?></div>
-                        <?php if (!empty(trim((string)($recipient['jabatan'] ?? '')))): ?>
-                            <div class="jabatan"><?= esc($recipient['jabatan']) ?></div>
+                        <div class="name"><?= esc($guest['name'] ?? '') ?></div>
+                        <?php if (!empty(trim((string)($guest['jabatan'] ?? '')))): ?>
+                            <div class="jabatan"><?= esc($guest['jabatan']) ?></div>
                         <?php endif; ?>
                         <div style="height: 2mm;">&nbsp;</div>
                         <div class="details">
                             <div class="prefix">di-</div>
-                            <div class="address"><?= empty(trim((string)($recipient['address'] ?? ''))) ? 'Tempat' : esc($recipient['address']) ?></div>
+                            <div class="address"><?= empty(trim((string)($guest['address'] ?? ''))) ? 'Tempat' : esc($guest['address']) ?></div>
                         </div>
                     <?php else: ?>
                         <div class="name">&nbsp;</div>

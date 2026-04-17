@@ -4,11 +4,11 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class AddIsMarkedToRecipients extends Migration
+class AddIsMarkedToGuests extends Migration
 {
     public function up()
     {
-        $this->forge->addColumn('recipients', [
+        $this->forge->addColumn('guests', [
             'is_marked' => [
                 'type' => 'BOOLEAN',
                 'default' => false,
@@ -19,6 +19,6 @@ class AddIsMarkedToRecipients extends Migration
 
     public function down()
     {
-        $this->forge->dropColumn('recipients', 'is_marked');
+        $this->forge->dropColumn('guests', 'is_marked');
     }
 }

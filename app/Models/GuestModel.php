@@ -4,9 +4,9 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class RecipientModel extends Model
+class GuestModel extends Model
 {
-    protected $table            = 'recipients';
+    protected $table            = 'guests';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

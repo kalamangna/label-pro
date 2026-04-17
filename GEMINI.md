@@ -23,8 +23,8 @@
   - Required structure: Kolom A (Nama), Kolom B (Jabatan - Opsional), Kolom C (Alamat - Opsional).
 - **Printing & Selection**:
   - **Server-side Selection**: Persistent selection state stored in the database (`is_selected`).
-  - **Unlimited Selection**: No hard limit on how many recipients can be selected at once.
-  - **Multi-page Printing**: Automatically chunks selected recipients into groups of 10 for multi-sheet printing.
+  - **Unlimited Selection**: No hard limit on how many guests can be selected at once.
+  - **Multi-page Printing**: Automatically chunks selected guests into groups of 10 for multi-sheet printing.
   - **Sticky Toolbar**: Real-time selected count and actions (Print/Clear) in a full-width footer toolbar.
   - **Label Offset**: Supports starting print from any position (1-10) on the first sheet to reuse partially spent sticker sheets.
   - **Label Type 121**: Precision layout for 38x75mm stickers (2 columns x 5 rows).
@@ -37,7 +37,7 @@
 ## Preferred Styles
 - Controller logic: Concise; use models for DB interaction.
 - UI Design: Minimal dashboard style, using modern standard web conventions (modals, client-side interactions where appropriate).
-- Interaction: Single-page workflow using Modals for CRUD (Recipients and Events).
+- Interaction: Single-page workflow using Modals for CRUD (Guests and Events).
 - Data State: Use fetch API for background updates (e.g., selection state).
 - Bulk Actions: Handled via AJAX with immediate UI feedback.
 - Status Management: Individual print status (`is_printed`) is managed via radio buttons within the Edit Modal.

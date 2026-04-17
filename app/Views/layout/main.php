@@ -91,9 +91,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/recipients" class="flex items-center p-3 rounded-2xl transition-all <?= str_starts_with(current_url(), base_url('recipients')) && current_url() != base_url('recipients/import') ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600' ?> group">
-                        <i class="fa-solid fa-users w-5 h-5 flex items-center justify-center transition duration-75 <?= str_starts_with(current_url(), base_url('recipients')) && current_url() != base_url('recipients/import') ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-600' ?>"></i>
-                        <span class="ms-3 whitespace-nowrap">Penerima</span>
+                    <a href="/guests" class="flex items-center p-3 rounded-2xl transition-all <?= str_starts_with(current_url(), base_url('guests')) && current_url() != base_url('guests/import') ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600' ?> group">
+                        <i class="fa-solid fa-users w-5 h-5 flex items-center justify-center transition duration-75 <?= str_starts_with(current_url(), base_url('guests')) && current_url() != base_url('guests/import') ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-600' ?>"></i>
+                        <span class="ms-3 whitespace-nowrap">Tamu</span>
                     </a>
                 </li>
                 <?php if (session()->get('role') === 'admin'): ?>

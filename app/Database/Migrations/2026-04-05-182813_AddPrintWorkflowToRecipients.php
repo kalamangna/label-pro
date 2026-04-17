@@ -4,11 +4,11 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class AddPrintWorkflowToRecipients extends Migration
+class AddPrintWorkflowToGuests extends Migration
 {
     public function up()
     {
-        $this->forge->addColumn('recipients', [
+        $this->forge->addColumn('guests', [
             'is_selected' => [
                 'type' => 'BOOLEAN',
                 'default' => false,
@@ -24,6 +24,6 @@ class AddPrintWorkflowToRecipients extends Migration
 
     public function down()
     {
-        $this->forge->dropColumn('recipients', ['is_selected', 'is_printed']);
+        $this->forge->dropColumn('guests', ['is_selected', 'is_printed']);
     }
 }

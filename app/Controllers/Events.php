@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\EventModel;
-use App\Models\RecipientModel;
+use App\Models\GuestModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class Events extends BaseController
@@ -41,9 +41,9 @@ class Events extends BaseController
 
         $model = $this->applyScope();
         
-        $model = $model->select('events.*, users.username as added_by, COUNT(recipients.id) as total_recipients')
+        $model = $model->select('events.*, users.username as added_by, COUNT(guests.id) as total_guests')
                        ->join('users', 'users.id = events.user_id', 'left')
-                       ->join('recipients', 'recipients.event_id = events.id', 'left')
+                       ->join('guests', 'guests.event_id = events.id', 'left')
                        ->groupBy('events.id');
 
         if (!empty($search)) {

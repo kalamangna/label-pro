@@ -4,11 +4,11 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class AddProjectIdToRecipients extends Migration
+class AddProjectIdToGuests extends Migration
 {
     public function up()
     {
-        $this->forge->addColumn('recipients', [
+        $this->forge->addColumn('guests', [
             'project_id' => [
                 'type'           => 'INT',
                 'constraint'     => 11,
@@ -21,7 +21,7 @@ class AddProjectIdToRecipients extends Migration
 
     public function down()
     {
-        $this->forge->dropForeignKey('recipients', 'recipients_project_id_foreign');
-        $this->forge->dropColumn('recipients', 'project_id');
+        $this->forge->dropForeignKey('guests', 'guests_project_id_foreign');
+        $this->forge->dropColumn('guests', 'project_id');
     }
 }

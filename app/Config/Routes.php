@@ -13,20 +13,20 @@ $routes->get('/demo/start', 'AuthController::startDemo');
 
 $routes->get('/dashboard', 'Home::dashboard', ['filter' => 'auth']);
 
-$routes->group('recipients', ['filter' => 'auth'], function($routes) {
-    $routes->get('/', 'Recipients::index');
-    $routes->post('store', 'Recipients::store');
-    $routes->post('update/(:num)', 'Recipients::update/$1');
-    $routes->get('delete/(:num)', 'Recipients::delete/$1');
-    $routes->get('import', 'Recipients::import');
-    $routes->post('import', 'Recipients::processImport');
-    $routes->get('print', 'Recipients::printLabels');
-    $routes->post('bulk-delete', 'Recipients::bulkDelete');
-    $routes->post('bulk-printed', 'Recipients::bulkUpdatePrinted');
-    $routes->post('printed/(:num)', 'Recipients::updatePrinted/$1');
-    $routes->post('toggle-selection/(:num)', 'Recipients::toggleSelection/$1');
-    $routes->post('bulk-toggle-selection', 'Recipients::bulkToggleSelection');
-    $routes->post('clear-selection', 'Recipients::clearSelection');
+$routes->group('guests', ['filter' => 'auth'], function($routes) {
+    $routes->get('/', 'Guests::index');
+    $routes->post('store', 'Guests::store');
+    $routes->post('update/(:num)', 'Guests::update/$1');
+    $routes->get('delete/(:num)', 'Guests::delete/$1');
+    $routes->get('import', 'Guests::import');
+    $routes->post('import', 'Guests::processImport');
+    $routes->get('print', 'Guests::printLabels');
+    $routes->post('bulk-delete', 'Guests::bulkDelete');
+    $routes->post('bulk-printed', 'Guests::bulkUpdatePrinted');
+    $routes->post('printed/(:num)', 'Guests::updatePrinted/$1');
+    $routes->post('toggle-selection/(:num)', 'Guests::toggleSelection/$1');
+    $routes->post('bulk-toggle-selection', 'Guests::bulkToggleSelection');
+    $routes->post('clear-selection', 'Guests::clearSelection');
 });
 
 $routes->group('events', ['filter' => 'auth'], function($routes) {

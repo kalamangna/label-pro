@@ -9,7 +9,7 @@ class RenameProjectsToEvents extends Migration
     public function up()
     {
         $this->forge->renameTable('projects', 'events');
-        $this->forge->modifyColumn('recipients', [
+        $this->forge->modifyColumn('guests', [
             'project_id' => [
                 'name' => 'event_id',
                 'type' => 'INT',
@@ -22,7 +22,7 @@ class RenameProjectsToEvents extends Migration
     public function down()
     {
         $this->forge->renameTable('events', 'projects');
-        $this->forge->modifyColumn('recipients', [
+        $this->forge->modifyColumn('guests', [
             'event_id' => [
                 'name' => 'project_id',
                 'type' => 'INT',

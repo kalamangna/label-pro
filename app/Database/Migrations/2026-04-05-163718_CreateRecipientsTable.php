@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateRecipientsTable extends Migration
+class CreateGuestsTable extends Migration
 {
     public function up()
     {
@@ -33,11 +33,11 @@ class CreateRecipientsTable extends Migration
             ],
         ]);
         $this->forge->addKey('id', true);
-        $this->forge->createTable('recipients');
+        $this->forge->createTable('guests');
     }
 
     public function down()
     {
-        $this->forge->dropTable('recipients');
+        $this->forge->dropTable('guests');
     }
 }

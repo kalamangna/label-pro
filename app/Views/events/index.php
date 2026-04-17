@@ -135,14 +135,14 @@
 
                     <td class="px-6 py-4 text-center">
                         <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
-                            <?= esc($event['total_recipients'] ?? 0) ?> Data
+                            <?= esc($event['total_guests'] ?? 0) ?> Data
                         </span>
                     </td>
 
                     <td class="px-6 py-4 text-right">
                         <div class="flex justify-end gap-2 items-center">
                             <?php if (session()->get('role') !== 'admin'): ?>
-                            <a href="/recipients/import?event_id=<?= $event['id'] ?>" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors" title="Impor Data Excel">
+                            <a href="/guests/import?event_id=<?= $event['id'] ?>" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors" title="Impor Data Excel">
                                 <i class="fa-solid fa-file-import text-xs"></i>
                             </a>
                             <button type="button" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors edit-event-btn"
@@ -155,7 +155,7 @@
                                 <i class="fa-solid fa-trash text-xs"></i>
                             </button>
                             <?php endif; ?>
-                            <a href="/recipients?event_id=<?= $event['id'] ?>" class="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center px-3 py-1.5 bg-emerald-50 rounded-lg ml-2 border border-emerald-100 transition-colors">
+                            <a href="/guests?event_id=<?= $event['id'] ?>" class="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center px-3 py-1.5 bg-emerald-50 rounded-lg ml-2 border border-emerald-100 transition-colors">
                                 Lihat Data
                                 <i class="fa-solid fa-arrow-right ms-1.5"></i>
                             </a>
@@ -171,7 +171,7 @@
                                         </div>
                                         <h3 class="mb-2 text-lg font-bold text-gray-900">Hapus acara ini?</h3>
                                         <p class="mb-1 text-sm text-gray-500 italic">"<?= esc($event['name']) ?>"</p>
-                                        <p class="mb-6 text-[10px] text-red-500 font-bold uppercase tracking-widest">Semua data penerima dalam acara ini juga akan dihapus!</p>
+                                        <p class="mb-6 text-[10px] text-red-500 font-bold uppercase tracking-widest">Semua data tamu dalam acara ini juga akan dihapus!</p>
                                         <div class="flex justify-center gap-3">
                                             <button data-modal-hide="delete-modal-<?= $event['id'] ?>" type="button" class="px-5 py-2.5 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
                                             <a href="/events/delete/<?= $event['id'] ?>" class="px-5 py-2.5 text-sm font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100">Hapus Acara</a>
@@ -192,7 +192,7 @@
                             <?php if (session()->get('role') === 'admin'): ?>
                                 <p class="text-xs text-gray-500 leading-relaxed">Sistem belum memiliki acara yang dibuat oleh pengguna.</p>
                             <?php else: ?>
-                                <p class="text-xs text-gray-500 leading-relaxed">Mulai dengan membuat acara pertama Anda untuk mengelompokkan penerima label.</p>
+                                <p class="text-xs text-gray-500 leading-relaxed">Mulai dengan membuat acara pertama Anda untuk mengelompokkan tamu label.</p>
                             <?php endif; ?>
                         </div>
                     </td>
