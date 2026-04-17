@@ -61,6 +61,7 @@ class Recipients extends BaseController
         if ($search !== '') {
             $model->groupStart()
                   ->like('recipients.name', $search)
+                  ->orLike('recipients.jabatan', $search)
                   ->orLike('recipients.address', $search)
                   ->groupEnd();
         }
@@ -89,27 +90,35 @@ class Recipients extends BaseController
         }
         $totalInDatabase = $totalInDatabase->countAllResults();
 
-        // Calculate selected count independently
+        // Calculate selected counts independently
         $selectedCount = 0;
+        $unprintedSelectedCount = 0;
         if (session()->get('role') !== 'admin') {
             $selectedCount = (new RecipientModel())
                 ->where('user_id', session()->get('user_id'))
                 ->where('is_selected', 1)
                 ->countAllResults();
+            
+            $unprintedSelectedCount = (new RecipientModel())
+                ->where('user_id', session()->get('user_id'))
+                ->where('is_selected', 1)
+                ->where('is_printed', 0)
+                ->countAllResults();
         }
 
         $data = [
-            'title'           => 'Daftar Penerima',
-            'recipients'      => $model->paginate(10),
-            'pager'           => $model->pager,
-            'search'          => $search,
-            'status'          => $status,
-            'sort'            => $sort,
-            'dir'             => $dir,
-            'eventId'         => $eventId,
-            'events'          => $events,
-            'selectedCount'   => $selectedCount,
-            'totalInDatabase' => $totalInDatabase,
+            'title'                  => 'Daftar Penerima',
+            'recipients'             => $model->paginate(10),
+            'pager'                  => $model->pager,
+            'search'                 => $search,
+            'status'                 => $status,
+            'sort'                   => $sort,
+            'dir'                    => $dir,
+            'eventId'                => $eventId,
+            'events'                 => $events,
+            'selectedCount'          => $selectedCount,
+            'unprintedSelectedCount' => $unprintedSelectedCount,
+            'totalInDatabase'        => $totalInDatabase,
         ];
 
         return view('recipients/index', $data);
@@ -140,6 +149,10 @@ class Recipients extends BaseController
                     'max_length' => '{field} maksimal {param} karakter.'
                 ]
             ],
+            'jabatan' => [
+                'label' => 'Jabatan',
+                'rules' => 'permit_empty|max_length[255]',
+            ],
             'address' => [
                 'label' => 'Alamat',
                 'rules' => 'permit_empty',
@@ -155,11 +168,13 @@ class Recipients extends BaseController
         }
 
         $name     = $this->request->getPost('name');
+        $jabatan  = $this->request->getPost('jabatan');
         $address  = $this->request->getPost('address');
         $eventId  = $this->request->getPost('event_id') ?: null;
         
         $existing = $this->applyScope()
                          ->where('name', $name)
+                         ->where('jabatan', $jabatan)
                          ->where('address', $address);
         
         if ($eventId) {
@@ -169,11 +184,12 @@ class Recipients extends BaseController
         }
 
         if ($existing->first()) {
-            return redirect()->back()->withInput()->with('error', 'Penerima dengan nama dan alamat tersebut sudah ada di daftar ini.');
+            return redirect()->back()->withInput()->with('error', 'Penerima dengan nama, jabatan, dan alamat tersebut sudah ada di daftar ini.');
         }
 
         $this->recipientModel->save([
             'name'     => $name,
+            'jabatan'  => $jabatan,
             'address'  => $address,
             'user_id'  => session()->get('user_id'),
             'event_id' => $eventId,
@@ -203,6 +219,10 @@ class Recipients extends BaseController
                     'max_length' => '{field} maksimal {param} karakter.'
                 ]
             ],
+            'jabatan' => [
+                'label' => 'Jabatan',
+                'rules' => 'permit_empty|max_length[255]',
+            ],
             'address' => [
                 'label' => 'Alamat',
                 'rules' => 'permit_empty',
@@ -211,6 +231,10 @@ class Recipients extends BaseController
                 'label' => 'Acara',
                 'rules' => 'permit_empty|is_natural_no_zero',
             ],
+            'is_printed' => [
+                'label' => 'Status Cetak',
+                'rules' => 'permit_empty|in_list[0,1]',
+            ],
         ];
 
         if (!$this->validate($rules)) {
@@ -218,9 +242,11 @@ class Recipients extends BaseController
         }
 
         $this->recipientModel->update($id, [
-            'name'     => $this->request->getPost('name'),
-            'address'  => $this->request->getPost('address'),
-            'event_id' => $this->request->getPost('event_id') ?: null,
+            'name'       => $this->request->getPost('name'),
+            'jabatan'    => $this->request->getPost('jabatan'),
+            'address'    => $this->request->getPost('address'),
+            'event_id'   => $this->request->getPost('event_id') ?: null,
+            'is_printed' => $this->request->getPost('is_printed') ?? 0,
         ]);
 
         return redirect()->to('/recipients')->with('message', 'Penerima berhasil diperbarui.');
@@ -324,9 +350,10 @@ class Recipients extends BaseController
                     break;
                 }
 
-                // Expecting: Column A (name), Column B (address)
+                // Expecting: Column A (name), Column B (jabatan), Column C (address)
                 $name = trim((string)($row[0] ?? ''));
-                $address = trim((string)($row[1] ?? ''));
+                $jabatan = trim((string)($row[1] ?? ''));
+                $address = trim((string)($row[2] ?? ''));
 
                 if (empty($name)) {
                     $errorCount++;
@@ -335,6 +362,7 @@ class Recipients extends BaseController
 
                 $existing = $this->applyScope()
                                  ->where('name', $name)
+                                 ->where('jabatan', $jabatan)
                                  ->where('address', $address);
                 
                 if ($eventId) {
@@ -350,6 +378,7 @@ class Recipients extends BaseController
 
                 $this->recipientModel->insert([
                     'name'     => $name,
+                    'jabatan'  => $jabatan,
                     'address'  => $address,
                     'user_id'  => session()->get('user_id'),
                     'event_id' => $eventId,
@@ -386,29 +415,35 @@ class Recipients extends BaseController
         // Limit offset to max 9 for label 121 (which has 10 positions, index 0-9)
         if ($offset > 9) $offset = 9;
 
-        $recipients = $this->applyScope()->where('recipients.is_selected', 1)->findAll();
+        $recipients = $this->applyScope()
+            ->where('recipients.is_selected', 1)
+            ->where('recipients.is_printed', 0)
+            ->findAll();
 
         if (empty($recipients)) {
             return redirect()->to('/recipients')->with('error', 'Harap pilih penerima terlebih dahulu.');
         }
 
-        // Apply offset padding
+        // Apply offset padding (only affects the first page)
         if ($offset > 0) {
             $placeholders = array_fill(0, $offset, []);
             $recipients = array_merge($placeholders, $recipients);
         }
 
-        // Hard limit to 10 total items per print batch to ensure alignment on 1 sheet
-        $recipients = array_slice($recipients, 0, 10);
+        // Chunk into pages of 10 items
+        $pages = array_chunk($recipients, 10);
 
-        // Pad to exactly 10 items so the grid preview always shows all label boxes
-        if (count($recipients) < 10) {
-            $paddingCount = 10 - count($recipients);
-            $recipients = array_merge($recipients, array_fill(0, $paddingCount, []));
+        // Pad the last page to exactly 10 items so the grid layout is preserved
+        if (!empty($pages)) {
+            $lastPageIdx = count($pages) - 1;
+            if (count($pages[$lastPageIdx]) < 10) {
+                $paddingCount = 10 - count($pages[$lastPageIdx]);
+                $pages[$lastPageIdx] = array_merge($pages[$lastPageIdx], array_fill(0, $paddingCount, []));
+            }
         }
 
         $data = [
-            'recipients' => $recipients,
+            'pages'      => $pages,
             'type'       => $type,
             'align'      => $align,
         ];
@@ -425,10 +460,20 @@ class Recipients extends BaseController
         $recipient = $this->checkOwnership($id);
         if ($recipient) {
             $newValue = $recipient['is_printed'] ? 0 : 1;
-            $this->recipientModel->update($id, ['is_printed' => $newValue]);
-            return $this->response->setJSON(['success' => true, 'is_printed' => $newValue]);
-        }
-        return $this->response->setJSON(['success' => false], 404);
+
+            $updateData = ['is_printed' => $newValue];
+
+            $this->recipientModel->update($id, $updateData);
+            $newCount = $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->where('recipients.is_selected', 1)->countAllResults();
+            $newUnprintedCount = $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->where('recipients.is_selected', 1)->where('recipients.is_printed', 0)->countAllResults();
+
+            return $this->response->setJSON([
+                'success' => true, 
+                'is_printed' => $newValue, 
+                'count' => $newCount,
+                'unprinted_count' => $newUnprintedCount
+            ]);
+            }        return $this->response->setJSON(['success' => false], 404);
     }
 
     public function bulkDelete()
@@ -489,20 +534,18 @@ class Recipients extends BaseController
 
         $newState = $recipient['is_selected'] ? 0 : 1;
 
-        if ($newState === 1) {
-            $selectedCount = $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->where('recipients.is_selected', 1)->countAllResults();
-            if ($selectedCount >= 10) {
-                return $this->response->setJSON(['success' => false, 'limit_reached' => true, 'message' => 'Maksimal 10 penerima yang dapat dipilih untuk dicetak.']);
-            }
-        }
-
         $this->recipientModel->update($id, ['is_selected' => $newState]);
 
         $newCount = $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->where('recipients.is_selected', 1)->countAllResults();
-        
-        return $this->response->setJSON(['success' => true, 'is_selected' => $newState, 'count' => $newCount]);
-    }
+        $newUnprintedCount = $this->recipientModel->where('recipients.user_id', session()->get('user_id'))->where('recipients.is_selected', 1)->where('recipients.is_printed', 0)->countAllResults();
 
+        return $this->response->setJSON([
+            'success' => true, 
+            'is_selected' => $newState, 
+            'count' => $newCount,
+            'unprinted_count' => $newUnprintedCount
+        ]);
+        }
     public function bulkToggleSelection()
     {
         if (session()->get('role') === 'admin') {
@@ -520,19 +563,18 @@ class Recipients extends BaseController
         $userId = session()->get('user_id');
 
         if ($action === 'select') {
-            $currentSelectedCount = $this->recipientModel->where('recipients.user_id', $userId)->where('recipients.is_selected', 1)->countAllResults();
-            $availableSlots = 10 - $currentSelectedCount;
-
-            if ($availableSlots <= 0) {
-                return $this->response->setJSON(['success' => false, 'limit_reached' => true, 'message' => 'Batas maksimal 10 penerima telah tercapai.']);
-            }
-
-            $idsToSelect = array_slice($ids, 0, $availableSlots);
+            // Select all requested IDs that belong to the user
+            $validRecipients = $this->recipientModel->whereIn('id', $ids)
+                                                   ->where('recipients.user_id', $userId)
+                                                   ->findAll();
             
-            $this->recipientModel->whereIn('id', $idsToSelect)
-                                 ->where('recipients.user_id', $userId)
-                                 ->set(['is_selected' => 1])
-                                 ->update();
+            $validIds = array_column($validRecipients, 'id');
+
+            if (!empty($validIds)) {
+                $this->recipientModel->whereIn('id', $validIds)
+                                     ->set(['is_selected' => 1])
+                                     ->update();
+            }
         } else {
             $this->recipientModel->whereIn('id', $ids)
                                  ->where('recipients.user_id', $userId)
@@ -541,8 +583,13 @@ class Recipients extends BaseController
         }
 
         $newCount = $this->recipientModel->where('recipients.user_id', $userId)->where('recipients.is_selected', 1)->countAllResults();
+        $newUnprintedCount = $this->recipientModel->where('recipients.user_id', $userId)->where('recipients.is_selected', 1)->where('recipients.is_printed', 0)->countAllResults();
 
-        return $this->response->setJSON(['success' => true, 'count' => $newCount]);
+        return $this->response->setJSON([
+            'success' => true, 
+            'count' => $newCount,
+            'unprinted_count' => $newUnprintedCount
+        ]);
     }
 
     public function clearSelection()

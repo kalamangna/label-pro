@@ -38,10 +38,12 @@
                         <tr class="text-emerald-600 border-b border-emerald-200">
                             <th class="text-left pb-2 font-bold">Kolom A</th>
                             <th class="text-left pb-2 font-bold">Kolom B</th>
+                            <th class="text-left pb-2 font-bold">Kolom C</th>
                         </tr>
                         <tr>
                             <td class="py-2 font-bold">nama</td>
-                            <td class="py-2 font-bold">alamat</td>
+                            <td class="py-2 font-bold">jabatan (opsional)</td>
+                            <td class="py-2 font-bold">alamat (opsional)</td>
                         </tr>
                     </table>
                 </div>
@@ -57,7 +59,7 @@
                 <ul class="text-sm text-gray-600 space-y-2 list-disc list-inside">
                     <li>Baris pertama (header) akan otomatis dilewati.</li>
                     <li>Nama tidak boleh kosong.</li>
-                    <li>Data dengan <strong>nama dan alamat yang sama</strong> akan otomatis dilewati.</li>
+                    <li>Data dengan <strong>nama, jabatan, dan alamat yang sama</strong> akan otomatis dilewati.</li>
                     <li>Format file harus <strong>.xlsx</strong>.</li>
                 </ul>
             </div>

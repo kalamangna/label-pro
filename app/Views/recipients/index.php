@@ -61,7 +61,7 @@
     <form action="/recipients" method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-x-4 gap-y-5">
         <!-- Search -->
         <div class="md:col-span-4">
-            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Cari Nama / Alamat</label>
+            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Cari Nama / Jabatan / Alamat</label>
             <div class="relative">
                 <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                     <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs"></i>
@@ -166,12 +166,13 @@
                 </th>
                 <?php endif; ?>
                 <th scope="col" class="px-6 py-4 font-bold">Nama Penerima</th>
+                <th scope="col" class="px-6 py-4 font-bold">Jabatan</th>
                 <th scope="col" class="px-6 py-4 font-bold">Alamat</th>
-                <th scope="col" class="px-6 py-4 font-bold">Acara</th>
+                <th scope="col" class="px-6 py-4 font-bold whitespace-nowrap">Acara</th>
                 <?php if (session()->get('role') === 'admin'): ?>
                     <th scope="col" class="px-6 py-4 font-bold text-center">Ditambahkan Oleh</th>
                 <?php endif; ?>
-                <th scope="col" class="px-6 py-4 text-center font-bold">Status</th>
+                <th scope="col" class="px-6 py-4 text-center font-bold whitespace-nowrap">Status Cetak</th>
                 <?php if (session()->get('role') !== 'admin'): ?>
                 <th scope="col" class="px-6 py-4 text-right font-bold">Aksi</th>
                 <?php endif; ?>
@@ -189,9 +190,12 @@
                         <?= esc($recipient['name']) ?>
                     </th>
                     <td class="px-6 py-4 <?= ($recipient['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : 'text-gray-600 font-medium' ?>">
+                        <?= !empty(trim((string)($recipient['jabatan'] ?? ''))) ? esc($recipient['jabatan']) : '-' ?>
+                    </td>
+                    <td class="px-6 py-4 <?= ($recipient['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : 'text-gray-600 font-medium' ?>">
                         <div class="line-clamp-1"><?= esc($recipient['address']) ?></div>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4 whitespace-nowrap">
                         <span class="text-xs font-medium text-gray-500">
                             <i class="fa-solid fa-folder me-1 text-[10px] opacity-40"></i>
                             <?= esc($recipient['event_name'] ?? 'Tanpa Acara') ?>
@@ -205,14 +209,16 @@
                         </span>
                     </td>
                     <?php endif; ?>
-                    <td class="px-6 py-4 text-center">
-                        <?php if (session()->get('role') !== 'admin'): ?>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer toggle-printed" data-id="<?= $recipient['id'] ?>" <?= ($recipient['is_printed'] ?? 0) ? 'checked' : '' ?>>
-                            <div class="relative w-8 h-4 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-500"></div>
-                        </label>
+                    <td class="px-6 py-4 text-center whitespace-nowrap">
+                        <?php if ($recipient['is_printed'] ?? 0): ?>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                <i class="fa-solid fa-check me-1.5 text-[10px]"></i>
+                                Sudah
+                            </span>
                         <?php else: ?>
-                            <?= ($recipient['is_printed'] ?? 0) ? '<span class="text-xs text-emerald-600 font-bold"><i class="fa-solid fa-check me-1"></i>Sudah</span>' : '<span class="text-xs text-gray-400 font-bold">Belum</span>' ?>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                Belum
+                            </span>
                         <?php endif; ?>
                     </td>
                     <?php if (session()->get('role') !== 'admin'): ?>
@@ -223,6 +229,7 @@
                                     data-name="<?= esc($recipient['name']) ?>" 
                                     data-address="<?= esc($recipient['address']) ?>"
                                     data-event-id="<?= $recipient['event_id'] ?>"
+                                    data-is-printed="<?= $recipient['is_printed'] ?? 0 ?>"
                                     title="Edit">
                                 <i class="fa-solid fa-pen-to-square text-xs"></i>
                             </button>
@@ -305,7 +312,7 @@
         const selectionToolbar = document.getElementById('selection-toolbar');
         const countBadge = document.getElementById('selected-count-badge');
 
-        function updateToolbar(count) {
+        function updateToolbar(count, unprintedCount) {
             if (countBadge) countBadge.textContent = count;
             if (selectionToolbar) {
                 if (count > 0) {
@@ -314,6 +321,45 @@
                 } else {
                     selectionToolbar.classList.add('hidden');
                     selectionToolbar.classList.remove('flex');
+                }
+            }
+
+            // Update Print Modal Warnings
+            const unprintedWarning = document.getElementById('unprinted-selected-count-warning');
+            const unprintedWarningContainer = document.getElementById('unprinted-selected-count-warning-container');
+            if (unprintedWarning) unprintedWarning.textContent = unprintedCount;
+            if (unprintedWarningContainer) {
+                if (unprintedCount > 10) {
+                    unprintedWarningContainer.classList.remove('hidden');
+                    unprintedWarningContainer.classList.add('flex');
+                } else {
+                    unprintedWarningContainer.classList.add('hidden');
+                    unprintedWarningContainer.classList.remove('flex');
+                }
+            }
+            
+            const printedExcludedCountEl = document.getElementById('printed-excluded-count');
+            const printedExcludedWarning = document.getElementById('printed-excluded-warning');
+            if (printedExcludedCountEl && printedExcludedWarning) {
+                const excludedCount = count - unprintedCount;
+                printedExcludedCountEl.textContent = excludedCount;
+                if (excludedCount > 0) {
+                    printedExcludedWarning.classList.remove('hidden');
+                    printedExcludedWarning.classList.add('flex');
+                } else {
+                    printedExcludedWarning.classList.add('hidden');
+                    printedExcludedWarning.classList.remove('flex');
+                }
+            }
+
+            const noUnprintedWarning = document.getElementById('no-unprinted-warning');
+            if (noUnprintedWarning) {
+                if (unprintedCount === 0 && count > 0) {
+                    noUnprintedWarning.classList.remove('hidden');
+                    noUnprintedWarning.classList.add('flex');
+                } else {
+                    noUnprintedWarning.classList.add('hidden');
+                    noUnprintedWarning.classList.remove('flex');
                 }
             }
         }
@@ -336,15 +382,14 @@
                     headers: headers,
                 }).then(response => response.json()).then(data => {
                     if (data.success) {
-                        updateToolbar(data.count);
-                        updateSelectAllState();
+                       updateToolbar(data.count, data.unprinted_count);
+                       updateSelectAllState();
                     } else {
-                        if (data.limit_reached) alert(data.message);
-                        else alert('Gagal memperbarui status pilihan.');
-                        this.checked = originalState;
-                        updateSelectAllState();
-                    }
-                }).catch(() => {
+                       if (data.limit_reached || data.message) alert(data.message || 'Gagal memperbarui status pilihan.');
+                       else alert('Gagal memperbarui status pilihan.');
+                       this.checked = originalState;
+                       updateSelectAllState();
+                    }                }).catch(() => {
                     alert('Terjadi kesalahan jaringan.');
                     this.checked = originalState;
                     updateSelectAllState();
@@ -364,20 +409,14 @@
                     body: JSON.stringify({ ids: ids, action: action })
                 }).then(response => response.json()).then(data => {
                     if (data.success) {
-                        updateToolbar(data.count);
-                        // If limit reached partially, we should reload to reflect correct checked states
-                        if (isChecked && action === 'select' && data.count >= 10 && ids.length > (10 - data.count)) {
-                            window.location.reload();
-                        } else {
-                            selectCheckboxes.forEach(cb => cb.checked = isChecked);
-                            updateSelectAllState();
-                        }
+                       updateToolbar(data.count, data.unprinted_count);
+                       selectCheckboxes.forEach(cb => cb.checked = isChecked);
+                       updateSelectAllState();
                     } else {
-                        if (data.limit_reached) alert(data.message);
-                        else alert('Gagal memperbarui status pilihan.');
-                        this.checked = !isChecked;
-                    }
-                }).catch(() => {
+                       if (data.limit_reached || data.message) alert(data.message || 'Gagal memperbarui status pilihan.');
+                       else alert('Gagal memperbarui status pilihan.');
+                       this.checked = !isChecked;
+                    }                }).catch(() => {
                     alert('Terjadi kesalahan jaringan.');
                     this.checked = !isChecked;
                 });
@@ -399,36 +438,6 @@
         }
 
         updateSelectAllState();
-
-        document.querySelectorAll('.toggle-printed').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const id = this.getAttribute('data-id');
-                const originalState = !this.checked;
-                const row = document.getElementById(`row-${id}`);
-                const nameEl = row.querySelector('th');
-                const addrEl = row.querySelector('td div');
-
-                fetch(`/recipients/printed/${id}`, {
-                    method: 'POST',
-                    headers: headers,
-                }).then(response => response.json()).then(data => {
-                    if (data.success) {
-                        if (data.is_printed == 1) {
-                            row.classList.add('bg-gray-50/30');
-                            nameEl.classList.add('line-through', 'text-gray-400');
-                            addrEl.classList.add('line-through', 'text-gray-400');
-                        } else {
-                            row.classList.remove('bg-gray-50/30');
-                            nameEl.classList.remove('line-through', 'text-gray-400');
-                            addrEl.classList.remove('line-through', 'text-gray-400');
-                        }
-                    } else {
-                        alert('Gagal memperbarui status cetak.');
-                        this.checked = originalState;
-                    }
-                });
-            });
-        });
 
         const bulkDeleteModalEl = document.getElementById('bulk-delete-modal');
         const bulkDeleteModal = bulkDeleteModalEl ? new Modal(bulkDeleteModalEl) : null;
@@ -458,7 +467,8 @@
                     body: JSON.stringify({ ids: ids })
                 }).then(response => response.json()).then(data => {
                     if (data.success) {
-                        window.location.reload();
+                        fetch('/recipients/clear-selection', { method: 'POST', headers: headers })
+                            .finally(() => window.location.reload());
                     } else {
                         alert('Gagal menghapus data.');
                     }
@@ -523,7 +533,8 @@
                     body: JSON.stringify({ ids: ids, state: pendingStatusState })
                 }).then(response => response.json()).then(data => {
                     if (data.success) {
-                        window.location.reload();
+                        fetch('/recipients/clear-selection', { method: 'POST', headers: headers })
+                            .finally(() => window.location.reload());
                     } else {
                         alert('Gagal memperbarui data.');
                     }
@@ -573,6 +584,14 @@
         }
 
         function openPrintModal() {
+            const unprintedWarning = document.getElementById('unprinted-selected-count-warning');
+            const unprintedCount = unprintedWarning ? parseInt(unprintedWarning.textContent) || 0 : 0;
+
+            if (unprintedCount === 0) {
+                alert('Tidak ada data baru (belum dicetak) yang dipilih. Harap pilih data yang belum dicetak untuk melanjutkan.');
+                return;
+            }
+
             if (printOffsetInput) printOffsetInput.value = 1;
             if (printAlignInput) printAlignInput.value = 'center';
             updatePrintLink();
@@ -599,20 +618,31 @@
         const editModal = editModalElement ? new Modal(editModalElement) : null;
         
         document.querySelectorAll('.edit-recipient-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.getAttribute('data-id');
-                const name = this.getAttribute('data-name');
-                const address = this.getAttribute('data-address');
-                
-                const modal = document.getElementById('edit-recipient-modal');
-                modal.querySelector('#edit-name').value = name;
-                modal.querySelector('#edit-address').value = address;
-                modal.querySelector('#edit-form').action = '/recipients/update/' + id;
-                
-                if (editModal) editModal.show();
-            });
-        });
+           btn.addEventListener('click', function() {
+               const id = this.getAttribute('data-id');
+               const name = this.getAttribute('data-name');
+               const jabatan = this.getAttribute('data-jabatan');
+               const address = this.getAttribute('data-address');
+               const eventId = this.getAttribute('data-event-id');
+               const isPrinted = this.getAttribute('data-is-printed');
 
+               const modal = document.getElementById('edit-recipient-modal');
+               modal.querySelector('#edit-name').value = name;
+               modal.querySelector('#edit-jabatan').value = jabatan || '';
+               modal.querySelector('#edit-address').value = address;
+               modal.querySelector('#edit-event-id').value = eventId || '';
+               
+               if (isPrinted == '1') {
+                   modal.querySelector('#edit-status-sudah').checked = true;
+               } else {
+                   modal.querySelector('#edit-status-belum').checked = true;
+               }
+
+               modal.querySelector('#edit-form').action = '/recipients/update/' + id;
+
+               if (editModal) editModal.show();
+           });
+        });
         // Image Fullscreen Preview Logic
         const fullscreenModalEl = document.getElementById('image-fullscreen-modal');
         const fullscreenModal = new Modal(fullscreenModalEl);
@@ -644,16 +674,25 @@
                 </button>
             </div>
             <form action="/recipients/store" method="POST" class="p-4 md:p-5 space-y-4 text-left">
-                <?= csrf_field() ?>
-                <div>
-                    <label for="name" class="block mb-2 text-sm font-bold text-gray-900">Nama Lengkap</label>
-                    <input type="text" name="name" id="name" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Masukkan nama..." required>
-                </div>
-                <div>
-                    <label for="address" class="block mb-2 text-sm font-bold text-gray-900">Alamat / Keterangan</label>
-                    <textarea id="address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
+               <?= csrf_field() ?>
+               <div>
+                   <label for="name" class="block mb-2 text-sm font-bold text-gray-900">Nama Lengkap</label>
+                   <input type="text" name="name" id="name" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Masukkan nama..." required>
+               </div>
+               <div>
+                   <label for="address" class="block mb-2 text-sm font-bold text-gray-900">Alamat / Keterangan</label>
+                   <textarea id="address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
+               </div>
+               <div>
+                   <label for="event_id" class="block mb-2 text-sm font-bold text-gray-900">Acara</label>
+                   <select name="event_id" id="event_id" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
+                       <option value="">Tanpa Acara</option>
+                       <?php foreach ($events as $event): ?>
+                           <option value="<?= $event['id'] ?>" <?= (string)($eventId ?? '') === (string)$event['id'] ? 'selected' : '' ?>><?= esc($event['name']) ?></option>
+                       <?php endforeach; ?>
+                   </select>
+               </div>
+               <div class="flex justify-end gap-2 pt-2">
                     <button type="button" data-modal-hide="add-recipient-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
                     <button type="submit" class="px-6 py-2 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">Simpan</button>
                 </div>
@@ -673,16 +712,42 @@
                 </button>
             </div>
             <form id="edit-form" action="" method="POST" class="p-4 md:p-5 space-y-4 text-left">
-                <?= csrf_field() ?>
-                <div>
-                    <label for="edit-name" class="block mb-2 text-sm font-bold text-gray-900">Nama Lengkap</label>
-                    <input type="text" name="name" id="edit-name" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Masukkan nama..." required>
-                </div>
-                <div>
-                    <label for="edit-address" class="block mb-2 text-sm font-bold text-gray-900">Alamat / Keterangan</label>
-                    <textarea id="edit-address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
+               <?= csrf_field() ?>
+               <div>
+                   <label for="edit-name" class="block mb-2 text-sm font-bold text-gray-900">Nama Lengkap</label>
+                   <input type="text" name="name" id="edit-name" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Masukkan nama..." required>
+               </div>
+               <div>
+                   <label for="edit-jabatan" class="block mb-2 text-sm font-bold text-gray-900">Jabatan (Opsional)</label>
+                   <input type="text" name="jabatan" id="edit-jabatan" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Contoh: Bapak, Ibu, Direktur...">
+               </div>
+               <div>
+                   <label for="edit-address" class="block mb-2 text-sm font-bold text-gray-900">Alamat / Keterangan</label>
+                   <textarea id="edit-address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
+               </div>
+               <div>
+                   <label for="edit-event-id" class="block mb-2 text-sm font-bold text-gray-900">Acara</label>
+                   <select name="event_id" id="edit-event-id" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
+                       <option value="">Tanpa Acara</option>
+                       <?php foreach ($events as $event): ?>
+                           <option value="<?= $event['id'] ?>"><?= esc($event['name']) ?></option>
+                       <?php endforeach; ?>
+                   </select>
+               </div>
+               <div>
+                   <label class="block mb-3 text-sm font-bold text-gray-900">Status Cetak</label>
+                   <div class="flex flex-wrap gap-4">
+                       <label class="flex items-center px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-all peer-checked:bg-emerald-50 peer-checked:border-emerald-200">
+                           <input id="edit-status-belum" type="radio" value="0" name="is_printed" class="w-4 h-4 text-emerald-600 bg-white border-gray-300 focus:ring-emerald-500">
+                           <span class="ms-2 text-sm font-bold text-gray-700">Belum</span>
+                       </label>
+                       <label class="flex items-center px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-all peer-checked:bg-emerald-50 peer-checked:border-emerald-200">
+                           <input id="edit-status-sudah" type="radio" value="1" name="is_printed" class="w-4 h-4 text-emerald-600 bg-white border-gray-300 focus:ring-emerald-500">
+                           <span class="ms-2 text-sm font-bold text-gray-700">Sudah</span>
+                       </label>
+                   </div>
+               </div>
+               <div class="flex justify-end gap-2 pt-2">
                     <button type="button" data-modal-hide="edit-recipient-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
                     <button type="submit" class="px-6 py-2 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">Simpan Perubahan</button>
                 </div>
@@ -808,9 +873,23 @@
                 </div>
             </div>
             <!-- Modal footer -->
-            <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b italic text-[10px] text-gray-400">
-                <i class="fa-solid fa-circle-info me-2 text-emerald-500"></i>
-                Hanya data yang telah Anda centang di tabel yang akan dicetak.
+            <div class="flex flex-col p-4 md:p-5 border-t border-gray-200 rounded-b gap-2">
+                <div class="italic text-[10px] text-gray-400">
+                    <i class="fa-solid fa-circle-info me-2 text-emerald-500"></i>
+                    Hanya data yang telah Anda centang di tabel yang akan dicetak.
+                </div>
+                <div id="unprinted-selected-count-warning-container" class="<?= (($unprintedSelectedCount ?? 0) > 10) ? 'flex' : 'hidden' ?> items-center p-2 text-amber-800 bg-amber-50 rounded-lg border border-amber-100 italic text-[10px] font-bold">
+                    <i class="fa-solid fa-triangle-exclamation me-2 text-amber-500"></i>
+                    Perhatian: Terdapat <span id="unprinted-selected-count-warning"><?= esc($unprintedSelectedCount) ?></span> data siap cetak. Karena keterbatasan ukuran kertas (Label 121), data akan dicetak dalam beberapa halaman.
+                </div>
+                <div id="printed-excluded-warning" class="<?= (($selectedCount ?? 0) > ($unprintedSelectedCount ?? 0)) ? 'flex' : 'hidden' ?> items-center p-2 text-emerald-800 bg-emerald-50 rounded-lg border border-emerald-100 italic text-[10px] font-bold">
+                    <i class="fa-solid fa-circle-info me-2 text-emerald-500"></i>
+                    Catatan: <span id="printed-excluded-count"><?= esc(($selectedCount ?? 0) - ($unprintedSelectedCount ?? 0)) ?></span> data yang sudah dicetak tidak akan diikutkan dalam proses cetak ini.
+                </div>
+                <div id="no-unprinted-warning" class="<?= (($unprintedSelectedCount ?? 0) === 0 && ($selectedCount ?? 0) > 0) ? 'flex' : 'hidden' ?> items-center p-2 text-red-800 bg-red-50 rounded-lg border border-red-100 italic text-[10px] font-bold">
+                    <i class="fa-solid fa-circle-xmark me-2 text-red-500"></i>
+                    Peringatan: Tidak ada data baru (belum dicetak) yang dipilih untuk dicetak.
+                </div>
             </div>
         </div>
     </div>

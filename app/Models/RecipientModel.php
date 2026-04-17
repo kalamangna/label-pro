@@ -12,7 +12,7 @@ class RecipientModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['name', 'address', 'is_marked', 'is_printed', 'is_selected', 'user_id', 'event_id'];
+    protected $allowedFields    = ['name', 'jabatan', 'address', 'is_marked', 'is_printed', 'is_selected', 'user_id', 'event_id'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

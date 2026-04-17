@@ -24,13 +24,15 @@
         .page {
             width: 210mm;
             height: 297mm;
-            background-color: #fef08a; /* Light yellow background for sticker backing */
+            background-color: #fef08a;
+            /* Light yellow background for sticker backing */
             margin: 0 auto;
             display: flex;
             align-items: flex-start;
             position: relative;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             padding-top: 5mm;
+            break-after: page;
         }
 
         /* The actual sticker sheet area */
@@ -61,14 +63,22 @@
             align-items: center;
             text-align: center;
             overflow: hidden;
-            background-color: white; /* White sticker */
-            border-radius: 2mm; /* Rounded corners typical for stickers */
+            background-color: white;
+            /* White sticker */
+            border-radius: 2mm;
+            /* Rounded corners typical for stickers */
         }
 
         .name {
             font-size: 10pt;
             font-weight: bold;
             line-height: 1.2;
+            margin-bottom: 0.5mm;
+        }
+
+        .jabatan {
+            font-size: 8pt;
+            line-height: 1.1;
             margin-bottom: 0.5mm;
         }
 
@@ -150,7 +160,9 @@
         }
 
         @media print {
-            body, .page {
+
+            body,
+            .page {
                 background: none !important;
                 background-color: white !important;
             }
@@ -191,6 +203,7 @@
         </div>
     </div>
 
+    <?php foreach ($pages as $recipients): ?>
     <div class="page" style="justify-content: <?= esc($align ?? 'center') ?>;">
         <div class="sticker-sheet sheet-<?= $type ?>">
             <?php foreach ($recipients as $recipient): ?>
@@ -200,7 +213,10 @@
                             <div class="watermark">DEMO VERSION</div>
                         <?php endif; ?>
                         <div class="name"><?= esc($recipient['name'] ?? '') ?></div>
-                        <div style="height: 3mm;">&nbsp;</div>
+                        <?php if (!empty(trim((string)($recipient['jabatan'] ?? '')))): ?>
+                            <div class="jabatan"><?= esc($recipient['jabatan']) ?></div>
+                        <?php endif; ?>
+                        <div style="height: 2mm;">&nbsp;</div>
                         <div class="details">
                             <div class="prefix">di-</div>
                             <div class="address"><?= empty(trim((string)($recipient['address'] ?? ''))) ? 'Tempat' : esc($recipient['address']) ?></div>
@@ -212,6 +228,7 @@
             <?php endforeach; ?>
         </div>
     </div>
+    <?php endforeach; ?>
 </body>
 
 </html>

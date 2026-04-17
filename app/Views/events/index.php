@@ -105,6 +105,7 @@
                     <th scope="col" class="px-6 py-4 font-bold text-center">Ditambahkan Oleh</th>
                 <?php endif; ?>
                 <th scope="col" class="px-6 py-4 font-bold text-center">Dibuat Pada</th>
+                <th scope="col" class="px-6 py-4 font-bold text-center">Total Data</th>
                 <th scope="col" class="px-6 py-4 text-right font-bold">Aksi</th>
             </tr>
         </thead>
@@ -130,6 +131,12 @@
 
                     <td class="px-6 py-4 text-center text-gray-400 text-xs">
                         <?= date('d/m/Y', strtotime($event['created_at'])) ?>
+                    </td>
+
+                    <td class="px-6 py-4 text-center">
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                            <?= esc($event['total_recipients'] ?? 0) ?> Data
+                        </span>
                     </td>
 
                     <td class="px-6 py-4 text-right">
@@ -178,7 +185,7 @@
             <?php endforeach; ?>
             <?php if (empty($events)): ?>
                 <tr>
-                    <td colspan="<?= session()->get('role') === 'admin' ? '4' : '3' ?>" class="px-6 py-16 text-center bg-gray-50/30 text-gray-400 font-medium">
+                    <td colspan="<?= session()->get('role') === 'admin' ? '5' : '4' ?>" class="px-6 py-16 text-center bg-gray-50/30 text-gray-400 font-medium">
                         <div class="max-w-xs mx-auto text-center">
                             <i class="fa-solid fa-folder-open text-4xl mb-4 opacity-20 text-emerald-600"></i>
                             <p class="text-sm font-bold text-gray-900 mb-1">Belum ada acara</p>

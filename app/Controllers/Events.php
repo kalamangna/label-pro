@@ -41,8 +41,10 @@ class Events extends BaseController
 
         $model = $this->applyScope();
         
-        $model = $model->select('events.*, users.username as added_by')
-                       ->join('users', 'users.id = events.user_id', 'left');
+        $model = $model->select('events.*, users.username as added_by, COUNT(recipients.id) as total_recipients')
+                       ->join('users', 'users.id = events.user_id', 'left')
+                       ->join('recipients', 'recipients.event_id = events.id', 'left')
+                       ->groupBy('events.id');
 
         if (!empty($search)) {
             $model = $model->like('events.name', $search);
