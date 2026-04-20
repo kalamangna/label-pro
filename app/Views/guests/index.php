@@ -1,5 +1,16 @@
 <?= $this->extend('layout/main') ?>
 <?= $this->section('content') ?>
+<?php
+    $currentEventName = 'Acara';
+    if (!empty($eventId)) {
+        foreach ($events as $e) {
+            if ($e['id'] == $eventId) {
+                $currentEventName = $e['name'];
+                break;
+            }
+        }
+    }
+?>
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-6">
     <div class="flex items-center gap-4">
         <div class="bg-emerald-600 p-3 rounded-2xl shadow-lg shadow-emerald-100">
@@ -8,7 +19,11 @@
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight text-gray-900 leading-none mb-1">Daftar Tamu</h1>
             <p class="text-sm text-gray-500 font-medium">
-                Total <span class="text-emerald-600 font-bold"><?= number_format($totalInDatabase ?? 0) ?></span> tamu dalam database
+                <?php if (!empty($eventId)): ?>
+                    Daftar tamu untuk acara <span class="text-emerald-600 font-bold"><?= esc($currentEventName) ?></span>
+                <?php else: ?>
+                    Total <span class="text-emerald-600 font-bold"><?= number_format($totalInDatabase ?? 0) ?></span> tamu dalam database
+                <?php endif; ?>
             </p>
         </div>
     </div>
@@ -60,7 +75,7 @@
 <div class="mb-4 p-6 bg-gray-50/50 border border-gray-200 rounded-2xl">
     <form action="/guests" method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-x-4 gap-y-5">
         <!-- Search -->
-        <div class="md:col-span-4">
+        <div class="md:col-span-6">
             <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Cari Nama / Jabatan / Alamat</label>
             <div class="relative">
                 <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -80,19 +95,12 @@
             </select>
         </div>
 
-        <!-- Event Filter -->
-        <div class="md:col-span-3">
-            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Acara</label>
-            <select name="event_id" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full h-[42px] px-2.5 transition-all">
-                <option value="">Semua Acara</option>
-                <?php foreach ($events as $event): ?>
-                    <option value="<?= $event['id'] ?>" <?= (string)($eventId ?? '') === (string)$event['id'] ? 'selected' : '' ?>><?= esc($event['name']) ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+        <?php if (!empty($eventId)): ?>
+            <input type="hidden" name="event_id" value="<?= esc($eventId) ?>">
+        <?php endif; ?>
 
         <!-- Sort Filter -->
-        <div class="md:col-span-3">
+        <div class="md:col-span-4">
             <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Urutan</label>
             <select id="sort-select" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full h-[42px] px-2.5 transition-all">
                 <option value="id|desc" <?= ($sort == 'id' && $dir == 'desc') ? 'selected' : '' ?>>Terbaru</option>
@@ -128,7 +136,7 @@
             </div>
             <div class="flex gap-2 w-full md:w-auto">
                 <?php if (!empty($search) || ($status ?? '') !== '' || ($sort ?? 'id') !== 'id' || !empty($eventId)): ?>
-                    <a href="/guests" class="flex-1 md:w-32 h-[42px] flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all active:scale-95 text-center">Reset</a>
+                    <a href="/guests<?= !empty($eventId) ? '?event_id=' . esc($eventId) : '' ?>" class="flex-1 md:w-32 h-[42px] flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all active:scale-95 text-center">Reset</a>
                 <?php endif; ?>
                 <button type="submit" class="flex-1 md:w-32 h-[42px] bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-900 focus:ring-4 focus:ring-slate-200 transition-all active:scale-95 shadow-md shadow-slate-200 flex items-center justify-center">Filter</button>
             </div>
@@ -227,6 +235,7 @@
                             <button type="button" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors edit-guest-btn" 
                                     data-id="<?= $guest['id'] ?>" 
                                     data-name="<?= esc($guest['name']) ?>" 
+                                    data-jabatan="<?= esc($guest['jabatan'] ?? '') ?>"
                                     data-address="<?= esc($guest['address']) ?>"
                                     data-event-id="<?= $guest['event_id'] ?>"
                                     data-is-printed="<?= $guest['is_printed'] ?? 0 ?>"
@@ -684,13 +693,21 @@
                    <textarea id="address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
                </div>
                <div>
-                   <label for="event_id" class="block mb-2 text-sm font-bold text-gray-900">Acara</label>
-                   <select name="event_id" id="event_id" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
-                       <option value="">Tanpa Acara</option>
-                       <?php foreach ($events as $event): ?>
-                           <option value="<?= $event['id'] ?>" <?= (string)($eventId ?? '') === (string)$event['id'] ? 'selected' : '' ?>><?= esc($event['name']) ?></option>
-                       <?php endforeach; ?>
-                   </select>
+                   <label class="block mb-2 text-sm font-bold text-gray-900">Acara</label>
+                   <?php if (!empty($eventId)): ?>
+                       <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold rounded-xl block w-full p-2.5">
+                           <i class="fa-solid fa-folder me-2 text-emerald-600"></i>
+                           <?= esc($currentEventName) ?>
+                       </div>
+                       <input type="hidden" name="event_id" value="<?= esc($eventId) ?>">
+                   <?php else: ?>
+                       <select name="event_id" id="event_id" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
+                           <option value="">Tanpa Acara</option>
+                           <?php foreach ($events as $event): ?>
+                               <option value="<?= $event['id'] ?>" <?= (string)($eventId ?? '') === (string)$event['id'] ? 'selected' : '' ?>><?= esc($event['name']) ?></option>
+                           <?php endforeach; ?>
+                       </select>
+                   <?php endif; ?>
                </div>
                <div class="flex justify-end gap-2 pt-2">
                     <button type="button" data-modal-hide="add-guest-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
@@ -726,13 +743,21 @@
                    <textarea id="edit-address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
                </div>
                <div>
-                   <label for="edit-event-id" class="block mb-2 text-sm font-bold text-gray-900">Acara</label>
-                   <select name="event_id" id="edit-event-id" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
-                       <option value="">Tanpa Acara</option>
-                       <?php foreach ($events as $event): ?>
-                           <option value="<?= $event['id'] ?>"><?= esc($event['name']) ?></option>
-                       <?php endforeach; ?>
-                   </select>
+                   <label class="block mb-2 text-sm font-bold text-gray-900">Acara</label>
+                   <?php if (!empty($eventId)): ?>
+                       <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold rounded-xl block w-full p-2.5">
+                           <i class="fa-solid fa-folder me-2 text-emerald-600"></i>
+                           <?= esc($currentEventName) ?>
+                       </div>
+                       <input type="hidden" name="event_id" id="edit-event-id" value="<?= esc($eventId) ?>">
+                   <?php else: ?>
+                       <select name="event_id" id="edit-event-id" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
+                           <option value="">Tanpa Acara</option>
+                           <?php foreach ($events as $event): ?>
+                               <option value="<?= $event['id'] ?>"><?= esc($event['name']) ?></option>
+                           <?php endforeach; ?>
+                       </select>
+                   <?php endif; ?>
                </div>
                <div>
                    <label class="block mb-3 text-sm font-bold text-gray-900">Status Cetak</label>

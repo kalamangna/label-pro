@@ -40,8 +40,8 @@
                             <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
                         </svg>
                     </button>
-                    <a href="/dashboard" class="flex ms-2 md:me-24 group">
-                        <span class="self-center text-xl font-extrabold sm:text-2xl whitespace-nowrap text-gray-900 tracking-tight transition-transform group-hover:scale-105">Label<span class="text-emerald-600">Pro</span></span>
+                    <a href="/dashboard" class="flex ms-2 md:me-24 group gap-3">
+                        <span class="self-center text-xl font-extrabold sm:text-2xl whitespace-nowrap text-gray-900 tracking-tight">Label<span class="text-emerald-600">Pro</span></span>
                     </a>
                 </div>
                 <div class="flex items-center">

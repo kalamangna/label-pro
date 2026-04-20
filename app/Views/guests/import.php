@@ -48,7 +48,7 @@
                     </table>
                 </div>
                 <div class="mt-4">
-                    <a href="/template_impor_labelpro.xlsx" class="text-sm font-semibold text-emerald-600 hover:underline" download>
+                    <a href="/template_impor_tamu_labelpro.xlsx" class="text-sm font-semibold text-emerald-600 hover:underline" download>
                         <i class="fa-solid fa-download me-2"></i>
                         Unduh Template Excel
                     </a>

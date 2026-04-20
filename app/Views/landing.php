@@ -4,7 +4,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabelPro - Cetak Label Undangan Otomatis</title>
+    <title>LabelPro - Cetak Label Undangan Otomatis & Presisi</title>
+    
+    <meta name="description" content="LabelPro - Aplikasi cetak label undangan otomatis tercepat. Impor dari Excel, atur posisi cetak (smart offset), dan hasilkan label tipe 121 yang presisi langsung dari browser.">
+    <meta name="keywords" content="cetak label undangan, label 121, print label undangan, wedding organizer tool, label pro, impor excel label, undangan digital">
+    <meta name="author" content="kalamangna">
+    <meta name="theme-color" content="#10b981">
+    <link rel="canonical" href="<?= base_url() ?>">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?= base_url() ?>">
+    <meta property="og:title" content="LabelPro - Cetak Label Undangan Otomatis & Presisi">
+    <meta property="og:description" content="Solusi cerdas cetak label undangan. Hemat waktu dengan impor Excel dan fitur smart offset.">
+    <meta property="og:image" content="<?= base_url('img/meta.png') ?>">
+    <meta property="og:site_name" content="LabelPro">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="<?= base_url() ?>">
+    <meta property="twitter:title" content="LabelPro - Cetak Label Undangan Otomatis">
+    <meta property="twitter:description" content="Stop ngetik manual. Cetak ribuan label undangan dalam hitungan detik.">
+    <meta property="twitter:image" content="<?= base_url('img/meta.png') ?>">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico') ?>">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "LabelPro",
+      "operatingSystem": "Web Browser",
+      "applicationCategory": "BusinessApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "99000",
+        "priceCurrency": "IDR"
+      },
+      "description": "Aplikasi berbasis web untuk manajemen daftar tamu dan pencetakan label undangan otomatis tipe 121 dengan presisi tinggi.",
+      "author": {
+        "@type": "Person",
+        "name": "kalamangna"
+      }
+    }
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -22,8 +68,8 @@
     <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <a href="/" class="flex items-center group">
-                    <span class="text-2xl font-extrabold text-gray-900 tracking-tight transition-transform group-hover:scale-105">Label<span class="text-emerald-600">Pro</span></span>
+                <a href="/" class="flex items-center group gap-3">
+                    <span class="text-2xl font-extrabold text-gray-900 tracking-tight">Label<span class="text-emerald-600">Pro</span></span>
                 </a>
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="#fitur" class="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors">Fitur</a>

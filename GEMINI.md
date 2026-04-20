@@ -31,6 +31,9 @@
   - **Print Layout**: Visualized with yellow backing and white stickers in the browser preview.
   - **Address Logic**: "di-" added automatically. If address is empty, uses "Tempat".
   - **Jabatan Support**: Optional "Jabatan" displayed between name and address with consistent spacing.
+- **Event Management**: 
+  - The event filter dropdown is removed from the main Guest list for a cleaner UI.
+  - Users manage guest lists per event by selecting an event from the Events page.
 - **Visual Assets**: Uses high-quality SVGs for all technical illustrations (Printer, Alignment, Flow).
 - **Interactive Guides**: Print alignment and position guides include a click-to-preview modal for better visibility.
 
@@ -42,3 +45,4 @@
 - Bulk Actions: Handled via AJAX with immediate UI feedback.
 - Status Management: Individual print status (`is_printed`) is managed via radio buttons within the Edit Modal.
 - Table Layout: Status column uses stylized badges (Green "Sudah", Gray "Belum"); important columns use `whitespace-nowrap` for readability.
+- Terminology: Consistently use "**Tamu**" (Guest) instead of generic "Data" in labels, buttons, and counts.
