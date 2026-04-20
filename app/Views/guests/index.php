@@ -102,7 +102,7 @@
         <!-- Sort Filter -->
         <div class="md:col-span-3">
             <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Urutan</label>
-            <select id="sort-select" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full h-[42px] px-2.5 transition-all">
+            <select id="sort-select" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-slate-500 focus:border-slate-500 block w-full h-[42px] px-2.5 transition-all">
                 <option value="id|desc" <?= ($sort == 'id' && $dir == 'desc') ? 'selected' : '' ?>>Terbaru</option>
                 <option value="id|asc" <?= ($sort == 'id' && $dir == 'asc') ? 'selected' : '' ?>>Terlama</option>
                 <option value="name|asc" <?= ($sort == 'name' && $dir == 'asc') ? 'selected' : '' ?>>Nama: A-Z</option>
@@ -152,7 +152,7 @@
         <i class="fa-solid fa-trash-can me-1.5"></i>
         Hapus
     </button>
-    <button id="bulkMarkPrintedBtn" type="button" class="text-emerald-700 bg-white border border-gray-200 hover:bg-emerald-50 focus:ring-4 focus:ring-emerald-100 font-bold rounded-lg text-[10px] px-3 py-1.5 inline-flex items-center transition-all">
+    <button id="bulkMarkPrintedBtn" type="button" class="text-slate-700 bg-white border border-gray-200 hover:bg-slate-50 focus:ring-4 focus:ring-slate-100 font-bold rounded-lg text-[10px] px-3 py-1.5 inline-flex items-center transition-all">
         <i class="fa-solid fa-check-double me-1.5"></i>
         Tandai Sudah Cetak
     </button>
@@ -170,7 +170,7 @@
             <tr>
                 <?php if (session()->get('role') !== 'admin'): ?>
                 <th scope="col" class="p-4 w-4 text-center">
-                    <input id="select-all" type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer">
+                    <input id="select-all" type="checkbox" class="w-4 h-4 text-slate-600 bg-white border-gray-200 rounded focus:ring-slate-500 cursor-pointer">
                 </th>
                 <?php endif; ?>
                 <th scope="col" class="px-6 py-4 font-bold">Nama Tamu</th>
