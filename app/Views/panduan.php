@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-6">
     <div class="flex items-center gap-4">
-        <div class="bg-amber-500 p-3 rounded-2xl shadow-lg shadow-amber-100">
+        <div class="bg-emerald-600 p-3 rounded-2xl shadow-lg shadow-emerald-100">
             <i class="fa-solid fa-book-open text-white text-xl"></i>
         </div>
         <div>
@@ -23,7 +23,7 @@
                 <span class="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 font-black text-sm">1</span>
                 <h2 class="text-lg font-bold text-gray-900">Alur Kerja Cepat (Quick Start)</h2>
             </div>
-            
+
             <div class="relative border-l-2 border-emerald-100 ms-4 ps-8 space-y-10">
                 <!-- Step 1 -->
                 <div class="relative">
@@ -84,7 +84,7 @@
                     <button type="button" class="flex items-center justify-between w-full p-5 font-bold text-left border border-b-0 border-gray-200 rounded-t-2xl focus:ring-4 focus:ring-emerald-100 hover:bg-emerald-50 transition-all gap-3" data-accordion-target="#accordion-faq-body-1" aria-expanded="true" aria-controls="accordion-faq-body-1">
                         <span>Apa itu fitur "Mulai dari posisi ke-" saat mencetak?</span>
                         <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5" />
                         </svg>
                     </button>
                 </h2>
@@ -100,7 +100,7 @@
                     <button type="button" class="flex items-center justify-between w-full p-5 font-bold text-left border border-b-0 border-gray-200 focus:ring-4 focus:ring-emerald-100 hover:bg-emerald-50 transition-all gap-3" data-accordion-target="#accordion-faq-body-2" aria-expanded="false" aria-controls="accordion-faq-body-2">
                         <span>Kenapa hasil cetakan tidak pas di tengah stiker?</span>
                         <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5" />
                         </svg>
                     </button>
                 </h2>
@@ -120,7 +120,7 @@
                     <button type="button" class="flex items-center justify-between w-full p-5 font-bold text-left border border-gray-200 rounded-b-2xl focus:ring-4 focus:ring-emerald-100 hover:bg-emerald-50 transition-all gap-3" data-accordion-target="#accordion-faq-body-3" aria-expanded="false" aria-controls="accordion-faq-body-3">
                         <span>Dapatkah saya mencetak ulang tamu yang sudah ditandai?</span>
                         <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5" />
                         </svg>
                     </button>
                 </h2>

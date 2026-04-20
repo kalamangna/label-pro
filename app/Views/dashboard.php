@@ -120,7 +120,7 @@
                     Kelola Pengguna
                 </a>
                 <a href="/panduan" class="text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-sm">
-                    <i class="fa-solid fa-book-open me-2 text-amber-500"></i>
+                    <i class="fa-solid fa-book-open me-2 text-slate-500"></i>
                     Baca Panduan
                 </a>
             </div>
@@ -134,7 +134,7 @@
                     Pilih Acara
                 </a>
                 <a href="/panduan" class="text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-sm">
-                    <i class="fa-solid fa-book-open me-2 text-amber-500"></i>
+                    <i class="fa-solid fa-book-open me-2 text-slate-500"></i>
                     Baca Panduan
                 </a>
             </div>

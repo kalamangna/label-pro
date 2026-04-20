@@ -12,6 +12,7 @@
 - **UI Theme**: 
   - Primary: `emerald` (Elegant Green).
   - Accent: `amber` (Gold) for printing and warnings.
+  - Dashboard: `emerald` for Total Events, `amber` for Total Guests.
   - Secondary/Filters: `slate` for a clean look.
   - Layout: Minimal light theme using Flowbite components.
 - **Localization & Timezone**:
@@ -46,6 +47,7 @@
 - Bulk Actions: Handled via AJAX with immediate UI feedback.
 - Status Management: Individual print status (`is_printed`) is managed via radio buttons within the Edit Modal.
 - Table Layout: Status column uses stylized badges (Green "Sudah", Gray "Belum"); important columns use `whitespace-nowrap` for readability.
+- Dashboard Layout: Displays "Total Acara" (Emerald) before "Total Tamu" (Amber) to prioritize event management.
 - Filter UI: Consistent filter grids with 12-column layouts, labels, and informatory summaries.
 - Terminology: Consistently use "**Tamu**" (Guest) instead of generic "Data" in labels, buttons, and counts.
 - Field Labels: Simplified labels in modals (e.g., "Nama", "Alamat (Opsional)").
