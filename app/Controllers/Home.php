@@ -34,4 +34,9 @@ class Home extends BaseController
         ];
         return view('dashboard', $data);
     }
+
+    public function panduan(): string
+    {
+        return view('panduan', ['title' => 'Panduan Penggunaan']);
+    }
 }

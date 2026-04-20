@@ -15,10 +15,10 @@
 
     <div class="flex flex-wrap items-center gap-3">
         <?php if (session()->get('role') !== 'admin'): ?>
-        <button data-modal-target="add-event-modal" data-modal-toggle="add-event-modal" class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">
-            <i class="fa-solid fa-plus me-2"></i>
-            Tambah Acara
-        </button>
+            <button data-modal-target="add-event-modal" data-modal-toggle="add-event-modal" class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">
+                <i class="fa-solid fa-plus me-2"></i>
+                Tambah Acara
+            </button>
         <?php endif; ?>
     </div>
 </div>
@@ -49,35 +49,36 @@
 
 <!-- Filters -->
 <div class="mb-4 p-6 bg-gray-50/50 border border-gray-200 rounded-2xl">
-    <form action="/events" method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+    <form action="/events" method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-x-4 gap-y-5">
         <!-- Search -->
-        <div class="md:col-span-<?= session()->get('role') === 'admin' ? '3' : '6' ?> relative">
-            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs"></i>
+        <div class="md:col-span-<?= session()->get('role') === 'admin' ? '6' : '9' ?>">
+            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Cari Nama Acara</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs"></i>
+                </div>
+                <input type="text" name="search" value="<?= esc($search ?? '') ?>" class="block w-full ps-9 text-sm text-gray-900 border border-slate-300 rounded-xl bg-white focus:ring-emerald-500 focus:border-emerald-500 h-[42px] transition-all placeholder-slate-400" placeholder="Ketik pencarian...">
             </div>
-            <input type="text" name="search" value="<?= esc($search ?? '') ?>" class="block w-full ps-9 text-sm text-gray-900 border border-slate-300 rounded-xl bg-white focus:ring-slate-500 focus:border-slate-500 h-[42px] transition-all placeholder-slate-400" placeholder="Cari nama acara...">
         </div>
 
         <?php if (session()->get('role') === 'admin'): ?>
-        <!-- User Filter -->
-        <div class="md:col-span-3">
-            <select name="user_id" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-slate-500 focus:border-slate-500 block w-full h-[42px] px-2.5 transition-all">
-                <option value="">Semua Pengguna</option>
-                <?php foreach ($users as $u): ?>
-                    <option value="<?= $u['id'] ?>" <?= (string)($userIdFilter ?? '') === (string)$u['id'] ? 'selected' : '' ?>><?= esc($u['username']) ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+            <!-- User Filter -->
+            <div class="md:col-span-3">
+                <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Pengguna</label>
+                <select name="user_id" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full h-[42px] px-2.5 transition-all">
+                    <option value="">Semua Pengguna</option>
+                    <?php foreach ($users as $u): ?>
+                        <option value="<?= $u['id'] ?>" <?= (string)($userIdFilter ?? '') === (string)$u['id'] ? 'selected' : '' ?>><?= esc($u['username']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         <?php endif; ?>
 
         <!-- Sort Filter -->
-        <div class="md:col-span-3">
-            <select name="sort_select" id="sort-select" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-slate-500 focus:border-slate-500 block w-full h-[42px] px-2.5 transition-all" onchange="
-                const parts = this.value.split('|');
-                document.getElementById('real-sort').value = parts[0];
-                document.getElementById('real-dir').value = parts[1];
-            ">
-                <option value="id|desc" <?= ($sort ?? '') == 'id' ? 'selected' : '' ?>>Urutan: Terbaru</option>
+        <div class="md:col-span-<?= session()->get('role') === 'admin' ? '3' : '3' ?>">
+            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Urutan</label>
+            <select name="sort_select" id="sort-select" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full h-[42px] px-2.5 transition-all">
+                <option value="id|desc" <?= ($sort ?? '') == 'id' ? 'selected' : '' ?>>Terbaru</option>
                 <option value="name|asc" <?= ($sort ?? '') == 'name' && ($dir ?? 'asc') == 'asc' ? 'selected' : '' ?>>Nama: A-Z</option>
                 <option value="name|desc" <?= ($sort ?? '') == 'name' && ($dir ?? 'asc') == 'desc' ? 'selected' : '' ?>>Nama: Z-A</option>
             </select>
@@ -85,12 +86,34 @@
             <input type="hidden" name="dir" id="real-dir" value="<?= esc($dir ?? 'desc') ?>">
         </div>
 
-        <!-- Buttons -->
-        <div class="md:col-span-3 flex justify-end gap-2">
-            <button type="submit" class="w-full sm:w-32 h-[42px] bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-900 focus:ring-4 focus:ring-slate-200 transition-all active:scale-95 shadow-md shadow-slate-200 flex items-center justify-center">Filter</button>
-            <?php if (!empty($search) || ($sort ?? 'id') !== 'id' || !empty($userIdFilter)): ?>
-                <a href="/events" class="w-full sm:w-32 h-[42px] flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all active:scale-95 text-center">Reset</a>
-            <?php endif; ?>
+        <!-- Buttons & Results Info -->
+        <div class="md:col-span-12 flex flex-col md:flex-row items-center justify-between gap-4 mt-2 pt-4 border-t border-gray-200/60">
+            <div class="text-xs font-bold text-slate-500">
+                <?php
+                $activeFilters = [];
+                if (!empty($search)) $activeFilters[] = "Pencarian: '" . esc($search) . "'";
+                if (!empty($userIdFilter)) {
+                    $currentUserName = 'Pengguna';
+                    foreach ($users as $u) {
+                        if ($u['id'] == $userIdFilter) {
+                            $currentUserName = $u['username'];
+                            break;
+                        }
+                    }
+                    $activeFilters[] = "Pengguna: " . esc($currentUserName);
+                }
+                ?>
+                <?php if (!empty($activeFilters)): ?>
+                    Ditemukan <span class="text-emerald-600"><?= number_format($pager->getTotal()) ?></span> data untuk
+                    <span class="text-slate-700 italic"><?= implode(', ', $activeFilters) ?></span>
+                <?php endif; ?>
+            </div>
+            <div class="flex gap-2 w-full md:w-auto">
+                <?php if (!empty($search) || ($sort ?? 'id') !== 'id' || !empty($userIdFilter)): ?>
+                    <a href="/events" class="flex-1 md:w-32 h-[42px] flex items-center justify-center bg-white border border-slate-300 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all active:scale-95 text-center">Reset</a>
+                <?php endif; ?>
+                <button type="submit" class="flex-1 md:w-32 h-[42px] bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-900 focus:ring-4 focus:ring-slate-200 transition-all active:scale-95 shadow-md shadow-slate-200 flex items-center justify-center">Filter</button>
+            </div>
         </div>
     </form>
 </div>
@@ -120,7 +143,7 @@
                             <?= esc($event['name']) ?>
                         </div>
                     </th>
-                    
+
                     <?php if (session()->get('role') === 'admin'): ?>
                         <td class="px-6 py-4 text-center">
                             <span class="bg-gray-100 text-gray-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-gray-200">
@@ -142,18 +165,18 @@
                     <td class="px-6 py-4 text-right">
                         <div class="flex justify-end gap-2 items-center">
                             <?php if (session()->get('role') !== 'admin'): ?>
-                            <a href="/guests/import?event_id=<?= $event['id'] ?>" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors" title="Impor Tamu Excel">
-                                <i class="fa-solid fa-file-import text-xs"></i>
-                            </a>
-                            <button type="button" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors edit-event-btn"
+                                <a href="/guests/import?event_id=<?= $event['id'] ?>" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors" title="Impor Tamu Excel">
+                                    <i class="fa-solid fa-file-import text-xs"></i>
+                                </a>
+                                <button type="button" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors edit-event-btn"
                                     data-id="<?= $event['id'] ?>"
                                     data-name="<?= esc($event['name']) ?>"
                                     title="Edit">
-                                <i class="fa-solid fa-pen-to-square text-xs"></i>
-                            </button>
-                            <button type="button" data-modal-target="delete-modal-<?= $event['id'] ?>" data-modal-toggle="delete-modal-<?= $event['id'] ?>" class="p-2 text-gray-400 hover:text-red-600 transition-colors" title="Hapus">
-                                <i class="fa-solid fa-trash text-xs"></i>
-                            </button>
+                                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                </button>
+                                <button type="button" data-modal-target="delete-modal-<?= $event['id'] ?>" data-modal-toggle="delete-modal-<?= $event['id'] ?>" class="p-2 text-gray-400 hover:text-red-600 transition-colors" title="Hapus">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
                             <?php endif; ?>
                             <a href="/guests?event_id=<?= $event['id'] ?>" class="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center px-3 py-1.5 bg-emerald-50 rounded-lg ml-2 border border-emerald-100 transition-colors">
                                 Lihat Tamu
@@ -258,6 +281,15 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const sortSelect = document.getElementById('sort-select');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function() {
+                const [sort, dir] = this.value.split('|');
+                document.getElementById('real-sort').value = sort;
+                document.getElementById('real-dir').value = dir;
+            });
+        }
+
         const editModalElement = document.getElementById('edit-event-modal');
         const editModal = editModalElement ? new Modal(editModalElement) : null;
 

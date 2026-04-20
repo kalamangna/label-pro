@@ -9,7 +9,8 @@ LabelPro adalah aplikasi berbasis web modern untuk manajemen daftar tamu dan pen
 - **Impor Excel**: Impor ribuan tamu secara massal menggunakan file Excel (.xlsx) dengan struktur Nama, Jabatan, dan Alamat ke dalam acara pilihan.
 - **Sticky Selection Toolbar**: Pantau jumlah tamu terpilih, lakukan aksi massal (Hapus/Tanda Cetak), dan cetak label secara instan dari halaman mana pun.
 - **Multi-page Printing**: Otomatis membagi tamu terpilih ke dalam beberapa halaman/lembar stiker (10 label per halaman).
-- **Filter Canggih**: Cari dan filter tamu berdasarkan Nama, Jabatan, Alamat, atau Status Cetak dengan ringkasan hasil yang informatif.
+- **Filter & Urutan**: Cari dan filter tamu berdasarkan Nama, Jabatan, Alamat, atau Status Cetak dengan UI filter yang konsisten dan informatif.
+- **Panduan Penggunaan**: Halaman panduan terintegrasi yang menjelaskan alur kerja aplikasi, tips mencetak, dan spesifikasi label.
 - **Panduan Visual**: Ilustrasi interaktif untuk posisi cetak dan perataan kertas dengan fitur preview gambar untuk akurasi maksimal.
 - **Label Offset**: Fitur cerdas untuk memulai cetak dari posisi mana pun pada kertas stiker, menghemat penggunaan kertas yang sudah terpakai sebagian.
 - **Pencetakan Akurat**: Layout presisi untuk label stiker tipe 121 (38x75mm) pada kertas A4 dengan visualisasi pratinjau yang realistis.
@@ -34,7 +35,7 @@ LabelPro adalah aplikasi berbasis web modern untuk manajemen daftar tamu dan pen
 
 ## Penggunaan
 - Pastikan pengaturan margin browser disetel ke "None" dan Scale ke "100%" saat mencetak langsung.
+- Gunakan fitur **Panduan Penggunaan** di dalam aplikasi untuk tips operasional lebih lanjut.
 
 ## Lisensi
 LabelPro dikembangkan oleh **kalamangna**. Ditujukan untuk mempermudah pekerjaan Wedding Organizer, staf kantor, dan bisnis percetakan.
-

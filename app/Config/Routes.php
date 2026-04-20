@@ -12,6 +12,7 @@ $routes->get('/logout', 'AuthController::logout');
 $routes->get('/demo/start', 'AuthController::startDemo');
 
 $routes->get('/dashboard', 'Home::dashboard', ['filter' => 'auth']);
+$routes->get('/panduan', 'Home::panduan', ['filter' => 'auth']);
 
 $routes->group('guests', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'Guests::index');

@@ -119,9 +119,9 @@
                     <i class="fa-solid fa-user-gear me-2"></i>
                     Kelola Pengguna
                 </a>
-                <a href="/events" class="text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-sm">
-                    <i class="fa-solid fa-folder-open me-2"></i>
-                    Pantau Acara
+                <a href="/panduan" class="text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-sm">
+                    <i class="fa-solid fa-book-open me-2 text-amber-500"></i>
+                    Baca Panduan
                 </a>
             </div>
         <?php else: ?>
@@ -133,9 +133,9 @@
                     <i class="fa-solid fa-folder-open me-2"></i>
                     Pilih Acara
                 </a>
-                <a href="/guests" class="text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-sm">
-                    <i class="fa-solid fa-table-list me-2"></i>
-                    Lihat Semua Tamu
+                <a href="/panduan" class="text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-sm">
+                    <i class="fa-solid fa-book-open me-2 text-amber-500"></i>
+                    Baca Panduan
                 </a>
             </div>
         <?php endif; ?>

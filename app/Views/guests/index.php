@@ -86,7 +86,7 @@
         </div>
 
         <!-- Status Filter -->
-        <div class="md:col-span-2">
+        <div class="md:col-span-3">
             <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Status</label>
             <select name="status" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full h-[42px] px-2.5 transition-all">
                 <option value="">Semua Status</option>
@@ -100,7 +100,7 @@
         <?php endif; ?>
 
         <!-- Sort Filter -->
-        <div class="md:col-span-4">
+        <div class="md:col-span-3">
             <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500 ps-1">Urutan</label>
             <select id="sort-select" class="bg-white border border-slate-300 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full h-[42px] px-2.5 transition-all">
                 <option value="id|desc" <?= ($sort == 'id' && $dir == 'desc') ? 'selected' : '' ?>>Terbaru</option>
@@ -685,11 +685,15 @@
             <form action="/guests/store" method="POST" class="p-4 md:p-5 space-y-4 text-left">
                <?= csrf_field() ?>
                <div>
-                   <label for="name" class="block mb-2 text-sm font-bold text-gray-900">Nama Lengkap</label>
+                   <label for="name" class="block mb-2 text-sm font-bold text-gray-900">Nama</label>
                    <input type="text" name="name" id="name" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Masukkan nama..." required>
                </div>
                <div>
-                   <label for="address" class="block mb-2 text-sm font-bold text-gray-900">Alamat / Keterangan</label>
+                   <label for="jabatan" class="block mb-2 text-sm font-bold text-gray-900">Jabatan (Opsional)</label>
+                   <input type="text" name="jabatan" id="jabatan" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Contoh: Bapak, Ibu, Direktur...">
+               </div>
+               <div>
+                   <label for="address" class="block mb-2 text-sm font-bold text-gray-900">Alamat (Opsional)</label>
                    <textarea id="address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
                </div>
                <div>
@@ -731,7 +735,7 @@
             <form id="edit-form" action="" method="POST" class="p-4 md:p-5 space-y-4 text-left">
                <?= csrf_field() ?>
                <div>
-                   <label for="edit-name" class="block mb-2 text-sm font-bold text-gray-900">Nama Lengkap</label>
+                   <label for="edit-name" class="block mb-2 text-sm font-bold text-gray-900">Nama</label>
                    <input type="text" name="name" id="edit-name" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Masukkan nama..." required>
                </div>
                <div>
@@ -739,7 +743,7 @@
                    <input type="text" name="jabatan" id="edit-jabatan" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Contoh: Bapak, Ibu, Direktur...">
                </div>
                <div>
-                   <label for="edit-address" class="block mb-2 text-sm font-bold text-gray-900">Alamat / Keterangan</label>
+                   <label for="edit-address" class="block mb-2 text-sm font-bold text-gray-900">Alamat (Opsional)</label>
                    <textarea id="edit-address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
                </div>
                <div>

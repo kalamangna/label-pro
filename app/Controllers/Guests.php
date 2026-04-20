@@ -195,7 +195,12 @@ class Guests extends BaseController
             'event_id' => $eventId,
         ]);
 
-        return redirect()->to('/guests')->with('message', 'Tamu berhasil ditambahkan.');
+        $redirectUrl = '/guests';
+        if ($eventId) {
+            $redirectUrl .= '?event_id=' . $eventId;
+        }
+
+        return redirect()->to($redirectUrl)->with('message', 'Tamu berhasil ditambahkan.');
     }
 
     public function update($id)
@@ -241,15 +246,21 @@ class Guests extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
+        $eventId = $this->request->getPost('event_id') ?: null;
         $this->guestModel->update($id, [
             'name'       => $this->request->getPost('name'),
             'jabatan'    => $this->request->getPost('jabatan'),
             'address'    => $this->request->getPost('address'),
-            'event_id'   => $this->request->getPost('event_id') ?: null,
+            'event_id'   => $eventId,
             'is_printed' => $this->request->getPost('is_printed') ?? 0,
         ]);
 
-        return redirect()->to('/guests')->with('message', 'Tamu berhasil diperbarui.');
+        $redirectUrl = '/guests';
+        if ($eventId) {
+            $redirectUrl .= '?event_id=' . $eventId;
+        }
+
+        return redirect()->to($redirectUrl)->with('message', 'Tamu berhasil diperbarui.');
     }
 
     public function delete($id)

@@ -34,15 +34,18 @@
 - **Event Management**: 
   - The event filter dropdown is removed from the main Guest list for a cleaner UI.
   - Users manage guest lists per event by selecting an event from the Events page.
+- **User Guide**: Integrated "Panduan Penggunaan" (User Guide) page providing step-by-step instructions, FAQs, and tips in Bahasa Indonesia.
 - **Visual Assets**: Uses high-quality SVGs for all technical illustrations (Printer, Alignment, Flow).
 - **Interactive Guides**: Print alignment and position guides include a click-to-preview modal for better visibility.
 
 ## Preferred Styles
-- Controller logic: Concise; use models for DB interaction.
+- Controller logic: Concise; use models for DB interaction. Redirects maintain context (e.g., `event_id`) after actions.
 - UI Design: Minimal dashboard style, using modern standard web conventions (modals, client-side interactions where appropriate).
 - Interaction: Single-page workflow using Modals for CRUD (Guests and Events).
 - Data State: Use fetch API for background updates (e.g., selection state).
 - Bulk Actions: Handled via AJAX with immediate UI feedback.
 - Status Management: Individual print status (`is_printed`) is managed via radio buttons within the Edit Modal.
 - Table Layout: Status column uses stylized badges (Green "Sudah", Gray "Belum"); important columns use `whitespace-nowrap` for readability.
+- Filter UI: Consistent filter grids with 12-column layouts, labels, and informatory summaries.
 - Terminology: Consistently use "**Tamu**" (Guest) instead of generic "Data" in labels, buttons, and counts.
+- Field Labels: Simplified labels in modals (e.g., "Nama", "Alamat (Opsional)").
