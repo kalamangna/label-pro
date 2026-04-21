@@ -31,6 +31,10 @@
     <div class="flex flex-wrap items-center gap-3">
         <?php if (session()->get('role') !== 'admin'): ?>
         <div class="flex gap-2 w-full sm:w-auto">
+            <button id="btn-check-duplicates" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
+                <i class="fa-solid fa-copy me-2 text-amber-600"></i>
+                Cek Duplikat
+            </button>
             <?php if (!empty($eventId)): ?>
                 <a href="/guests/import?event_id=<?= esc($eventId) ?>" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
                     <i class="fa-solid fa-file-import me-2 text-emerald-600"></i>
@@ -669,6 +673,103 @@
         document.querySelectorAll('[data-modal-hide="image-fullscreen-modal"]').forEach(btn => {
             btn.addEventListener('click', () => fullscreenModal.hide());
         });
+
+        // Duplicate Checker Logic
+        const duplicateModalEl = document.getElementById('duplicate-check-modal');
+        const duplicateModal = duplicateModalEl ? new Modal(duplicateModalEl) : null;
+        const btnCheckDuplicates = document.getElementById('btn-check-duplicates');
+        const duplicateListContainer = document.getElementById('duplicate-list-container');
+        const duplicateLoading = document.getElementById('duplicate-loading');
+
+        if (btnCheckDuplicates && duplicateModal) {
+            btnCheckDuplicates.addEventListener('click', () => {
+                duplicateModal.show();
+                duplicateLoading.classList.remove('hidden');
+                duplicateListContainer.innerHTML = '';
+                
+                const eventParam = <?= !empty($eventId) ? "'" . esc($eventId) . "'" : "''" ?>;
+                const url = eventParam ? `/guests/duplicates?event_id=${eventParam}` : '/guests/duplicates';
+
+                fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    duplicateLoading.classList.add('hidden');
+                    if (data.success && data.data.length > 0) {
+                        let html = '';
+                        data.data.forEach(group => {
+                            html += `
+                                <div class="mb-6 bg-gray-50 border border-gray-200 rounded-2xl p-4 shadow-sm">
+                                    <h4 class="font-bold text-gray-900 mb-3 flex items-center justify-between">
+                                        <span><i class="fa-solid fa-users me-2 text-amber-500"></i> ${group.name}</span>
+                                        <span class="bg-amber-100 text-amber-800 text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-lg border border-amber-200 font-black">${group.count} Data</span>
+                                    </h4>
+                                    <div class="space-y-3">
+                            `;
+                            group.items.forEach(item => {
+                                html += `
+                                    <div class="flex items-start justify-between bg-white p-3 rounded-xl border border-gray-100 shadow-sm" id="duplicate-item-${item.id}">
+                                        <div>
+                                            <p class="text-sm font-bold text-gray-900">${item.name}</p>
+                                            <p class="text-xs text-gray-500 mt-1"><span class="font-medium text-gray-700">Jabatan:</span> ${item.jabatan || '-'}</p>
+                                            <p class="text-xs text-gray-500 mt-1"><span class="font-medium text-gray-700">Alamat:</span> <span class="line-clamp-1">${item.address || '-'}</span></p>
+                                            <p class="text-xs mt-2">
+                                                <span class="font-medium text-gray-700">Status:</span> 
+                                                ${item.is_printed == 1 
+                                                    ? '<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 ml-1"><i class="fa-solid fa-check me-1"></i>Sudah Cetak</span>' 
+                                                    : '<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200 ml-1">Belum Cetak</span>'}
+                                            </p>
+                                        </div>
+                                        <button type="button" class="btn-delete-duplicate flex-shrink-0 ms-4 text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 focus:ring-4 focus:ring-red-50 font-bold rounded-lg text-[10px] px-3 py-1.5 transition-all mt-1" data-id="${item.id}">
+                                            <i class="fa-solid fa-trash-can me-1.5"></i> Hapus
+                                        </button>
+                                    </div>
+                                `;
+                            });
+                            html += `</div></div>`;
+                        });
+                        duplicateListContainer.innerHTML = html;
+                        
+                        // Attach delete handlers
+                        document.querySelectorAll('.btn-delete-duplicate').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const id = this.getAttribute('data-id');
+                                if (confirm('Yakin ingin menghapus data duplikat ini?')) {
+                                    fetch('/guests/bulk-delete', {
+                                        method: 'POST',
+                                        headers: headers,
+                                        body: JSON.stringify({ ids: [id] })
+                                    })
+                                    .then(res => res.json())
+                                    .then(delData => {
+                                        if (delData.success) {
+                                            document.getElementById(`duplicate-item-${id}`).remove();
+                                        } else {
+                                            alert('Gagal menghapus data.');
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    } else {
+                        duplicateListContainer.innerHTML = `
+                            <div class="text-center py-10">
+                                <div class="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fa-solid fa-check-double text-2xl"></i>
+                                </div>
+                                <h4 class="text-lg font-bold text-gray-900 mb-1">Bebas Duplikat</h4>
+                                <p class="text-sm text-gray-500">Tidak ditemukan data dengan nama yang sama persis.</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(() => {
+                    duplicateLoading.classList.add('hidden');
+                    alert('Terjadi kesalahan saat mengambil data.');
+                });
+            });
+        }
     });
 </script>
 
@@ -734,6 +835,10 @@
             </div>
             <form id="edit-form" action="" method="POST" class="p-4 md:p-5 space-y-4 text-left">
                <?= csrf_field() ?>
+               <input type="hidden" name="current_search" value="<?= esc($search ?? '') ?>">
+               <input type="hidden" name="current_status" value="<?= esc($status ?? '') ?>">
+               <input type="hidden" name="current_sort" value="<?= esc($sort ?? '') ?>">
+               <input type="hidden" name="current_dir" value="<?= esc($dir ?? '') ?>">
                <div>
                    <label for="edit-name" class="block mb-2 text-sm font-bold text-gray-900">Nama</label>
                    <input type="text" name="name" id="edit-name" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Masukkan nama..." required>
@@ -946,4 +1051,34 @@
         </div>
     </div>
 </div>
+
+<!-- Duplicate Check Modal -->
+<div id="duplicate-check-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col max-h-[85vh]">
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t shrink-0">
+                <h3 class="text-lg font-bold text-gray-900">Cek Data Duplikat</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="duplicate-check-modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="p-4 md:p-5 overflow-y-auto flex-1">
+                <div id="duplicate-loading" class="text-center py-10 hidden">
+                    <i class="fa-solid fa-circle-notch fa-spin text-3xl text-emerald-500 mb-4"></i>
+                    <p class="text-sm font-bold text-gray-900">Memeriksa data...</p>
+                </div>
+                
+                <div id="duplicate-list-container" class="space-y-4">
+                    <!-- Dynamic content will be injected here -->
+                </div>
+            </div>
+            
+            <div class="flex justify-end p-4 md:p-5 border-t border-gray-100 rounded-b shrink-0 bg-gray-50">
+                <button type="button" data-modal-hide="duplicate-check-modal" class="px-5 py-2.5 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all shadow-sm">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>

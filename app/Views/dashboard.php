@@ -119,10 +119,6 @@
                     <i class="fa-solid fa-user-gear me-2"></i>
                     Kelola Pengguna
                 </a>
-                <a href="/panduan" class="text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-sm">
-                    <i class="fa-solid fa-book-open me-2 text-slate-500"></i>
-                    Baca Panduan
-                </a>
             </div>
         <?php else: ?>
             <p class="text-lg text-gray-600 leading-relaxed mb-8 font-medium">

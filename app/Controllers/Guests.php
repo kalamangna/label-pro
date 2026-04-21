@@ -255,9 +255,32 @@ class Guests extends BaseController
             'is_printed' => $this->request->getPost('is_printed') ?? 0,
         ]);
 
-        $redirectUrl = '/guests';
+        $redirectParams = [];
         if ($eventId) {
-            $redirectUrl .= '?event_id=' . $eventId;
+            $redirectParams['event_id'] = $eventId;
+        }
+
+        $currentSearch = $this->request->getPost('current_search');
+        $currentStatus = $this->request->getPost('current_status');
+        $currentSort   = $this->request->getPost('current_sort');
+        $currentDir    = $this->request->getPost('current_dir');
+
+        if (!empty($currentSearch)) {
+            $redirectParams['search'] = $currentSearch;
+        }
+        if ($currentStatus !== null && $currentStatus !== '') {
+            $redirectParams['status'] = $currentStatus;
+        }
+        if (!empty($currentSort)) {
+            $redirectParams['sort'] = $currentSort;
+        }
+        if (!empty($currentDir)) {
+            $redirectParams['dir'] = $currentDir;
+        }
+
+        $redirectUrl = '/guests';
+        if (!empty($redirectParams)) {
+            $redirectUrl .= '?' . http_build_query($redirectParams);
         }
 
         return redirect()->to($redirectUrl)->with('message', 'Tamu berhasil diperbarui.');
@@ -614,5 +637,82 @@ class Guests extends BaseController
                              ->update();
 
         return $this->response->setJSON(['success' => true, 'count' => 0]);
+    }
+
+    private function normalizeNameForDuplicateCheck($name)
+    {
+        $name = strtolower($name);
+        
+        // Remove punctuation
+        $name = preg_replace('/[.,\/#!$%\^&\*;:{}=\-_`~()]/', ' ', $name);
+        
+        // Common titles to ignore
+        $titles = [
+            'bpk', 'bapak', 'ibu', 'sdr', 'sdri', 'dr', 'drg', 'prof', 'ir', 'kh', 'h', 'hj',
+            's kom', 's e', 's pd', 's t', 's h', 's sos', 's ag', 's ip', 's i kom',
+            'm kom', 'm t', 'm pd', 'm h', 'm si', 'm ag', 'm a', 'm m',
+            'amd', 'a md', 'st', 'se', 'sh', 'spd', 'skom'
+        ];
+        
+        $words = explode(' ', $name);
+        $filtered = array_filter($words, function($word) use ($titles) {
+            $word = trim($word);
+            return !empty($word) && !in_array($word, $titles);
+        });
+        
+        $normalized = implode(' ', $filtered);
+        
+        // Fallback to original lowercase if normalization strips everything (e.g., if the name was literally just "Bapak")
+        return empty($normalized) ? trim(strtolower($name)) : $normalized;
+    }
+
+    public function getDuplicates()
+    {
+        if (session()->get('role') === 'admin') {
+            return $this->response->setJSON(['success' => false, 'message' => 'Admin tidak dapat menggunakan fitur ini.'], 403);
+        }
+
+        $userId = session()->get('user_id');
+        $eventId = $this->request->getGet('event_id');
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('guests');
+
+        $builder->select('*')->where('user_id', $userId);
+        
+        if (!empty($eventId)) {
+            $builder->where('event_id', $eventId);
+        }
+
+        $allGuests = $builder->get()->getResultArray();
+
+        $groups = [];
+        foreach ($allGuests as $guest) {
+            $norm = $this->normalizeNameForDuplicateCheck($guest['name']);
+            if (!isset($groups[$norm])) {
+                $groups[$norm] = [];
+            }
+            $groups[$norm][] = $guest;
+        }
+
+        $results = [];
+        foreach ($groups as $norm => $items) {
+            if (count($items) > 1) {
+                // Determine a good display name for the group
+                $displayNames = array_column($items, 'name');
+                // Sort by length ascending to pick the shortest/cleanest base name
+                usort($displayNames, function($a, $b) {
+                    return strlen($a) <=> strlen($b);
+                });
+                
+                $results[] = [
+                    'name' => $displayNames[0],
+                    'count' => count($items),
+                    'items' => $items
+                ];
+            }
+        }
+
+        return $this->response->setJSON(['success' => true, 'data' => $results]);
     }
 }

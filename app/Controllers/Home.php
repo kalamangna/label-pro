@@ -35,8 +35,11 @@ class Home extends BaseController
         return view('dashboard', $data);
     }
 
-    public function panduan(): string
+    public function panduan()
     {
+        if (session()->get('role') === 'admin') {
+            return redirect()->to('/dashboard');
+        }
         return view('panduan', ['title' => 'Panduan Penggunaan']);
     }
 }

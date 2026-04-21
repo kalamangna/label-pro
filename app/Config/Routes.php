@@ -16,6 +16,7 @@ $routes->get('/panduan', 'Home::panduan', ['filter' => 'auth']);
 
 $routes->group('guests', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'Guests::index');
+    $routes->get('duplicates', 'Guests::getDuplicates');
     $routes->post('store', 'Guests::store');
     $routes->post('update/(:num)', 'Guests::update/$1');
     $routes->get('delete/(:num)', 'Guests::delete/$1');
