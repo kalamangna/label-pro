@@ -35,9 +35,15 @@
 - **Event Management**: 
   - The event filter dropdown is removed from the main Guest list for a cleaner UI.
   - Users manage guest lists per event by selecting an event from the Events page.
-- **User Guide**: Integrated "Panduan Penggunaan" (User Guide) page providing step-by-step instructions, FAQs, and tips in Bahasa Indonesia.
+- **User Guide**: 
+  - Integrated "Panduan Penggunaan" (User Guide) page providing step-by-step instructions, FAQs, and tips in Bahasa Indonesia.
+  - **Role Restriction**: Access to "Panduan" is hidden and blocked for `admin` role to maintain a clean system management focus.
 - **Visual Assets**: Uses high-quality SVGs for all technical illustrations (Printer, Alignment, Flow).
 - **Interactive Guides**: Print alignment and position guides include a click-to-preview modal for better visibility.
+- **Duplicate Prevention**:
+  - **Smart Duplicate Check**: Integrated feature to scan and group guests with identical or similar names. 
+  - **Title Normalization**: The check ignores Indonesian common titles (Bpk, Ibu, etc.) and degrees (S.Kom, Dr, etc.) during comparison to catch variations of the same person.
+  - **Resolution Modal**: Users can resolve duplicates directly from a specialized modal showing print status to help decide which record to keep.
 
 ## Preferred Styles
 - Controller logic: Concise; use models for DB interaction. Redirects maintain context (e.g., `event_id`) after actions.
@@ -49,5 +55,6 @@
 - Table Layout: Status column uses stylized badges (Green "Sudah", Gray "Belum"); important columns use `whitespace-nowrap` for readability.
 - Dashboard Layout: Displays "Total Acara" (Emerald) before "Total Tamu" (Amber) to prioritize event management.
 - Filter UI: Consistent filter grids with 12-column layouts, labels, and informatory summaries.
+- **Filter Persistence**: Current search, sort, and status filters are preserved and passed back through hidden inputs during Edit and Delete actions to maintain user context.
 - Terminology: Consistently use "**Tamu**" (Guest) instead of generic "Data" in labels, buttons, and counts.
 - Field Labels: Simplified labels in modals (e.g., "Nama", "Alamat (Opsional)").
