@@ -49,7 +49,7 @@
             grid-template-columns: repeat(2, 75mm);
             grid-template-rows: repeat(5, 38mm);
             column-gap: 2mm;
-            row-gap: 1mm;
+            row-gap: 2mm;
         }
 
         .label {
@@ -76,7 +76,7 @@
             margin-bottom: 0.5mm;
         }
 
-        .jabatan {
+        .position {
             font-size: 8pt;
             line-height: 1.1;
             margin-bottom: 0.5mm;
@@ -204,30 +204,30 @@
     </div>
 
     <?php foreach ($pages as $guests): ?>
-    <div class="page" style="justify-content: <?= esc($align ?? 'center') ?>;">
-        <div class="sticker-sheet sheet-<?= $type ?>">
-            <?php foreach ($guests as $guest): ?>
-                <div class="label" style="position: relative;">
-                    <?php if (!empty($guest)): ?>
-                        <?php if (session()->get('role') === 'demo'): ?>
-                            <div class="watermark">DEMO VERSION</div>
+        <div class="page" style="justify-content: <?= esc($align ?? 'center') ?>;">
+            <div class="sticker-sheet sheet-<?= $type ?>">
+                <?php foreach ($guests as $guest): ?>
+                    <div class="label" style="position: relative;">
+                        <?php if (!empty($guest)): ?>
+                            <?php if (session()->get('role') === 'demo'): ?>
+                                <div class="watermark">DEMO VERSION</div>
+                            <?php endif; ?>
+                            <div class="name"><?= esc($guest['name'] ?? '') ?></div>
+                            <?php if (!empty(trim((string)($guest['position'] ?? '')))): ?>
+                                <div class="position"><?= esc($guest['position']) ?></div>
+                            <?php endif; ?>
+                            <div style="height: 2mm;">&nbsp;</div>
+                            <div class="details">
+                                <div class="prefix">di-</div>
+                                <div class="address"><?= empty(trim((string)($guest['address'] ?? ''))) ? 'Tempat' : esc($guest['address']) ?></div>
+                            </div>
+                        <?php else: ?>
+                            <div class="name">&nbsp;</div>
                         <?php endif; ?>
-                        <div class="name"><?= esc($guest['name'] ?? '') ?></div>
-                        <?php if (!empty(trim((string)($guest['jabatan'] ?? '')))): ?>
-                            <div class="jabatan"><?= esc($guest['jabatan']) ?></div>
-                        <?php endif; ?>
-                        <div style="height: 2mm;">&nbsp;</div>
-                        <div class="details">
-                            <div class="prefix">di-</div>
-                            <div class="address"><?= empty(trim((string)($guest['address'] ?? ''))) ? 'Tempat' : esc($guest['address']) ?></div>
-                        </div>
-                    <?php else: ?>
-                        <div class="name">&nbsp;</div>
-                    <?php endif; ?>
-                </div>
-            <?php endforeach; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
-    </div>
     <?php endforeach; ?>
 </body>
 

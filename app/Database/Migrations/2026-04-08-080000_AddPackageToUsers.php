@@ -12,7 +12,8 @@ class AddPackageToUsers extends Migration
             'package' => [
                 'type'       => 'ENUM',
                 'constraint' => ['basic', 'pro', 'unlimited'],
-                'default'    => 'basic',
+                'null'       => true,
+                'default'    => null,
                 'after'      => 'role',
             ],
         ]);

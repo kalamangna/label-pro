@@ -112,7 +112,7 @@
     <div class="max-w-xl">
         <?php if (session()->get('role') === 'admin'): ?>
             <p class="text-lg text-gray-600 leading-relaxed mb-8 font-medium">
-                Selamat datang di Panel Administrator. Anda dapat mengelola akun pengguna dan memantau keseluruhan data sistem.
+                Selamat datang di Panel Admin. Anda dapat mengelola akun pengguna dan memantau keseluruhan data sistem.
             </p>
             <div class="flex flex-wrap gap-4 justify-center md:justify-start">
                 <a href="/users" class="text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-200 font-bold rounded-xl text-sm px-8 py-3 transition-all active:scale-95 shadow-lg shadow-purple-100">

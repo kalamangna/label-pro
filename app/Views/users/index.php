@@ -51,8 +51,9 @@
         <thead class="text-xs text-gray-400 uppercase bg-gray-50/50 border-b border-gray-100">
             <tr>
                 <th scope="col" class="px-6 py-4 font-bold">Username</th>
-                <th scope="col" class="px-6 py-4 font-bold text-center">Peran (Role)</th>
+                <th scope="col" class="px-6 py-4 font-bold text-center">Role</th>
                 <th scope="col" class="px-6 py-4 font-bold text-center">Paket</th>
+                <th scope="col" class="px-6 py-4 font-bold text-center">Pembayaran</th>
                 <th scope="col" class="px-6 py-4 font-bold text-center">Dibuat Pada</th>
                 <th scope="col" class="px-6 py-4 text-right font-bold">Aksi</th>
             </tr>
@@ -73,20 +74,41 @@
                     </th>
                     <td class="px-6 py-4 text-center">
                         <?php if ($user['role'] === 'admin'): ?>
-                            <span class="bg-purple-50 text-purple-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-purple-100 uppercase tracking-wider">Administrator</span>
+                            <span class="bg-purple-50 text-purple-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-purple-100 uppercase tracking-wider">Admin</span>
                         <?php elseif ($user['role'] === 'demo'): ?>
-                            <span class="bg-amber-50 text-amber-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-amber-100 uppercase tracking-wider">Demo User</span>
+                            <span class="bg-amber-50 text-amber-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-amber-100 uppercase tracking-wider">Demo</span>
                         <?php else: ?>
-                            <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-emerald-100 uppercase tracking-wider">Standard User</span>
+                            <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-emerald-100 uppercase tracking-wider">User</span>
                         <?php endif; ?>
                     </td>
                     <td class="px-6 py-4 text-center">
-                        <?php 
-                            $userLimits = \App\Models\UserModel::getPackageLimits($user['package'] ?? 'basic', $user['role']);
-                        ?>
-                        <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 uppercase tracking-wider">
-                            <?= esc($userLimits['name']) ?>
-                        </span>
+                        <?php if (in_array($user['role'], ['user', 'demo'])): ?>
+                            <?php 
+                                $userLimits = \App\Models\UserModel::getPackageLimits($user['package'] ?? 'basic', $user['role']);
+                            ?>
+                            <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-slate-200 uppercase tracking-wider">
+                                <?= esc($userLimits['name']) ?>
+                            </span>
+                        <?php else: ?>
+                            <span class="text-gray-300">-</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <?php if ($user['role'] === 'user'): ?>
+                            <button type="button" data-modal-target="manage-payment-modal-<?= $user['id'] ?>" data-modal-toggle="manage-payment-modal-<?= $user['id'] ?>" class="hover:opacity-80 transition-opacity">
+                                <?php if (($user['payment_status'] ?? 'belum') === 'lunas'): ?>
+                                    <div class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-emerald-100 uppercase tracking-wider">
+                                        <i class="fa-solid fa-check-circle"></i> Lunas
+                                    </div>
+                                <?php else: ?>
+                                    <div class="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-gray-200 uppercase tracking-wider">
+                                        <i class="fa-solid fa-clock"></i> Belum
+                                    </div>
+                                <?php endif; ?>
+                            </button>
+                        <?php else: ?>
+                            <span class="text-gray-300">-</span>
+                        <?php endif; ?>
                     </td>
                     <td class="px-6 py-4 text-center text-gray-400 text-xs">
                         <?= date('d M Y, H:i', strtotime($user['created_at'])) ?> WIB
@@ -107,6 +129,73 @@
                                 </button>
                             <?php endif; ?>
                         </div>
+
+                        <!-- Manage Payment Modal -->
+                        <?php if ($user['role'] === 'user'): ?>
+                        <div id="manage-payment-modal-<?= $user['id'] ?>" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                            <div class="relative p-4 w-full max-w-md max-h-full text-left">
+                                <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100">
+                                    <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+                                        <h3 class="text-lg font-bold text-gray-900">Kelola Pembayaran</h3>
+                                        <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="manage-payment-modal-<?= $user['id'] ?>">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                    <div class="p-4 md:p-5 space-y-4">
+                                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <span class="text-sm font-medium text-slate-500">Username</span>
+                                                <span class="text-sm font-bold text-slate-900"><?= esc($user['username']) ?></span>
+                                            </div>
+                                            <div class="flex justify-between items-center mb-2">
+                                                <span class="text-sm font-medium text-slate-500">Paket</span>
+                                                <span class="text-sm font-bold text-slate-900"><?= esc($userLimits['name']) ?></span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm font-medium text-slate-500">Status</span>
+                                                <?php if (($user['payment_status'] ?? 'belum') === 'lunas'): ?>
+                                                    <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded uppercase tracking-wider">Lunas</span>
+                                                <?php else: ?>
+                                                    <span class="text-xs font-bold text-gray-700 bg-gray-200 px-2 py-0.5 rounded uppercase tracking-wider">Belum Lunas</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <a href="/users/invoice/<?= $user['id'] ?>" target="_blank" class="flex flex-col items-center justify-center p-4 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-emerald-200 transition-all group">
+                                                <i class="fa-solid fa-file-invoice text-2xl text-gray-400 group-hover:text-emerald-500 mb-2 transition-colors"></i>
+                                                <span class="text-xs font-bold text-gray-600 group-hover:text-emerald-600 text-center">Lihat Invoice</span>
+                                            </a>
+                                            <?php if (!empty($user['payment_proof'])): ?>
+                                                <a href="/<?= esc($user['payment_proof']) ?>" target="_blank" class="flex flex-col items-center justify-center p-4 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-emerald-200 transition-all group">
+                                                    <i class="fa-solid fa-image text-2xl text-gray-400 group-hover:text-emerald-500 mb-2 transition-colors"></i>
+                                                    <span class="text-xs font-bold text-gray-600 group-hover:text-emerald-600 text-center">Bukti Transfer</span>
+                                                </a>
+                                            <?php else: ?>
+                                                <div class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl opacity-60">
+                                                    <i class="fa-solid fa-image text-2xl text-gray-300 mb-2"></i>
+                                                    <span class="text-xs font-bold text-gray-400 text-center">Belum Ada Bukti</span>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <?php if (($user['payment_status'] ?? 'belum') !== 'lunas'): ?>
+                                            <form action="/users/confirm-payment/<?= $user['id'] ?>" method="POST" enctype="multipart/form-data" class="mt-4 pt-4 border-t border-gray-100">
+                                                <?= csrf_field() ?>
+                                                <div class="mb-3">
+                                                    <label class="block mb-2 text-xs font-bold text-gray-900" for="payment_proof_<?= $user['id'] ?>">Unggah Bukti & Konfirmasi Lunas</label>
+                                                    <input class="block w-full text-xs text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-3 file:py-1.5 file:px-3 file:rounded-l-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" id="payment_proof_<?= $user['id'] ?>" name="payment_proof" type="file" accept="image/*" required>
+                                                </div>
+                                                <button type="submit" class="w-full px-4 py-2.5 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 flex justify-center items-center gap-2">
+                                                    <i class="fa-solid fa-check"></i> Konfirmasi Lunas
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
 
                         <!-- Delete Modal -->
                         <div id="delete-modal-<?= $user['id'] ?>" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -154,10 +243,11 @@
                     <input type="password" name="password" id="password" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="••••••••" required>
                 </div>
                 <div>
-                    <label for="role" class="block mb-2 text-sm font-bold text-gray-900">Peran (Role)</label>
+                    <label for="role" class="block mb-2 text-sm font-bold text-gray-900">Role</label>
                     <select name="role" id="role" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
-                        <option value="user">Standard User</option>
-                        <option value="admin">Administrator</option>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                        <option value="demo">Demo User</option>
                     </select>
                 </div>
                 <div id="package-div">
@@ -198,10 +288,11 @@
                     <input type="password" name="password" id="edit-password" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="••••••••">
                 </div>
                 <div>
-                    <label for="edit-role" class="block mb-2 text-sm font-bold text-gray-900">Peran (Role)</label>
+                    <label for="edit-role" class="block mb-2 text-sm font-bold text-gray-900">Role</label>
                     <select name="role" id="edit-role" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
-                        <option value="user">Standard User</option>
-                        <option value="admin">Administrator</option>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                        <option value="demo">Demo User</option>
                     </select>
                 </div>
                 <div id="edit-package-div">
@@ -230,12 +321,12 @@
             
             if (roleSelect && packageDiv) {
                 const updateVisibility = () => {
-                    if (roleSelect.value === 'admin') {
-                        packageDiv.classList.add('hidden');
-                        packageDiv.querySelector('select').removeAttribute('required');
-                    } else {
+                    if (roleSelect.value === 'user') {
                         packageDiv.classList.remove('hidden');
                         packageDiv.querySelector('select').setAttribute('required', 'required');
+                    } else {
+                        packageDiv.classList.add('hidden');
+                        packageDiv.querySelector('select').removeAttribute('required');
                     }
                 };
                 

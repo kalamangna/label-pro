@@ -26,7 +26,7 @@ class CreateUsersTable extends Migration
             ],
             'role' => [
                 'type'       => 'ENUM',
-                'constraint' => ['admin', 'user'],
+                'constraint' => ['admin', 'user', 'demo'],
                 'default'    => 'user',
             ],
             'created_at' => [

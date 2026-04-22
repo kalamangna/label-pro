@@ -41,9 +41,14 @@
 - **Visual Assets**: Uses high-quality SVGs for all technical illustrations (Printer, Alignment, Flow).
 - **Interactive Guides**: Print alignment and position guides include a click-to-preview modal for better visibility.
 - **Duplicate Prevention**:
-  - **Smart Duplicate Check**: Integrated feature to scan and group guests with identical or similar names. 
-  - **Title Normalization**: The check ignores Indonesian common titles (Bpk, Ibu, etc.) and degrees (S.Kom, Dr, etc.) during comparison to catch variations of the same person.
-  - **Resolution Modal**: Users can resolve duplicates directly from a specialized modal showing print status to help decide which record to keep.
+  - **Smart Duplicate Check**: Internal fuzzy matching algorithm using `similar_text` for high-performance duplicate detection.
+  - **Weighted Scoring**: Name (60%), Position (15%), Address (25%).
+  - **Stricter Hard Gates**: Mandatory name similarity of >= 85% and exact word token match required to reduce false positives.
+  - **Normalization**: Standardizes Indonesian name variations (e.g., "Muh." -> "muhammad") and supports swapped name detection (e.g., "Ahmad Fauzi" matches "Fauzi Ahmad").
+- **User & Payment Management**:
+  - **Unified UI**: Payment status, invoice links, and transfer proof uploads are consolidated into a single "Kelola Pembayaran" modal for standard users.
+  - **Role-based Display**: Admin and Demo accounts are explicitly excluded from payment workflows and package assignments.
+  - **Simplified Labels**: Roles are consistently labeled as "Admin", "User", and "Demo" for clarity.
 
 ## Preferred Styles
 - Controller logic: Concise; use models for DB interaction. Redirects maintain context (e.g., `event_id`) after actions.

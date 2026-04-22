@@ -12,7 +12,7 @@ class UserModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['username', 'password', 'role', 'package'];
+    protected $allowedFields    = ['username', 'password', 'role', 'package', 'payment_status', 'payment_proof'];
 
     // Dates
     protected $useTimestamps = true;
@@ -25,24 +25,24 @@ class UserModel extends Model
         'username' => 'required|min_length[3]|is_unique[users.username,id,{id}]',
         'password' => 'required|min_length[5]',
         'role'     => 'required|in_list[admin,user,demo]',
-        'package'  => 'required|in_list[basic,pro,unlimited]',
+        'package'  => 'permit_empty|in_list[basic,pro,unlimited]',
     ];
 
     public static function getPackageLimits(string $package, string $role = 'user'): array
     {
         if ($role === 'admin') {
             return [
-                'max_events'     => 999999,
+                'max_events' => 999999,
                 'max_guests' => 999999,
-                'name'           => 'Administrator',
+                'name'       => '-',
             ];
         }
 
         if ($role === 'demo') {
             return [
-                'max_events'     => 1,
+                'max_events' => 1,
                 'max_guests' => 10,
-                'name'           => 'Mode Demo',
+                'name'       => 'Demo',
             ];
         }
 

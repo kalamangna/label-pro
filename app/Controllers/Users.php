@@ -30,7 +30,7 @@ class Users extends BaseController
         $rules = [
             'username' => 'required|min_length[3]|is_unique[users.username]',
             'password' => 'required|min_length[5]',
-            'role'     => 'required|in_list[admin,user]',
+            'role'     => 'required|in_list[admin,user,demo]',
         ];
 
         if ($role === 'user') {
@@ -42,10 +42,11 @@ class Users extends BaseController
         }
 
         $this->userModel->save([
-            'username' => $this->request->getPost('username'),
-            'password' => password_hash((string)$this->request->getPost('password'), PASSWORD_DEFAULT),
-            'role'     => $role,
-            'package'  => $role === 'admin' ? 'basic' : $this->request->getPost('package'),
+            'username'       => $this->request->getPost('username'),
+            'password'       => password_hash((string)$this->request->getPost('password'), PASSWORD_DEFAULT),
+            'role'           => $role,
+            'package'        => $role === 'user' ? $this->request->getPost('package') : null,
+            'payment_status' => $role === 'user' ? 'belum' : null,
         ]);
 
         return redirect()->to('/users')->with('message', 'Pengguna berhasil ditambahkan.');
@@ -61,7 +62,7 @@ class Users extends BaseController
         $role = $this->request->getPost('role');
         $rules = [
             'username' => "required|min_length[3]|is_unique[users.username,id,{$id}]",
-            'role'     => 'required|in_list[admin,user]',
+            'role'     => 'required|in_list[admin,user,demo]',
         ];
 
         if ($role === 'user') {
@@ -78,9 +79,11 @@ class Users extends BaseController
         }
 
         $data = [
-            'username' => $this->request->getPost('username'),
-            'role'     => $role,
-            'package'  => $role === 'admin' ? 'basic' : $this->request->getPost('package'),
+            'username'       => $this->request->getPost('username'),
+            'role'           => $role,
+            'package'        => $role === 'user' ? $this->request->getPost('package') : null,
+            'payment_status' => $role === 'user' ? ($user['payment_status'] ?? 'belum') : null,
+            'payment_proof'  => $role === 'user' ? ($user['payment_proof'] ?? null) : null,
         ];
 
         if (!empty($password)) {
@@ -106,5 +109,66 @@ class Users extends BaseController
         }
 
         return redirect()->to('/users')->with('error', 'Gagal menghapus pengguna.');
+    }
+
+    public function invoice($id)
+    {
+        $user = $this->userModel->find($id);
+        if (!$user) {
+            return redirect()->to('/users')->with('error', 'Pengguna tidak ditemukan.');
+        }
+
+        if ($user['role'] !== 'user') {
+            return redirect()->to('/users')->with('error', 'Invoice hanya tersedia untuk akun pengguna standar.');
+        }
+
+        $packageLimits = UserModel::getPackageLimits($user['package'] ?? 'basic', $user['role']);
+        
+        $prices = [
+            'basic'     => 50000,
+            'pro'       => 150000,
+            'unlimited' => 350000,
+        ];
+
+        $data = [
+            'title'         => 'Invoice #' . str_pad($user['id'], 5, '0', STR_PAD_LEFT),
+            'user'          => $user,
+            'package_name'  => $packageLimits['name'],
+            'price'         => $prices[$user['package'] ?? 'basic'] ?? 0,
+            'invoice_no'    => 'INV/' . date('Ymd', strtotime($user['created_at'])) . '/' . str_pad($user['id'], 4, '0', STR_PAD_LEFT),
+        ];
+
+        return view('users/invoice', $data);
+    }
+
+    public function confirmPayment($id)
+    {
+        $user = $this->userModel->find($id);
+        if (!$user) {
+            return redirect()->to('/users')->with('error', 'Pengguna tidak ditemukan.');
+        }
+
+        $rules = [
+            'payment_proof' => 'uploaded[payment_proof]|max_size[payment_proof,2048]|is_image[payment_proof]|ext_in[payment_proof,png,jpg,jpeg,webp]',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->to('/users')->with('error', 'Gagal mengunggah bukti pembayaran. Pastikan file berupa gambar (maksimal 2MB).');
+        }
+
+        $file = $this->request->getFile('payment_proof');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $newName = $file->getRandomName();
+            $file->move(FCPATH . 'uploads/payments', $newName);
+            
+            $this->userModel->update($id, [
+                'payment_status' => 'lunas',
+                'payment_proof'  => 'uploads/payments/' . $newName,
+            ]);
+
+            return redirect()->to('/users')->with('message', 'Pembayaran berhasil dikonfirmasi.');
+        }
+
+        return redirect()->to('/users')->with('error', 'Terjadi kesalahan saat mengunggah file.');
     }
 }

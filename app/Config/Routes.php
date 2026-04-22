@@ -16,7 +16,6 @@ $routes->get('/panduan', 'Home::panduan', ['filter' => 'auth']);
 
 $routes->group('guests', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'Guests::index');
-    $routes->get('duplicates', 'Guests::getDuplicates');
     $routes->post('store', 'Guests::store');
     $routes->post('update/(:num)', 'Guests::update/$1');
     $routes->get('delete/(:num)', 'Guests::delete/$1');
@@ -29,6 +28,8 @@ $routes->group('guests', ['filter' => 'auth'], function($routes) {
     $routes->post('toggle-selection/(:num)', 'Guests::toggleSelection/$1');
     $routes->post('bulk-toggle-selection', 'Guests::bulkToggleSelection');
     $routes->post('clear-selection', 'Guests::clearSelection');
+    $routes->post('check-duplicate', 'Guests::checkSmartDuplicate');
+    $routes->get('scan-duplicates', 'Guests::scanDuplicates');
 });
 
 $routes->group('events', ['filter' => 'auth'], function($routes) {
@@ -43,4 +44,6 @@ $routes->group('users', ['filter' => ['auth', 'admin']], function($routes) {
     $routes->post('store', 'Users::store');
     $routes->post('update/(:num)', 'Users::update/$1');
     $routes->get('delete/(:num)', 'Users::delete/$1');
+    $routes->get('invoice/(:num)', 'Users::invoice/$1');
+    $routes->post('confirm-payment/(:num)', 'Users::confirmPayment/$1');
 });

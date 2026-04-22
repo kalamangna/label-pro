@@ -26,6 +26,8 @@
 # app.forceGlobalSecureRequests = false
 # app.CSPEnabled = false
 
+# GEMINI_API_KEY = 'your-api-key-here'
+
 #--------------------------------------------------------------------
 # DATABASE
 #--------------------------------------------------------------------

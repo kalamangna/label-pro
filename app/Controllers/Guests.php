@@ -45,8 +45,8 @@ class Guests extends BaseController
 
         // Join events to get event name and users to get username
         $model->select('guests.*, users.username as added_by, events.name as event_name')
-              ->join('users', 'users.id = guests.user_id', 'left')
-              ->join('events', 'events.id = guests.event_id', 'left');
+            ->join('users', 'users.id = guests.user_id', 'left')
+            ->join('events', 'events.id = guests.event_id', 'left');
 
         // Apply owner scope if not admin
         if (session()->get('role') !== 'admin') {
@@ -60,10 +60,10 @@ class Guests extends BaseController
 
         if ($search !== '') {
             $model->groupStart()
-                  ->like('guests.name', $search)
-                  ->orLike('guests.jabatan', $search)
-                  ->orLike('guests.address', $search)
-                  ->groupEnd();
+                ->like('guests.name', $search)
+                ->orLike('guests.position', $search)
+                ->orLike('guests.address', $search)
+                ->groupEnd();
         }
 
         if ($status !== null && $status !== '') {
@@ -79,8 +79,8 @@ class Guests extends BaseController
 
         // Fetch event list for the filter dropdown
         $eventModel = new \App\Models\EventModel();
-        $events = session()->get('role') === 'admin' 
-            ? $eventModel->findAll() 
+        $events = session()->get('role') === 'admin'
+            ? $eventModel->findAll()
             : $eventModel->where('user_id', session()->get('user_id'))->findAll();
 
         // Calculate absolute total independently
@@ -98,7 +98,7 @@ class Guests extends BaseController
                 ->where('user_id', session()->get('user_id'))
                 ->where('is_selected', 1)
                 ->countAllResults();
-            
+
             $unprintedSelectedCount = (new GuestModel())
                 ->where('user_id', session()->get('user_id'))
                 ->where('is_selected', 1)
@@ -132,9 +132,9 @@ class Guests extends BaseController
 
         $package = session()->get('package') ?? 'basic';
         $limits  = \App\Models\UserModel::getPackageLimits($package, session()->get('role'));
-        
+
         $currentGuestsCount = $this->guestModel->where('guests.user_id', session()->get('user_id'))->countAllResults();
-        
+
         if ($currentGuestsCount >= $limits['max_guests']) {
             return redirect()->back()->withInput()->with('error', "Anda telah mencapai batas maksimal tamu untuk {$limits['name']} ({$limits['max_guests']} tamu). Silakan hubungi admin untuk upgrade.");
         }
@@ -149,7 +149,7 @@ class Guests extends BaseController
                     'max_length' => '{field} maksimal {param} karakter.'
                 ]
             ],
-            'jabatan' => [
+            'position' => [
                 'label' => 'Jabatan',
                 'rules' => 'permit_empty|max_length[255]',
             ],
@@ -168,15 +168,15 @@ class Guests extends BaseController
         }
 
         $name     = $this->request->getPost('name');
-        $jabatan  = $this->request->getPost('jabatan');
+        $position = $this->request->getPost('position');
         $address  = $this->request->getPost('address');
         $eventId  = $this->request->getPost('event_id') ?: null;
-        
+
         $existing = $this->applyScope()
-                         ->where('name', $name)
-                         ->where('jabatan', $jabatan)
-                         ->where('address', $address);
-        
+            ->where('name', $name)
+            ->where('position', $position)
+            ->where('address', $address);
+
         if ($eventId) {
             $existing = $existing->where('event_id', $eventId);
         } else {
@@ -189,7 +189,7 @@ class Guests extends BaseController
 
         $this->guestModel->save([
             'name'     => $name,
-            'jabatan'  => $jabatan,
+            'position' => $position,
             'address'  => $address,
             'user_id'  => session()->get('user_id'),
             'event_id' => $eventId,
@@ -224,7 +224,7 @@ class Guests extends BaseController
                     'max_length' => '{field} maksimal {param} karakter.'
                 ]
             ],
-            'jabatan' => [
+            'position' => [
                 'label' => 'Jabatan',
                 'rules' => 'permit_empty|max_length[255]',
             ],
@@ -249,7 +249,7 @@ class Guests extends BaseController
         $eventId = $this->request->getPost('event_id') ?: null;
         $this->guestModel->update($id, [
             'name'       => $this->request->getPost('name'),
-            'jabatan'    => $this->request->getPost('jabatan'),
+            'position'   => $this->request->getPost('position'),
             'address'    => $this->request->getPost('address'),
             'event_id'   => $eventId,
             'is_printed' => $this->request->getPost('is_printed') ?? 0,
@@ -295,7 +295,14 @@ class Guests extends BaseController
         $guest = $this->checkOwnership($id);
         if ($guest) {
             $this->guestModel->delete($id);
-            return redirect()->to('/guests')->with('message', 'Tamu berhasil dihapus.');
+
+            $redirectParams = $this->request->getGet();
+            $redirectUrl = '/guests';
+            if (!empty($redirectParams)) {
+                $redirectUrl .= '?' . http_build_query($redirectParams);
+            }
+
+            return redirect()->to($redirectUrl)->with('message', 'Tamu berhasil dihapus.');
         }
         return redirect()->to('/guests')->with('error', 'Tamu tidak ditemukan atau Anda tidak memiliki akses.');
     }
@@ -307,13 +314,13 @@ class Guests extends BaseController
         }
 
         $eventId = $this->request->getGet('event_id');
-        
+
         if (!$eventId) {
             return redirect()->to('/events')->with('error', 'Silakan pilih acara terlebih dahulu untuk mengimpor data.');
         }
 
         $eventModel = new \App\Models\EventModel();
-        $event = session()->get('role') === 'admin' 
+        $event = session()->get('role') === 'admin'
             ? $eventModel->find($eventId)
             : $eventModel->where('user_id', session()->get('user_id'))->find($eventId);
 
@@ -337,7 +344,7 @@ class Guests extends BaseController
 
         $package = session()->get('package') ?? 'basic';
         $limits  = \App\Models\UserModel::getPackageLimits($package, session()->get('role'));
-        
+
         $currentGuestsCount = $this->guestModel->where('user_id', session()->get('user_id'))->countAllResults();
 
         $file = $this->request->getFile('excel_file');
@@ -348,7 +355,7 @@ class Guests extends BaseController
         }
 
         $eventModel = new \App\Models\EventModel();
-        $event = session()->get('role') === 'admin' 
+        $event = session()->get('role') === 'admin'
             ? $eventModel->find($eventId)
             : $eventModel->where('user_id', session()->get('user_id'))->find($eventId);
 
@@ -384,9 +391,9 @@ class Guests extends BaseController
                     break;
                 }
 
-                // Expecting: Column A (name), Column B (jabatan), Column C (address)
+                // Expecting: Column A (name), Column B (position), Column C (address)
                 $name = trim((string)($row[0] ?? ''));
-                $jabatan = trim((string)($row[1] ?? ''));
+                $position = trim((string)($row[1] ?? ''));
                 $address = trim((string)($row[2] ?? ''));
 
                 if (empty($name)) {
@@ -395,10 +402,10 @@ class Guests extends BaseController
                 }
 
                 $existing = $this->applyScope()
-                                 ->where('name', $name)
-                                 ->where('jabatan', $jabatan)
-                                 ->where('address', $address);
-                
+                    ->where('name', $name)
+                    ->where('position', $position)
+                    ->where('address', $address);
+
                 if ($eventId) {
                     $existing = $existing->where('event_id', $eventId);
                 } else {
@@ -412,7 +419,7 @@ class Guests extends BaseController
 
                 $this->guestModel->insert([
                     'name'     => $name,
-                    'jabatan'  => $jabatan,
+                    'position' => $position,
                     'address'  => $address,
                     'user_id'  => session()->get('user_id'),
                     'event_id' => $eventId,
@@ -430,7 +437,6 @@ class Guests extends BaseController
             }
 
             return redirect()->to('/guests' . ($eventId ? '?event_id=' . $eventId : ''))->with('message', $message);
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses file: ' . $e->getMessage());
         }
@@ -441,7 +447,7 @@ class Guests extends BaseController
         $type = $this->request->getGet('type') ?? '121';
         $offsetStr = $this->request->getGet('offset');
         $offset = (is_numeric($offsetStr) && (int)$offsetStr > 0) ? (int)$offsetStr : 0;
-        
+
         $alignRaw = $this->request->getGet('align') ?? 'center';
         $validAlignments = ['flex-start', 'center', 'flex-end'];
         $align = in_array($alignRaw, $validAlignments) ? $alignRaw : 'center';
@@ -502,12 +508,13 @@ class Guests extends BaseController
             $newUnprintedCount = $this->guestModel->where('guests.user_id', session()->get('user_id'))->where('guests.is_selected', 1)->where('guests.is_printed', 0)->countAllResults();
 
             return $this->response->setJSON([
-                'success' => true, 
-                'is_printed' => $newValue, 
+                'success' => true,
+                'is_printed' => $newValue,
                 'count' => $newCount,
                 'unprinted_count' => $newUnprintedCount
             ]);
-            }        return $this->response->setJSON(['success' => false], 404);
+        }
+        return $this->response->setJSON(['success' => false], 404);
     }
 
     public function bulkDelete()
@@ -574,12 +581,12 @@ class Guests extends BaseController
         $newUnprintedCount = $this->guestModel->where('guests.user_id', session()->get('user_id'))->where('guests.is_selected', 1)->where('guests.is_printed', 0)->countAllResults();
 
         return $this->response->setJSON([
-            'success' => true, 
-            'is_selected' => $newState, 
+            'success' => true,
+            'is_selected' => $newState,
             'count' => $newCount,
             'unprinted_count' => $newUnprintedCount
         ]);
-        }
+    }
     public function bulkToggleSelection()
     {
         if (session()->get('role') === 'admin') {
@@ -599,28 +606,28 @@ class Guests extends BaseController
         if ($action === 'select') {
             // Select all requested IDs that belong to the user
             $validGuests = $this->guestModel->whereIn('id', $ids)
-                                                   ->where('guests.user_id', $userId)
-                                                   ->findAll();
-            
+                ->where('guests.user_id', $userId)
+                ->findAll();
+
             $validIds = array_column($validGuests, 'id');
 
             if (!empty($validIds)) {
                 $this->guestModel->whereIn('id', $validIds)
-                                     ->set(['is_selected' => 1])
-                                     ->update();
+                    ->set(['is_selected' => 1])
+                    ->update();
             }
         } else {
             $this->guestModel->whereIn('id', $ids)
-                                 ->where('guests.user_id', $userId)
-                                 ->set(['is_selected' => 0])
-                                 ->update();
+                ->where('guests.user_id', $userId)
+                ->set(['is_selected' => 0])
+                ->update();
         }
 
         $newCount = $this->guestModel->where('guests.user_id', $userId)->where('guests.is_selected', 1)->countAllResults();
         $newUnprintedCount = $this->guestModel->where('guests.user_id', $userId)->where('guests.is_selected', 1)->where('guests.is_printed', 0)->countAllResults();
 
         return $this->response->setJSON([
-            'success' => true, 
+            'success' => true,
             'count' => $newCount,
             'unprinted_count' => $newUnprintedCount
         ]);
@@ -633,86 +640,58 @@ class Guests extends BaseController
         }
 
         $this->guestModel->where('guests.user_id', session()->get('user_id'))
-                             ->set(['is_selected' => 0])
-                             ->update();
+            ->set(['is_selected' => 0])
+            ->update();
 
         return $this->response->setJSON(['success' => true, 'count' => 0]);
     }
 
-    private function normalizeNameForDuplicateCheck($name)
-    {
-        $name = strtolower($name);
-        
-        // Remove punctuation
-        $name = preg_replace('/[.,\/#!$%\^&\*;:{}=\-_`~()]/', ' ', $name);
-        
-        // Common titles to ignore
-        $titles = [
-            'bpk', 'bapak', 'ibu', 'sdr', 'sdri', 'dr', 'drg', 'prof', 'ir', 'kh', 'h', 'hj',
-            's kom', 's e', 's pd', 's t', 's h', 's sos', 's ag', 's ip', 's i kom',
-            'm kom', 'm t', 'm pd', 'm h', 'm si', 'm ag', 'm a', 'm m',
-            'amd', 'a md', 'st', 'se', 'sh', 'spd', 'skom'
-        ];
-        
-        $words = explode(' ', $name);
-        $filtered = array_filter($words, function($word) use ($titles) {
-            $word = trim($word);
-            return !empty($word) && !in_array($word, $titles);
-        });
-        
-        $normalized = implode(' ', $filtered);
-        
-        // Fallback to original lowercase if normalization strips everything (e.g., if the name was literally just "Bapak")
-        return empty($normalized) ? trim(strtolower($name)) : $normalized;
-    }
-
-    public function getDuplicates()
+    /**
+     * Endpoint for Smart Duplicate Check
+     */
+    public function checkSmartDuplicate()
     {
         if (session()->get('role') === 'admin') {
-            return $this->response->setJSON(['success' => false, 'message' => 'Admin tidak dapat menggunakan fitur ini.'], 403);
+            return $this->response->setJSON(['success' => false, 'message' => 'Admin tidak dapat melakukan pengecekan ini.'], 403);
         }
 
-        $userId = session()->get('user_id');
+        $name     = $this->request->getPost('name');
+        $position = $this->request->getPost('position');
+        $address  = $this->request->getPost('address');
+        $eventId  = $this->request->getPost('event_id') ?: null;
+
+        if (empty($name)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Nama wajib diisi untuk pengecekan.'], 400);
+        }
+
+        $result = $this->guestModel->checkSmartDuplicate([
+            'name'     => $name,
+            'position' => $position,
+            'address'  => $address
+        ], session()->get('user_id'), $eventId);
+
+        return $this->response->setJSON([
+            'is_duplicate' => $result['is_duplicate'],
+            'confidence'   => $result['confidence'],
+            'candidates'   => $result['candidates']
+        ]);
+    }
+
+    /**
+     * Endpoint to scan all guests for duplicates
+     */
+    public function scanDuplicates()
+    {
+        if (session()->get('role') === 'admin') {
+            return $this->response->setJSON(['success' => false, 'message' => 'Admin tidak dapat melakukan pengecekan ini.'], 403);
+        }
+
         $eventId = $this->request->getGet('event_id');
+        $results = $this->guestModel->scanAllDuplicates(session()->get('user_id'), $eventId);
 
-        $db = \Config\Database::connect();
-        $builder = $db->table('guests');
-
-        $builder->select('*')->where('user_id', $userId);
-        
-        if (!empty($eventId)) {
-            $builder->where('event_id', $eventId);
-        }
-
-        $allGuests = $builder->get()->getResultArray();
-
-        $groups = [];
-        foreach ($allGuests as $guest) {
-            $norm = $this->normalizeNameForDuplicateCheck($guest['name']);
-            if (!isset($groups[$norm])) {
-                $groups[$norm] = [];
-            }
-            $groups[$norm][] = $guest;
-        }
-
-        $results = [];
-        foreach ($groups as $norm => $items) {
-            if (count($items) > 1) {
-                // Determine a good display name for the group
-                $displayNames = array_column($items, 'name');
-                // Sort by length ascending to pick the shortest/cleanest base name
-                usort($displayNames, function($a, $b) {
-                    return strlen($a) <=> strlen($b);
-                });
-                
-                $results[] = [
-                    'name' => $displayNames[0],
-                    'count' => count($items),
-                    'items' => $items
-                ];
-            }
-        }
-
-        return $this->response->setJSON(['success' => true, 'data' => $results]);
+        return $this->response->setJSON([
+            'success' => true,
+            'data'    => $results
+        ]);
     }
 }

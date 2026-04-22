@@ -1,15 +1,26 @@
 <?= $this->extend('layout/main') ?>
 <?= $this->section('content') ?>
 <?php
-    $currentEventName = 'Acara';
-    if (!empty($eventId)) {
-        foreach ($events as $e) {
-            if ($e['id'] == $eventId) {
-                $currentEventName = $e['name'];
-                break;
-            }
+$currentEventName = 'Acara';
+if (!empty($eventId)) {
+    foreach ($events as $e) {
+        if ($e['id'] == $eventId) {
+            $currentEventName = $e['name'];
+            break;
         }
     }
+}
+
+$urlParams = array_filter([
+    'event_id' => $eventId,
+    'search'   => $search,
+    'status'   => $status,
+    'sort'     => $sort,
+    'dir'      => $dir,
+], function ($val) {
+    return $val !== null && $val !== '';
+});
+$urlQuery = !empty($urlParams) ? '?' . http_build_query($urlParams) : '';
 ?>
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-6">
     <div class="flex items-center gap-4">
@@ -35,18 +46,17 @@
                 <i class="fa-solid fa-copy me-2 text-amber-600"></i>
                 Cek Duplikat
             </button>
-            <?php if (!empty($eventId)): ?>
-                <a href="/guests/import?event_id=<?= esc($eventId) ?>" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
-                    <i class="fa-solid fa-file-import me-2 text-emerald-600"></i>
-                    Impor Data
-                </a>
-            <?php endif; ?>
+            <?php if (!empty($eventId)): ?>                    <a href="/guests/import?event_id=<?= esc($eventId) ?>" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
+                        <i class="fa-solid fa-file-import me-2 text-emerald-600"></i>
+                        Impor Data
+                    </a>
+                <?php endif; ?>
 
-            <button data-modal-target="add-guest-modal" data-modal-toggle="add-guest-modal" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">
-                <i class="fa-solid fa-plus me-2"></i>
-                Tambah
-            </button>
-        </div>
+                <button data-modal-target="add-guest-modal" data-modal-toggle="add-guest-modal" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">
+                    <i class="fa-solid fa-plus me-2"></i>
+                    Tambah
+                </button>
+            </div>
         <?php endif; ?>
     </div>
 </div>
@@ -121,20 +131,23 @@
         <!-- Buttons & Results Info -->
         <div class="md:col-span-12 flex flex-col md:flex-row items-center justify-between gap-4 mt-2 pt-4 border-t border-gray-200/60">
             <div class="text-xs font-bold text-slate-500">
-                <?php 
-                    $activeFilters = [];
-                    if (!empty($search)) $activeFilters[] = "Pencarian: '" . esc($search) . "'";
-                    if (($status ?? '') !== '') $activeFilters[] = "Status: " . ($status == '1' ? 'Sudah Dicetak' : 'Belum Dicetak');
-                    if (!empty($eventId)) {
-                        $currentEventName = 'Acara';
-                        foreach ($events as $e) {
-                            if ($e['id'] == $eventId) { $currentEventName = $e['name']; break; }
+                <?php
+                $activeFilters = [];
+                if (!empty($search)) $activeFilters[] = "Pencarian: '" . esc($search) . "'";
+                if (($status ?? '') !== '') $activeFilters[] = "Status: " . ($status == '1' ? 'Sudah Dicetak' : 'Belum Dicetak');
+                if (!empty($eventId)) {
+                    $currentEventName = 'Acara';
+                    foreach ($events as $e) {
+                        if ($e['id'] == $eventId) {
+                            $currentEventName = $e['name'];
+                            break;
                         }
-                        $activeFilters[] = "Acara: " . esc($currentEventName);
                     }
+                    $activeFilters[] = "Acara: " . esc($currentEventName);
+                }
                 ?>
                 <?php if (!empty($activeFilters)): ?>
-                    Ditemukan <span class="text-emerald-600"><?= number_format($pager->getTotal()) ?></span> data untuk 
+                    Ditemukan <span class="text-emerald-600"><?= number_format($pager->getTotal()) ?></span> data untuk
                     <span class="text-emerald-700 italic"><?= implode(', ', $activeFilters) ?></span>
                 <?php endif; ?>
             </div>
@@ -150,21 +163,21 @@
 
 <!-- Bulk Actions Bar -->
 <?php if (session()->get('role') !== 'admin'): ?>
-<div class="mb-6 flex flex-wrap items-center gap-2 p-2 bg-emerald-50/50 border border-emerald-100 rounded-xl">
-    <span class="text-[10px] uppercase tracking-widest font-black text-emerald-800 px-3 py-1">Aksi Massal:</span>
-    <button id="bulkDeleteBtn" type="button" class="text-red-600 bg-white border border-gray-200 hover:bg-red-50 focus:ring-4 focus:ring-red-100 font-bold rounded-lg text-[10px] px-3 py-1.5 inline-flex items-center transition-all">
-        <i class="fa-solid fa-trash-can me-1.5"></i>
-        Hapus
-    </button>
-    <button id="bulkMarkPrintedBtn" type="button" class="text-emerald-700 bg-white border border-gray-200 hover:bg-emerald-50 focus:ring-4 focus:ring-emerald-100 font-bold rounded-lg text-[10px] px-3 py-1.5 inline-flex items-center transition-all">
-        <i class="fa-solid fa-check-double me-1.5"></i>
-        Tandai Sudah Cetak
-    </button>
-    <button id="bulkMarkNotPrintedBtn" type="button" class="text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-lg text-[10px] px-3 py-1.5 inline-flex items-center transition-all">
-        <i class="fa-solid fa-rotate-left me-1.5"></i>
-        Tandai Belum Cetak
-    </button>
-</div>
+    <div class="mb-6 flex flex-wrap items-center gap-2 p-2 bg-emerald-50/50 border border-emerald-100 rounded-xl">
+        <span class="text-[10px] uppercase tracking-widest font-black text-emerald-800 px-3 py-1">Aksi Massal:</span>
+        <button id="bulkDeleteBtn" type="button" class="text-red-600 bg-white border border-gray-200 hover:bg-red-50 focus:ring-4 focus:ring-red-100 font-bold rounded-lg text-[10px] px-3 py-1.5 inline-flex items-center transition-all">
+            <i class="fa-solid fa-trash-can me-1.5"></i>
+            Hapus
+        </button>
+        <button id="bulkMarkPrintedBtn" type="button" class="text-emerald-700 bg-white border border-gray-200 hover:bg-emerald-50 focus:ring-4 focus:ring-emerald-100 font-bold rounded-lg text-[10px] px-3 py-1.5 inline-flex items-center transition-all">
+            <i class="fa-solid fa-check-double me-1.5"></i>
+            Tandai Sudah Cetak
+        </button>
+        <button id="bulkMarkNotPrintedBtn" type="button" class="text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 font-bold rounded-lg text-[10px] px-3 py-1.5 inline-flex items-center transition-all">
+            <i class="fa-solid fa-rotate-left me-1.5"></i>
+            Tandai Belum Cetak
+        </button>
+    </div>
 <?php endif; ?>
 
 <!-- Table -->
@@ -173,9 +186,9 @@
         <thead class="text-xs text-gray-400 uppercase bg-gray-50/50 border-b border-gray-100">
             <tr>
                 <?php if (session()->get('role') !== 'admin'): ?>
-                <th scope="col" class="p-4 w-4 text-center">
-                    <input id="select-all" type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer">
-                </th>
+                    <th scope="col" class="p-4 w-4 text-center">
+                        <input id="select-all" type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer">
+                    </th>
                 <?php endif; ?>
                 <th scope="col" class="px-6 py-4 font-bold">Nama Tamu</th>
                 <th scope="col" class="px-6 py-4 font-bold">Jabatan</th>
@@ -186,7 +199,7 @@
                 <?php endif; ?>
                 <th scope="col" class="px-6 py-4 text-center font-bold whitespace-nowrap">Status Cetak</th>
                 <?php if (session()->get('role') !== 'admin'): ?>
-                <th scope="col" class="px-6 py-4 text-right font-bold">Aksi</th>
+                    <th scope="col" class="px-6 py-4 text-right font-bold">Aksi</th>
                 <?php endif; ?>
             </tr>
         </thead>
@@ -194,15 +207,15 @@
             <?php foreach ($guests as $guest): ?>
                 <tr id="row-<?= $guest['id'] ?>" class="bg-white hover:bg-emerald-50/30 transition-colors <?= ($guest['is_printed'] ?? 0) ? 'bg-gray-50/30' : '' ?>">
                     <?php if (session()->get('role') !== 'admin'): ?>
-                    <td class="p-4 text-center">
-                        <input type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer toggle-select" data-id="<?= $guest['id'] ?>" <?= ($guest['is_selected'] ?? 0) ? 'checked' : '' ?>>
-                    </td>
+                        <td class="p-4 text-center">
+                            <input type="checkbox" class="w-4 h-4 text-emerald-600 bg-white border-gray-200 rounded focus:ring-emerald-500 cursor-pointer toggle-select" data-id="<?= $guest['id'] ?>" <?= ($guest['is_selected'] ?? 0) ? 'checked' : '' ?>>
+                        </td>
                     <?php endif; ?>
                     <th scope="row" class="px-6 py-4 font-bold text-gray-900 <?= ($guest['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : '' ?>">
                         <?= esc($guest['name']) ?>
                     </th>
                     <td class="px-6 py-4 <?= ($guest['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : 'text-gray-600 font-medium' ?>">
-                        <?= !empty(trim((string)($guest['jabatan'] ?? ''))) ? esc($guest['jabatan']) : '-' ?>
+                        <?= !empty(trim((string)($guest['position'] ?? ''))) ? esc($guest['position']) : '-' ?>
                     </td>
                     <td class="px-6 py-4 <?= ($guest['is_printed'] ?? 0) ? 'line-through text-gray-400 font-medium' : 'text-gray-600 font-medium' ?>">
                         <div class="line-clamp-1"><?= esc($guest['address']) ?></div>
@@ -214,12 +227,12 @@
                         </span>
                     </td>
                     <?php if (session()->get('role') === 'admin'): ?>
-                    <td class="px-6 py-4 text-center">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-800">
-                            <i class="fa-solid fa-user me-1.5 text-[10px] opacity-50"></i>
-                            <?= esc($guest['added_by'] ?? 'Sistem') ?>
-                        </span>
-                    </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-800">
+                                <i class="fa-solid fa-user me-1.5 text-[10px] opacity-50"></i>
+                                <?= esc($guest['added_by'] ?? 'Sistem') ?>
+                            </span>
+                        </td>
                     <?php endif; ?>
                     <td class="px-6 py-4 text-center whitespace-nowrap">
                         <?php if ($guest['is_printed'] ?? 0): ?>
@@ -234,42 +247,42 @@
                         <?php endif; ?>
                     </td>
                     <?php if (session()->get('role') !== 'admin'): ?>
-                    <td class="px-6 py-4 text-right">
-                        <div class="flex justify-end gap-2">
-                            <button type="button" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors edit-guest-btn" 
-                                    data-id="<?= $guest['id'] ?>" 
-                                    data-name="<?= esc($guest['name']) ?>" 
-                                    data-jabatan="<?= esc($guest['jabatan'] ?? '') ?>"
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-2">
+                                <button type="button" class="p-2 text-gray-400 hover:text-emerald-600 transition-colors edit-guest-btn"
+                                    data-id="<?= $guest['id'] ?>"
+                                    data-name="<?= esc($guest['name']) ?>"
+                                    data-position="<?= esc($guest['position'] ?? '') ?>"
                                     data-address="<?= esc($guest['address']) ?>"
                                     data-event-id="<?= $guest['event_id'] ?>"
                                     data-is-printed="<?= $guest['is_printed'] ?? 0 ?>"
                                     title="Edit">
-                                <i class="fa-solid fa-pen-to-square text-xs"></i>
-                            </button>
-                            <button type="button" data-modal-target="delete-modal-<?= $guest['id'] ?>" data-modal-toggle="delete-modal-<?= $guest['id'] ?>" class="p-2 text-gray-400 hover:text-red-600 transition-colors" title="Hapus">
-                                <i class="fa-solid fa-trash text-xs"></i>
-                            </button>
-                        </div>
+                                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                </button>
+                                <button type="button" data-modal-target="delete-modal-<?= $guest['id'] ?>" data-modal-toggle="delete-modal-<?= $guest['id'] ?>" class="p-2 text-gray-400 hover:text-red-600 transition-colors" title="Hapus">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </div>
 
-                        <!-- Delete Modal -->
-                        <div id="delete-modal-<?= $guest['id'] ?>" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                            <div class="relative p-4 w-full max-w-md max-h-full">
-                                <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100 text-left">
-                                    <div class="p-6 text-center">
-                                        <div class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <i class="fa-solid fa-circle-exclamation text-xl"></i>
-                                        </div>
-                                        <h3 class="mb-2 text-lg font-bold text-gray-900">Hapus data ini?</h3>
-                                        <p class="mb-6 text-sm text-gray-500 italic">"<?= esc($guest['name']) ?>"</p>
-                                        <div class="flex justify-center gap-3">
-                                            <button data-modal-hide="delete-modal-<?= $guest['id'] ?>" type="button" class="px-5 py-2.5 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
-                                            <a href="/guests/delete/<?= $guest['id'] ?>" class="px-5 py-2.5 text-sm font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100">Hapus Data</a>
+                            <!-- Delete Modal -->
+                            <div id="delete-modal-<?= $guest['id'] ?>" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                                <div class="relative p-4 w-full max-w-md max-h-full">
+                                    <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100 text-left">
+                                        <div class="p-6 text-center">
+                                            <div class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <i class="fa-solid fa-circle-exclamation text-xl"></i>
+                                            </div>
+                                            <h3 class="mb-2 text-lg font-bold text-gray-900">Hapus data ini?</h3>
+                                            <p class="mb-6 text-sm text-gray-500 italic">"<?= esc($guest['name']) ?>"</p>
+                                            <div class="flex justify-center gap-3">
+                                                <button data-modal-hide="delete-modal-<?= $guest['id'] ?>" type="button" class="px-5 py-2.5 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
+                                                <a href="/guests/delete/<?= $guest['id'] ?><?= $urlQuery ?>" class="px-5 py-2.5 text-sm font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100">Hapus Data</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </td>
+                        </td>
                     <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
@@ -297,19 +310,19 @@
 </div>
 
 <?php if (session()->get('role') !== 'admin'): ?>
-<!-- Sticky Selection Toolbar -->
-<div id="selection-toolbar" class="<?= ($selectedCount ?? 0) > 0 ? 'flex' : 'hidden' ?> fixed bottom-0 left-0 w-full z-50 items-center justify-between px-6 py-4 bg-slate-900 shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t border-slate-700 text-white transition-all duration-300">
-    <div class="flex items-center gap-3">
-        <div class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold" id="selected-count-badge"><?= esc($selectedCount ?? 0) ?></div>
-        <span class="text-base font-medium">Tamu Terpilih</span>
+    <!-- Sticky Selection Toolbar -->
+    <div id="selection-toolbar" class="<?= ($selectedCount ?? 0) > 0 ? 'flex' : 'hidden' ?> fixed bottom-0 left-0 w-full z-50 items-center justify-between px-6 py-4 bg-slate-900 shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t border-slate-700 text-white transition-all duration-300">
+        <div class="flex items-center gap-3">
+            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold" id="selected-count-badge"><?= esc($selectedCount ?? 0) ?></div>
+            <span class="text-base font-medium">Tamu Terpilih</span>
+        </div>
+        <div class="flex gap-3">
+            <button type="button" id="clearSelectionBtn" class="text-sm font-bold text-slate-300 hover:text-white transition-colors px-3 py-2 border border-transparent hover:border-slate-700 rounded-xl">Batal</button>
+            <button type="button" id="openPrintModalBtn" class="text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-900 px-6 py-2 rounded-xl transition-colors shadow-lg shadow-amber-900/20">
+                <i class="fa-solid fa-print me-2"></i> Cetak Label
+            </button>
+        </div>
     </div>
-    <div class="flex gap-3">
-        <button type="button" id="clearSelectionBtn" class="text-sm font-bold text-slate-300 hover:text-white transition-colors px-3 py-2 border border-transparent hover:border-slate-700 rounded-xl">Batal</button>
-        <button type="button" id="openPrintModalBtn" class="text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-900 px-6 py-2 rounded-xl transition-colors shadow-lg shadow-amber-900/20">
-            <i class="fa-solid fa-print me-2"></i> Cetak Label
-        </button>
-    </div>
-</div>
 <?php endif; ?>
 
 <script>
@@ -350,7 +363,7 @@
                     unprintedWarningContainer.classList.remove('flex');
                 }
             }
-            
+
             const printedExcludedCountEl = document.getElementById('printed-excluded-count');
             const printedExcludedWarning = document.getElementById('printed-excluded-warning');
             if (printedExcludedCountEl && printedExcludedWarning) {
@@ -395,14 +408,15 @@
                     headers: headers,
                 }).then(response => response.json()).then(data => {
                     if (data.success) {
-                       updateToolbar(data.count, data.unprinted_count);
-                       updateSelectAllState();
+                        updateToolbar(data.count, data.unprinted_count);
+                        updateSelectAllState();
                     } else {
-                       if (data.limit_reached || data.message) alert(data.message || 'Gagal memperbarui status pilihan.');
-                       else alert('Gagal memperbarui status pilihan.');
-                       this.checked = originalState;
-                       updateSelectAllState();
-                    }                }).catch(() => {
+                        if (data.limit_reached || data.message) alert(data.message || 'Gagal memperbarui status pilihan.');
+                        else alert('Gagal memperbarui status pilihan.');
+                        this.checked = originalState;
+                        updateSelectAllState();
+                    }
+                }).catch(() => {
                     alert('Terjadi kesalahan jaringan.');
                     this.checked = originalState;
                     updateSelectAllState();
@@ -419,17 +433,21 @@
                 fetch('/guests/bulk-toggle-selection', {
                     method: 'POST',
                     headers: headers,
-                    body: JSON.stringify({ ids: ids, action: action })
+                    body: JSON.stringify({
+                        ids: ids,
+                        action: action
+                    })
                 }).then(response => response.json()).then(data => {
                     if (data.success) {
-                       updateToolbar(data.count, data.unprinted_count);
-                       selectCheckboxes.forEach(cb => cb.checked = isChecked);
-                       updateSelectAllState();
+                        updateToolbar(data.count, data.unprinted_count);
+                        selectCheckboxes.forEach(cb => cb.checked = isChecked);
+                        updateSelectAllState();
                     } else {
-                       if (data.limit_reached || data.message) alert(data.message || 'Gagal memperbarui status pilihan.');
-                       else alert('Gagal memperbarui status pilihan.');
-                       this.checked = !isChecked;
-                    }                }).catch(() => {
+                        if (data.limit_reached || data.message) alert(data.message || 'Gagal memperbarui status pilihan.');
+                        else alert('Gagal memperbarui status pilihan.');
+                        this.checked = !isChecked;
+                    }
+                }).catch(() => {
                     alert('Terjadi kesalahan jaringan.');
                     this.checked = !isChecked;
                 });
@@ -463,7 +481,7 @@
                     alert('Harap pilih data untuk dihapus.');
                     return;
                 }
-                
+
                 const countEl = document.getElementById('bulk-delete-count');
                 if (countEl) countEl.innerText = ids.length;
                 if (bulkDeleteModal) bulkDeleteModal.show();
@@ -477,10 +495,15 @@
                 fetch('/guests/bulk-delete', {
                     method: 'POST',
                     headers: headers,
-                    body: JSON.stringify({ ids: ids })
+                    body: JSON.stringify({
+                        ids: ids
+                    })
                 }).then(response => response.json()).then(data => {
                     if (data.success) {
-                        fetch('/guests/clear-selection', { method: 'POST', headers: headers })
+                        fetch('/guests/clear-selection', {
+                                method: 'POST',
+                                headers: headers
+                            })
                             .finally(() => window.location.reload());
                     } else {
                         alert('Gagal menghapus data.');
@@ -543,10 +566,16 @@
                 fetch('/guests/bulk-printed', {
                     method: 'POST',
                     headers: headers,
-                    body: JSON.stringify({ ids: ids, state: pendingStatusState })
+                    body: JSON.stringify({
+                        ids: ids,
+                        state: pendingStatusState
+                    })
                 }).then(response => response.json()).then(data => {
                     if (data.success) {
-                        fetch('/guests/clear-selection', { method: 'POST', headers: headers })
+                        fetch('/guests/clear-selection', {
+                                method: 'POST',
+                                headers: headers
+                            })
                             .finally(() => window.location.reload());
                     } else {
                         alert('Gagal memperbarui data.');
@@ -568,13 +597,13 @@
         const print121Link = document.getElementById('print-121-link');
         const printOffsetInput = document.getElementById('print-offset');
         const printAlignInput = document.getElementById('print-align');
-        
+
         function updatePrintLink() {
             if (print121Link && printOffsetInput) {
                 let offset = parseInt(printOffsetInput.value) || 1;
                 if (offset < 1) offset = 1;
                 if (offset > 10) offset = 10;
-                
+
                 let align = printAlignInput ? printAlignInput.value : 'center';
                 print121Link.href = `/guests/print?type=121&offset=${offset - 1}&align=${align}`;
 
@@ -591,7 +620,7 @@
             printOffsetInput.addEventListener('input', updatePrintLink);
             printOffsetInput.addEventListener('change', updatePrintLink);
         }
-        
+
         if (printAlignInput) {
             printAlignInput.addEventListener('change', updatePrintLink);
         }
@@ -629,32 +658,32 @@
         // Edit Modal Logic
         const editModalElement = document.getElementById('edit-guest-modal');
         const editModal = editModalElement ? new Modal(editModalElement) : null;
-        
+
         document.querySelectorAll('.edit-guest-btn').forEach(btn => {
-           btn.addEventListener('click', function() {
-               const id = this.getAttribute('data-id');
-               const name = this.getAttribute('data-name');
-               const jabatan = this.getAttribute('data-jabatan');
-               const address = this.getAttribute('data-address');
-               const eventId = this.getAttribute('data-event-id');
-               const isPrinted = this.getAttribute('data-is-printed');
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+                const position = this.getAttribute('data-position');
+                const address = this.getAttribute('data-address');
+                const eventId = this.getAttribute('data-event-id');
+                const isPrinted = this.getAttribute('data-is-printed');
 
-               const modal = document.getElementById('edit-guest-modal');
-               modal.querySelector('#edit-name').value = name;
-               modal.querySelector('#edit-jabatan').value = jabatan || '';
-               modal.querySelector('#edit-address').value = address;
-               modal.querySelector('#edit-event-id').value = eventId || '';
-               
-               if (isPrinted == '1') {
-                   modal.querySelector('#edit-status-sudah').checked = true;
-               } else {
-                   modal.querySelector('#edit-status-belum').checked = true;
-               }
+                const modal = document.getElementById('edit-guest-modal');
+                modal.querySelector('#edit-name').value = name;
+                modal.querySelector('#edit-position').value = position || '';
+                modal.querySelector('#edit-address').value = address;
+                modal.querySelector('#edit-event-id').value = eventId || '';
 
-               modal.querySelector('#edit-form').action = '/guests/update/' + id;
+                if (isPrinted == '1') {
+                    modal.querySelector('#edit-status-sudah').checked = true;
+                } else {
+                    modal.querySelector('#edit-status-belum').checked = true;
+                }
 
-               if (editModal) editModal.show();
-           });
+                modal.querySelector('#edit-form').action = '/guests/update/' + id;
+
+                if (editModal) editModal.show();
+            });
         });
         // Image Fullscreen Preview Logic
         const fullscreenModalEl = document.getElementById('image-fullscreen-modal');
@@ -688,7 +717,7 @@
                 duplicateListContainer.innerHTML = '';
                 
                 const eventParam = <?= !empty($eventId) ? "'" . esc($eventId) . "'" : "''" ?>;
-                const url = eventParam ? `/guests/duplicates?event_id=${eventParam}` : '/guests/duplicates';
+                const url = eventParam ? `/guests/scan-duplicates?event_id=${eventParam}` : '/guests/scan-duplicates';
 
                 fetch(url, {
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -712,24 +741,66 @@
                                     <div class="flex items-start justify-between bg-white p-3 rounded-xl border border-gray-100 shadow-sm" id="duplicate-item-${item.id}">
                                         <div>
                                             <p class="text-sm font-bold text-gray-900">${item.name}</p>
-                                            <p class="text-xs text-gray-500 mt-1"><span class="font-medium text-gray-700">Jabatan:</span> ${item.jabatan || '-'}</p>
+                                            <p class="text-xs text-gray-500 mt-1"><span class="font-medium text-gray-700">Jabatan:</span> ${item.position || '-'}</p>
                                             <p class="text-xs text-gray-500 mt-1"><span class="font-medium text-gray-700">Alamat:</span> <span class="line-clamp-1">${item.address || '-'}</span></p>
                                             <p class="text-xs mt-2">
                                                 <span class="font-medium text-gray-700">Status:</span> 
                                                 ${item.is_printed == 1 
                                                     ? '<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 ml-1"><i class="fa-solid fa-check me-1"></i>Sudah Cetak</span>' 
                                                     : '<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200 ml-1">Belum Cetak</span>'}
+                                                ${item.similarity_score ? `<span class="ms-2 text-[10px] font-medium text-slate-400 italic">Skor: ${item.similarity_score}%</span>` : ''}
                                             </p>
                                         </div>
-                                        <button type="button" class="btn-delete-duplicate flex-shrink-0 ms-4 text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 focus:ring-4 focus:ring-red-50 font-bold rounded-lg text-[10px] px-3 py-1.5 transition-all mt-1" data-id="${item.id}">
-                                            <i class="fa-solid fa-trash-can me-1.5"></i> Hapus
-                                        </button>
+                                        <div class="flex flex-col gap-2 mt-1">
+                                            <button type="button" class="btn-edit-duplicate flex-shrink-0 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 focus:ring-4 focus:ring-emerald-50 font-bold rounded-lg text-[10px] px-3 py-1.5 transition-all" 
+                                                    data-id="${item.id}" 
+                                                    data-name="${item.name}" 
+                                                    data-jabatan="${item.position || ''}" 
+                                                    data-address="${item.address || ''}" 
+                                                    data-event-id="${item.event_id || ''}" 
+                                                    data-is-printed="${item.is_printed}">
+                                                <i class="fa-solid fa-pen-to-square me-1.5"></i> Edit
+                                            </button>
+                                            <button type="button" class="btn-delete-duplicate flex-shrink-0 text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 focus:ring-4 focus:ring-red-50 font-bold rounded-lg text-[10px] px-3 py-1.5 transition-all" data-id="${item.id}">
+                                                <i class="fa-solid fa-trash-can me-1.5"></i> Hapus
+                                            </button>
+                                        </div>
                                     </div>
                                 `;
                             });
                             html += `</div></div>`;
                         });
                         duplicateListContainer.innerHTML = html;
+
+                        // Attach edit handlers
+                        document.querySelectorAll('.btn-edit-duplicate').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const id = this.getAttribute('data-id');
+                                const name = this.getAttribute('data-name');
+                                const jabatan = this.getAttribute('data-jabatan');
+                                const address = this.getAttribute('data-address');
+                                const eventId = this.getAttribute('data-event-id');
+                                const isPrinted = this.getAttribute('data-is-printed');
+
+                                const modal = document.getElementById('edit-guest-modal');
+                                modal.querySelector('#edit-name').value = name;
+                                modal.querySelector('#edit-position').value = jabatan || '';
+                                modal.querySelector('#edit-address').value = address;
+                                modal.querySelector('#edit-event-id').value = eventId || '';
+                                
+                                if (isPrinted == '1') {
+                                    modal.querySelector('#edit-status-sudah').checked = true;
+                                } else {
+                                    modal.querySelector('#edit-status-belum').checked = true;
+                                }
+
+                                modal.querySelector('#edit-form').action = '/guests/update/' + id;
+
+                                // Hide duplicate modal and show edit modal
+                                if (duplicateModal) duplicateModal.hide();
+                                if (editModal) editModal.show();
+                            });
+                        });
                         
                         // Attach delete handlers
                         document.querySelectorAll('.btn-delete-duplicate').forEach(btn => {
@@ -752,19 +823,30 @@
                                 }
                             });
                         });
-                    } else {
+                    } else if (data.success && data.data.length === 0) {
                         duplicateListContainer.innerHTML = `
                             <div class="text-center py-10">
                                 <div class="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <i class="fa-solid fa-check-double text-2xl"></i>
                                 </div>
                                 <h4 class="text-lg font-bold text-gray-900 mb-1">Bebas Duplikat</h4>
-                                <p class="text-sm text-gray-500">Tidak ditemukan data dengan nama yang sama persis.</p>
+                                <p class="text-sm text-gray-500">Tidak ditemukan data yang terindikasi mirip atau ganda.</p>
+                            </div>
+                        `;
+                    } else {
+                        duplicateListContainer.innerHTML = `
+                            <div class="text-center py-10">
+                                <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fa-solid fa-circle-exclamation text-2xl"></i>
+                                </div>
+                                <h4 class="text-lg font-bold text-gray-900 mb-1">Gagal Memeriksa</h4>
+                                <p class="text-sm text-gray-500">${data.message || 'Terjadi kesalahan saat memproses data.'}</p>
                             </div>
                         `;
                     }
                 })
-                .catch(() => {
+                .catch((e) => {
+                    console.error(e);
                     duplicateLoading.classList.add('hidden');
                     alert('Terjadi kesalahan saat mengambil data.');
                 });
@@ -784,37 +866,37 @@
                 </button>
             </div>
             <form action="/guests/store" method="POST" class="p-4 md:p-5 space-y-4 text-left">
-               <?= csrf_field() ?>
-               <div>
-                   <label for="name" class="block mb-2 text-sm font-bold text-gray-900">Nama</label>
-                   <input type="text" name="name" id="name" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Masukkan nama..." required>
-               </div>
-               <div>
-                   <label for="jabatan" class="block mb-2 text-sm font-bold text-gray-900">Jabatan (Opsional)</label>
-                   <input type="text" name="jabatan" id="jabatan" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Contoh: Bapak, Ibu, Direktur...">
-               </div>
-               <div>
-                   <label for="address" class="block mb-2 text-sm font-bold text-gray-900">Alamat (Opsional)</label>
-                   <textarea id="address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
-               </div>
-               <div>
-                   <label class="block mb-2 text-sm font-bold text-gray-900">Acara</label>
-                   <?php if (!empty($eventId)): ?>
-                       <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold rounded-xl block w-full p-2.5">
-                           <i class="fa-solid fa-folder me-2 text-emerald-600"></i>
-                           <?= esc($currentEventName) ?>
-                       </div>
-                       <input type="hidden" name="event_id" value="<?= esc($eventId) ?>">
-                   <?php else: ?>
-                       <select name="event_id" id="event_id" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
-                           <option value="">Tanpa Acara</option>
-                           <?php foreach ($events as $event): ?>
-                               <option value="<?= $event['id'] ?>" <?= (string)($eventId ?? '') === (string)$event['id'] ? 'selected' : '' ?>><?= esc($event['name']) ?></option>
-                           <?php endforeach; ?>
-                       </select>
-                   <?php endif; ?>
-               </div>
-               <div class="flex justify-end gap-2 pt-2">
+                <?= csrf_field() ?>
+                <div>
+                    <label for="name" class="block mb-2 text-sm font-bold text-gray-900">Nama</label>
+                    <input type="text" name="name" id="name" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Masukkan nama..." required>
+                </div>
+                <div>
+                    <label for="position" class="block mb-2 text-sm font-bold text-gray-900">Jabatan (Opsional)</label>
+                    <input type="text" name="position" id="position" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Contoh: Bapak, Ibu, Direktur...">
+                </div>
+                <div>
+                    <label for="address" class="block mb-2 text-sm font-bold text-gray-900">Alamat (Opsional)</label>
+                    <textarea id="address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm font-bold text-gray-900">Acara</label>
+                    <?php if (!empty($eventId)): ?>
+                        <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold rounded-xl block w-full p-2.5">
+                            <i class="fa-solid fa-folder me-2 text-emerald-600"></i>
+                            <?= esc($currentEventName) ?>
+                        </div>
+                        <input type="hidden" name="event_id" value="<?= esc($eventId) ?>">
+                    <?php else: ?>
+                        <select name="event_id" id="event_id" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
+                            <option value="">Tanpa Acara</option>
+                            <?php foreach ($events as $event): ?>
+                                <option value="<?= $event['id'] ?>" <?= (string)($eventId ?? '') === (string)$event['id'] ? 'selected' : '' ?>><?= esc($event['name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php endif; ?>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
                     <button type="button" data-modal-hide="add-guest-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
                     <button type="submit" class="px-6 py-2 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">Simpan</button>
                 </div>
@@ -834,54 +916,54 @@
                 </button>
             </div>
             <form id="edit-form" action="" method="POST" class="p-4 md:p-5 space-y-4 text-left">
-               <?= csrf_field() ?>
-               <input type="hidden" name="current_search" value="<?= esc($search ?? '') ?>">
-               <input type="hidden" name="current_status" value="<?= esc($status ?? '') ?>">
-               <input type="hidden" name="current_sort" value="<?= esc($sort ?? '') ?>">
-               <input type="hidden" name="current_dir" value="<?= esc($dir ?? '') ?>">
-               <div>
-                   <label for="edit-name" class="block mb-2 text-sm font-bold text-gray-900">Nama</label>
-                   <input type="text" name="name" id="edit-name" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Masukkan nama..." required>
-               </div>
-               <div>
-                   <label for="edit-jabatan" class="block mb-2 text-sm font-bold text-gray-900">Jabatan (Opsional)</label>
-                   <input type="text" name="jabatan" id="edit-jabatan" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Contoh: Bapak, Ibu, Direktur...">
-               </div>
-               <div>
-                   <label for="edit-address" class="block mb-2 text-sm font-bold text-gray-900">Alamat (Opsional)</label>
-                   <textarea id="edit-address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
-               </div>
-               <div>
-                   <label class="block mb-2 text-sm font-bold text-gray-900">Acara</label>
-                   <?php if (!empty($eventId)): ?>
-                       <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold rounded-xl block w-full p-2.5">
-                           <i class="fa-solid fa-folder me-2 text-emerald-600"></i>
-                           <?= esc($currentEventName) ?>
-                       </div>
-                       <input type="hidden" name="event_id" id="edit-event-id" value="<?= esc($eventId) ?>">
-                   <?php else: ?>
-                       <select name="event_id" id="edit-event-id" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
-                           <option value="">Tanpa Acara</option>
-                           <?php foreach ($events as $event): ?>
-                               <option value="<?= $event['id'] ?>"><?= esc($event['name']) ?></option>
-                           <?php endforeach; ?>
-                       </select>
-                   <?php endif; ?>
-               </div>
-               <div>
-                   <label class="block mb-3 text-sm font-bold text-gray-900">Status Cetak</label>
-                   <div class="flex flex-wrap gap-4">
-                       <label class="flex items-center px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-all peer-checked:bg-emerald-50 peer-checked:border-emerald-200">
-                           <input id="edit-status-belum" type="radio" value="0" name="is_printed" class="w-4 h-4 text-emerald-600 bg-white border-gray-300 focus:ring-emerald-500">
-                           <span class="ms-2 text-sm font-bold text-gray-700">Belum</span>
-                       </label>
-                       <label class="flex items-center px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-all peer-checked:bg-emerald-50 peer-checked:border-emerald-200">
-                           <input id="edit-status-sudah" type="radio" value="1" name="is_printed" class="w-4 h-4 text-emerald-600 bg-white border-gray-300 focus:ring-emerald-500">
-                           <span class="ms-2 text-sm font-bold text-gray-700">Sudah</span>
-                       </label>
-                   </div>
-               </div>
-               <div class="flex justify-end gap-2 pt-2">
+                <?= csrf_field() ?>
+                <input type="hidden" name="current_search" value="<?= esc($search ?? '') ?>">
+                <input type="hidden" name="current_status" value="<?= esc($status ?? '') ?>">
+                <input type="hidden" name="current_sort" value="<?= esc($sort ?? '') ?>">
+                <input type="hidden" name="current_dir" value="<?= esc($dir ?? '') ?>">
+                <div>
+                    <label for="edit-name" class="block mb-2 text-sm font-bold text-gray-900">Nama</label>
+                    <input type="text" name="name" id="edit-name" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Masukkan nama..." required>
+                </div>
+                <div>
+                    <label for="edit-position" class="block mb-2 text-sm font-bold text-gray-900">Jabatan (Opsional)</label>
+                    <input type="text" name="position" id="edit-position" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5" placeholder="Contoh: Bapak, Ibu, Direktur...">
+                </div>
+                <div>
+                    <label for="edit-address" class="block mb-2 text-sm font-bold text-gray-900">Alamat (Opsional)</label>
+                    <textarea id="edit-address" name="address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-xl border border-gray-200 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Contoh: Jl. Melati No. 10, Jakarta"></textarea>
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm font-bold text-gray-900">Acara</label>
+                    <?php if (!empty($eventId)): ?>
+                        <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold rounded-xl block w-full p-2.5">
+                            <i class="fa-solid fa-folder me-2 text-emerald-600"></i>
+                            <?= esc($currentEventName) ?>
+                        </div>
+                        <input type="hidden" name="event_id" id="edit-event-id" value="<?= esc($eventId) ?>">
+                    <?php else: ?>
+                        <select name="event_id" id="edit-event-id" class="bg-white border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
+                            <option value="">Tanpa Acara</option>
+                            <?php foreach ($events as $event): ?>
+                                <option value="<?= $event['id'] ?>"><?= esc($event['name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php endif; ?>
+                </div>
+                <div>
+                    <label class="block mb-3 text-sm font-bold text-gray-900">Status Cetak</label>
+                    <div class="flex flex-wrap gap-4">
+                        <label class="flex items-center px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-all peer-checked:bg-emerald-50 peer-checked:border-emerald-200">
+                            <input id="edit-status-belum" type="radio" value="0" name="is_printed" class="w-4 h-4 text-emerald-600 bg-white border-gray-300 focus:ring-emerald-500">
+                            <span class="ms-2 text-sm font-bold text-gray-700">Belum</span>
+                        </label>
+                        <label class="flex items-center px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-all peer-checked:bg-emerald-50 peer-checked:border-emerald-200">
+                            <input id="edit-status-sudah" type="radio" value="1" name="is_printed" class="w-4 h-4 text-emerald-600 bg-white border-gray-300 focus:ring-emerald-500">
+                            <span class="ms-2 text-sm font-bold text-gray-700">Sudah</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
                     <button type="button" data-modal-hide="edit-guest-modal" class="px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
                     <button type="submit" class="px-6 py-2 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">Simpan Perubahan</button>
                 </div>
@@ -940,7 +1022,7 @@
                 </h3>
                 <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="print-options-modal">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                     </svg>
                     <span class="sr-only">Close modal</span>
                 </button>
@@ -954,7 +1036,7 @@
                             <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">1</div>
                             <h4 class="text-sm font-extrabold text-gray-900 uppercase tracking-wider">Pengaturan Posisi & Perataan</h4>
                         </div>
-                        
+
                         <div class="grid grid-cols-2 gap-x-8 gap-y-4 items-start">
                             <!-- Row 1: Inputs -->
                             <div>
@@ -970,7 +1052,7 @@
                                     <option value="flex-end">Kanan</option>
                                 </select>
                             </div>
-                            
+
                             <!-- Row 2: Visualizations -->
                             <div class="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100 flex flex-col items-center justify-center h-40 overflow-hidden relative">
                                 <span class="absolute top-2 left-3 text-[10px] font-bold text-emerald-800 uppercase tracking-widest z-10">Panduan Posisi</span>
@@ -993,7 +1075,7 @@
                             <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">2</div>
                             <h4 class="text-sm font-extrabold text-gray-900 uppercase tracking-wider">Pilih Model & Cetak</h4>
                         </div>
-                        
+
                         <div class="grid grid-cols-1 max-w-xs">
                             <a id="print-121-link" href="/guests/print?type=121" target="_blank" class="flex flex-col items-center justify-center p-6 bg-emerald-50 border-2 border-emerald-100 rounded-3xl hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all group shadow-xl shadow-emerald-900/5 hover:-translate-y-1">
                                 <span class="text-4xl font-black mb-1 tracking-tighter">121</span>
@@ -1039,12 +1121,12 @@
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
-        
+
         <!-- Image Container -->
         <div class="p-6 md:p-10 bg-gray-50 flex items-center justify-center">
             <img id="fullscreen-preview-img" src="" alt="Preview" class="max-w-full h-auto max-h-[60vh] object-contain rounded-xl shadow-sm border border-gray-200">
         </div>
-        
+
         <!-- Footer -->
         <div class="p-4 bg-white border-t border-gray-100 text-center">
             <p class="text-[10px] text-gray-400 font-medium uppercase tracking-[0.2em]">LabelPro Visualization Guide</p>
@@ -1057,7 +1139,7 @@
     <div class="relative p-4 w-full max-w-2xl max-h-full">
         <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col max-h-[85vh]">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t shrink-0">
-                <h3 class="text-lg font-bold text-gray-900">Cek Data Duplikat</h3>
+                <h3 class="text-lg font-bold text-gray-900">Hasil Pengecekan Duplikat</h3>
                 <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="duplicate-check-modal">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -1065,8 +1147,15 @@
             
             <div class="p-4 md:p-5 overflow-y-auto flex-1">
                 <div id="duplicate-loading" class="text-center py-10 hidden">
-                    <i class="fa-solid fa-circle-notch fa-spin text-3xl text-emerald-500 mb-4"></i>
-                    <p class="text-sm font-bold text-gray-900">Memeriksa data...</p>
+                    <div class="max-w-xs mx-auto">
+                        <div class="mb-4 flex justify-center">
+                            <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center animate-pulse">
+                                <i class="fa-solid fa-magnifying-glass fa-bounce text-3xl text-emerald-500"></i>
+                            </div>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900 mb-2">Menganalisis data tamu...</h4>
+                        <p class="text-xs text-gray-500">Ini mungkin memakan waktu beberapa saat tergantung jumlah data.</p>
+                    </div>
                 </div>
                 
                 <div id="duplicate-list-container" class="space-y-4">

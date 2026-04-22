@@ -61,7 +61,6 @@ class AuthController extends BaseController
             'username' => $username,
             'password' => $password,
             'role'     => 'demo',
-            'package'  => 'pro',
         ]);
 
         $userId = $userModel->insertID();
@@ -70,7 +69,6 @@ class AuthController extends BaseController
             'user_id'   => $userId,
             'username'  => 'Pengguna Demo',
             'role'      => 'demo',
-            'package'   => 'pro',
             'logged_in' => true
         ]);
 
