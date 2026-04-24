@@ -42,9 +42,12 @@
 - **Interactive Guides**: Print alignment and position guides include a click-to-preview modal for better visibility.
 - **Duplicate Prevention**:
   - **Smart Duplicate Check**: Internal fuzzy matching algorithm using `similar_text` for high-performance duplicate detection.
+  - **Optimized Scan**: Algorithm pre-processes normalization and sorting for all records to improve $O(N^2)$ performance.
   - **Weighted Scoring**: Name (60%), Position (15%), Address (25%).
   - **Stricter Hard Gates**: Mandatory name similarity of >= 85% and exact word token match required to reduce false positives.
-  - **Normalization**: Standardizes Indonesian name variations (e.g., "Muh." -> "muhammad") and supports swapped name detection (e.g., "Ahmad Fauzi" matches "Fauzi Ahmad").
+  - **Normalization**: Standardizes Indonesian name variations (e.g., "Muh.", "Moh.", "Mhd." -> "muhammad") and strips titles (Ir., Dr., Drs., Hj., etc.).
+  - **Swapped Name Detection**: Supports detection of swapped names (e.g., "Ahmad Fauzi" matches "Fauzi Ahmad").
+  - **Bukan Duplikat (Not Duplicate)**: Allows users to mark specific records as unique, excluding them from future duplicate scans. The "Bukan Duplikat" option is hidden for the first (primary) record in a duplicate group.
 - **User & Payment Management**:
   - **Unified UI**: Payment status, invoice links, and transfer proof uploads are consolidated into a single "Kelola Pembayaran" modal for standard users.
   - **Role-based Display**: Admin and Demo accounts are explicitly excluded from payment workflows and package assignments.

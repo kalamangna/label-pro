@@ -736,7 +736,7 @@ $urlQuery = !empty($urlParams) ? '?' . http_build_query($urlParams) : '';
                                     </h4>
                                     <div class="space-y-3">
                             `;
-                            group.items.forEach(item => {
+                            group.items.forEach((item, index) => {
                                 html += `
                                     <div class="flex items-start justify-between bg-white p-3 rounded-xl border border-gray-100 shadow-sm" id="duplicate-item-${item.id}">
                                         <div>
@@ -752,6 +752,11 @@ $urlQuery = !empty($urlParams) ? '?' . http_build_query($urlParams) : '';
                                             </p>
                                         </div>
                                         <div class="flex flex-col gap-2 mt-1">
+                                            ${index > 0 ? `
+                                            <button type="button" class="btn-ignore-duplicate flex-shrink-0 text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-100 focus:ring-4 focus:ring-blue-50 font-bold rounded-lg text-[10px] px-3 py-1.5 transition-all" data-id="${item.id}">
+                                                <i class="fa-solid fa-eye-slash me-1.5"></i> Bukan Duplikat
+                                            </button>
+                                            ` : ''}
                                             <button type="button" class="btn-edit-duplicate flex-shrink-0 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 focus:ring-4 focus:ring-emerald-50 font-bold rounded-lg text-[10px] px-3 py-1.5 transition-all" 
                                                     data-id="${item.id}" 
                                                     data-name="${item.name}" 
@@ -802,6 +807,27 @@ $urlQuery = !empty($urlParams) ? '?' . http_build_query($urlParams) : '';
                             });
                         });
                         
+                        // Attach ignore duplicate handlers
+                        document.querySelectorAll('.btn-ignore-duplicate').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const id = this.getAttribute('data-id');
+                                if (confirm('Tandai data ini sebagai bukan duplikat? Data ini tidak akan muncul lagi di pengecekan duplikat selanjutnya.')) {
+                                    fetch(`/guests/ignore-duplicate/${id}`, {
+                                        method: 'POST',
+                                        headers: headers
+                                    })
+                                    .then(res => res.json())
+                                    .then(delData => {
+                                        if (delData.success) {
+                                            document.getElementById(`duplicate-item-${id}`).remove();
+                                        } else {
+                                            alert(delData.message || 'Gagal mengubah status data.');
+                                        }
+                                    });
+                                }
+                            });
+                        });
+
                         // Attach delete handlers
                         document.querySelectorAll('.btn-delete-duplicate').forEach(btn => {
                             btn.addEventListener('click', function() {

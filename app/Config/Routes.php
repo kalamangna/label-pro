@@ -30,6 +30,7 @@ $routes->group('guests', ['filter' => 'auth'], function($routes) {
     $routes->post('clear-selection', 'Guests::clearSelection');
     $routes->post('check-duplicate', 'Guests::checkSmartDuplicate');
     $routes->get('scan-duplicates', 'Guests::scanDuplicates');
+    $routes->post('ignore-duplicate/(:num)', 'Guests::ignoreDuplicate/$1');
 });
 
 $routes->group('events', ['filter' => 'auth'], function($routes) {

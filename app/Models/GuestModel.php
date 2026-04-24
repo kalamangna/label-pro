@@ -12,27 +12,37 @@ class GuestModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['name', 'position', 'address', 'is_marked', 'is_printed', 'is_selected', 'user_id', 'event_id'];
+    protected $allowedFields    = [
+        'name',
+        'position',
+        'address',
+        'user_id',
+        'event_id',
+        'is_printed',
+        'is_selected',
+        'ignore_duplicate'
+    ];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
 
-    protected array $casts = [];
-    protected array $castHandlers = [];
+    protected array $casts = [
+        'is_printed'       => 'integer',
+        'is_selected'      => 'integer',
+        'ignore_duplicate' => 'integer',
+        'event_id'         => 'integer',
+        'user_id'          => 'integer',
+    ];
 
     // Dates
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_field';
+    protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules      = [
-        'name'     => 'required|min_length[3]|max_length[255]',
-        'address'  => 'permit_empty',
-        'event_id' => 'permit_empty|is_natural_no_zero',
-    ];
+    protected $validationRules      = [];
     protected $validationMessages   = [];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
@@ -46,7 +56,7 @@ class GuestModel extends Model
     protected $beforeFind     = [];
     protected $afterFind      = [];
     protected $beforeDelete   = [];
-    protected $afterDelete   = [];
+    protected $afterDelete    = [];
 
     public function normalizeText(?string $text, bool $standardize = true): string
     {
@@ -63,6 +73,14 @@ class GuestModel extends Model
                 '/\bmuh\b/'      => 'muhammad',
                 '/\bmhd\b/'      => 'muhammad',
                 '/\bmd\b/'       => 'muhammad',
+                '/\bmoh\b/'      => 'muhammad',
+                '/\bdrs\b/'      => '',
+                '/\bdra\b/'      => '',
+                '/\bir\b/'       => '',
+                '/\bhj\b/'       => '',
+                '/\bh\b/'        => '',
+                '/\bprof\b/'     => '',
+                '/\bdr\b/'       => '',
             ];
             $text = preg_replace(array_keys($variations), array_values($variations), $text);
         }
@@ -85,7 +103,8 @@ class GuestModel extends Model
         // Optimization: Pre-filter using first 3 chars of name
         $prefix = substr($normName, 0, 3);
         
-        $builder = $this->where('user_id', $userId);
+        $builder = $this->where('user_id', $userId)
+                        ->where('ignore_duplicate', 0);
         if (!empty($eventId)) {
             $builder->where('event_id', $eventId);
         }
@@ -169,7 +188,8 @@ class GuestModel extends Model
      */
     public function scanAllDuplicates(int $userId, ?int $eventId = null): array
     {
-        $builder = $this->where('user_id', $userId);
+        $builder = $this->where('user_id', $userId)
+                        ->where('ignore_duplicate', 0);
         if (!empty($eventId)) {
             $builder->where('event_id', $eventId);
         }
@@ -177,36 +197,36 @@ class GuestModel extends Model
         $guests = $builder->findAll();
         if (count($guests) < 2) return [];
 
+        // Pre-process all guests for performance
+        foreach ($guests as &$g) {
+            $g['norm_name'] = $this->normalizeText($g['name']);
+            $g['norm_pos']  = $this->normalizeText($g['position'] ?? '');
+            $g['norm_addr'] = $this->normalizeText($g['address'] ?? '');
+            
+            $words = explode(' ', $g['norm_name']);
+            $g['words'] = $words;
+            sort($words);
+            $g['norm_name_sorted'] = implode(' ', $words);
+        }
+        unset($g);
+
         $results = [];
         $processedIds = [];
 
-        foreach ($guests as $i => $guest) {
+        for ($i = 0; $i < count($guests); $i++) {
+            $guest = $guests[$i];
             if (in_array($guest['id'], $processedIds)) continue;
 
             $group = [$guest];
             $processedIds[] = $guest['id'];
 
-            $normName = $this->normalizeText($guest['name']);
-            $normPos = $this->normalizeText($guest['position'] ?? '');
-            $normAddr = $this->normalizeText($guest['address'] ?? '');
-            $sWordsOriginal = explode(' ', $normName);
-            $sWordsSorted = $sWordsOriginal;
-            sort($sWordsSorted);
-            $sWordsSortedStr = implode(' ', $sWordsSorted);
-
             for ($j = $i + 1; $j < count($guests); $j++) {
                 $other = $guests[$j];
                 if (in_array($other['id'], $processedIds)) continue;
 
-                $cName = $this->normalizeText($other['name']);
-                
-                // similarity in percentage
-                similar_text($normName, $cName, $namePercent);
-                
-                $cWordsOriginal = explode(' ', $cName);
-                $cWordsSorted = $cWordsOriginal;
-                sort($cWordsSorted);
-                similar_text($sWordsSortedStr, implode(' ', $cWordsSorted), $nameSortedPercent);
+                // Name similarity
+                similar_text($guest['norm_name'], $other['norm_name'], $namePercent);
+                similar_text($guest['norm_name_sorted'], $other['norm_name_sorted'], $nameSortedPercent);
                 
                 $finalNamePercent = max($namePercent, $nameSortedPercent);
                 
@@ -214,24 +234,23 @@ class GuestModel extends Model
                 if ($finalNamePercent < 85) continue;
                 
                 // Ensure at least 1 word matches exactly
-                $intersection = array_intersect($sWordsOriginal, $cWordsOriginal);
+                $intersection = array_intersect($guest['words'], $other['words']);
                 if (empty($intersection)) continue;
 
-                $cPos = $this->normalizeText($other['position'] ?? '');
-                $cAddr = $this->normalizeText($other['address'] ?? '');
-
+                // Position similarity
                 $posPercent = 0;
-                if (empty($normPos) && empty($cPos)) {
+                if (empty($guest['norm_pos']) && empty($other['norm_pos'])) {
                     $posPercent = 100;
-                } elseif (!empty($normPos) && !empty($cPos)) {
-                    similar_text($normPos, $cPos, $posPercent);
+                } elseif (!empty($guest['norm_pos']) && !empty($other['norm_pos'])) {
+                    similar_text($guest['norm_pos'], $other['norm_pos'], $posPercent);
                 }
 
+                // Address similarity
                 $addrPercent = 0;
-                if (empty($normAddr) && empty($cAddr)) {
+                if (empty($guest['norm_addr']) && empty($other['norm_addr'])) {
                     $addrPercent = 100;
-                } elseif (!empty($normAddr) && !empty($cAddr)) {
-                    similar_text($normAddr, $cAddr, $addrPercent);
+                } elseif (!empty($guest['norm_addr']) && !empty($other['norm_addr'])) {
+                    similar_text($guest['norm_addr'], $other['norm_addr'], $addrPercent);
                 }
 
                 // Weighted score: name 60%, position 15%, address 25%

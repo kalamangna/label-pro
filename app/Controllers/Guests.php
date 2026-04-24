@@ -694,4 +694,21 @@ class Guests extends BaseController
             'data'    => $results
         ]);
     }
+
+    public function ignoreDuplicate($id)
+    {
+        if (session()->get('role') === 'admin') {
+            return $this->response->setJSON(['success' => false, 'message' => 'Admin tidak dapat melakukan aksi ini.']);
+        }
+
+        $guest = $this->checkOwnership($id);
+
+        if (!$guest) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Data tidak ditemukan atau Anda tidak memiliki akses.']);
+        }
+
+        $this->guestModel->update($id, ['ignore_duplicate' => 1]);
+
+        return $this->response->setJSON(['success' => true]);
+    }
 }
